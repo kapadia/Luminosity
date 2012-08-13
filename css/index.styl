@@ -1,0 +1,73 @@
+@import './mixin'
+@import 'css/jquery-ui-1.8.22.custom.css'
+@import './progress'
+@import './fonts'
+@import './image'
+@import './table'
+@import './d3'
+
+$blue = #0172E6
+$gray1 = #F3F3F3
+$gray2 = #CFCFCF
+$gray3 = #505050
+$black = #131313
+
+body
+  margin 0 auto
+  background-color $gray1
+  color $gray3
+  font-family 'Open Sans', sans-serif
+
+  #drop
+    background-color $gray1
+    width 100%
+    height 100%
+    position absolute
+    
+    p
+      left 50%
+      top 50%
+      width 200px
+      height 20px
+      margin -10px 0 0 -100px
+      position absolute
+      color $blue
+      text-align center
+      font-size 18px
+      font-weight 200
+    
+    .over
+      background-color $blue
+
+.tab
+  font-size 12px
+
+table
+  font-size 11px
+  
+table.header
+  float left
+  
+  .key
+    text-align right
+  .value
+    text-align left
+  .even
+    background-color #FAFAFA
+  .odd
+    background-color #F7F7F7
+
+.hdu
+  overflow auto
+
+.dataunit
+  float left
+
+.plot
+  float left
+
+.column-names
+  font-weight 700
+
+div.axes
+  float left

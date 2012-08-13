@@ -1,0 +1,10 @@
+<div class='fits-viewer'></div>
+<div class='scale'></div>
+<div class='histogram'></div>
+<select class='stretch'>
+  <option value="linear">Linear</option>
+  <option value="logarithm">Logarithm</option>
+  <option value="sqrt">Square Root</option>
+  <option value="arcsinh">Arcsinh</option>
+  <option value="power">Power</option>
+</select>

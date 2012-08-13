@@ -1,0 +1,145 @@
+@import 'css/jquery-ui-1.8.22.custom.css';
+#progress_bar {
+  margin: 10px 0;
+  padding: 3px;
+  border: 1px solid #000;
+  font-size: 14px;
+  clear: both;
+  opacity: 0;
+  -moz-transition: opacity 1s linear;
+  -o-transition: opacity 1s linear;
+  -webkit-transition: opacity 1s linear;
+}
+#progress_bar.loading {
+  opacity: 1;
+}
+#progress_bar .percent {
+  background-color: #9cf;
+  height: auto;
+  width: 0;
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Bold'), local('OpenSans-Bold'), url("fonts/k3k702ZOKiLJc3WVjuplzKRDOzjiPcYnFooOUGCOsRk.woff") format('woff');
+}
+@font-face {
+  font-family: 'Open Sans Condensed';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Open Sans Condensed Bold'), local('OpenSans-CondensedBold'), url("fonts/gk5FxslNkTTHtojXrkp-xM6Eyu0BCqAfob_z3hhzRFzr7w4p9aSvGirXi6XmeXNA.woff") format('woff');
+}
+@font-face {
+  font-family: 'Open Sans Condensed';
+  font-style: normal;
+  font-weight: 300;
+  src: local('Open Sans Cond Light'), local('OpenSans-CondensedLight'), url("fonts/gk5FxslNkTTHtojXrkp-xGAzD5WKQVN4wSyA0MYYi4rr7w4p9aSvGirXi6XmeXNA.woff") format('woff');
+}
+@font-face {
+  font-family: 'Open Sans';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Open Sans'), local('OpenSans'), url("fonts/cJZKeOuBrn4kERxqtaUH3bO3LdcAZYWl9Si6vvxL-qU.woff") format('woff');
+}
+table.tablesorter {
+  background-color: #cdcdcd;
+  margin10px: 0pt 15px;
+  width: 100%;
+  text-align: left;
+}
+table.tablesorter thead tr th,
+table.tablesorter tfoot tr th {
+  background-color: #cfcfcf;
+  border: 1px solid #fff;
+  padding: 4px;
+}
+table.tablesorter thead tr .header {
+  background-image: url("css/images/bg.gif");
+  background-repeat: no-repeat;
+  background-position: center right;
+  cursor: pointer;
+}
+table.tablesorter tbody td {
+  color: #3d3d3d;
+  padding: 4px;
+  background-color: #fafafa;
+  vertical-align: top;
+}
+table.tablesorter tbody tr.odd td {
+  background-color: #f7f7f7;
+}
+table.tablesorter thead tr .headerSortUp {
+  background-image: url("css/images/asc.gif");
+}
+table.tablesorter thead tr .headerSortDown {
+  background-image: url("css/images/desc.gif");
+}
+table.tablesorter thead tr .headerSortDown,
+table.tablesorter thead tr .headerSortUp {
+  background-color: #f3f3f3;
+}
+body {
+  margin: 0 auto;
+  background-color: #f3f3f3;
+  font-family: 'Open Sans', sans-serif;
+}
+body #luminosity {
+  border-top: 3px solid #0172e6;
+}
+body #luminosity #top {
+  background-color: #131313;
+  height: 25px;
+}
+body #drop {
+  margin: 0 auto;
+  margin-top: 20px;
+  display: block;
+  width: 500px;
+  height: 500px;
+  background-color: #cfcfcf;
+  -moz-border-radius: 20px;
+  -webkit-border-radius: 20px;
+  border-radius: 20px;
+  padding: 18px 5px 18px 18px;
+  font-size: 12px;
+}
+body #drop .over {
+  background-color: #0172e6;
+}
+.tab {
+  font-size: 12px;
+}
+table {
+  font-size: 11px;
+}
+table.header {
+  float: left;
+}
+table.header .key {
+  text-align: right;
+}
+table.header .value {
+  text-align: left;
+}
+table.header .even {
+  background-color: #fafafa;
+}
+table.header .odd {
+  background-color: #f7f7f7;
+}
+.hdu {
+  overflow: auto;
+}
+.dataunit {
+  float: left;
+}
+.plot {
+  float: left;
+}
+.column-names {
+  font-weight: 700;
+}
+div.axes {
+  float: left;
+}

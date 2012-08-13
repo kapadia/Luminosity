@@ -1,0 +1,33 @@
+<div class='axes'>
+  <select class='axis'>
+  <% for column, index in @columns: %>
+    <option value='<%= index %>'><%= column %></option>
+  <% end %>
+  </select>
+  <select class='axis'>
+  <% for column, index in @columns: %>
+    <option value='<%= index %>'><%= column %></option>
+  <% end %>
+  </select>
+</div>
+
+<table class='fits-table tablesorter'>
+  <thead>
+    <tr class='column-names'>
+      <% for column in @columns: %>
+      <th><%= column %></th>
+      <% end %>
+    </tr>
+  </thead>
+  <tbody>
+  <% for index in [1..@rows]: %>
+    <% row = @getRow() %>
+    <% rowClass = if index % 2 then 'odd' else 'even' %>
+    <tr>
+      <% for value in row: %>
+        <td><%= value %></td>
+      <% end %>
+    </tr>
+  <% end %>
+  </tbody>
+</table>

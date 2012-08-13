@@ -1,0 +1,15 @@
+{
+  "name": "Luminosity",
+  "version": "0.0.1",
+  "dependencies": { 
+    "serveup": "~0.0.4",
+    "hem": "~0.1.7",
+    "es5-shimify": "~0.0.1",
+    "json2ify": "~0.0.1",
+    "jqueryify": "~0.0.1",
+    "spine": "~1.0.6",
+    "jDataView": "git://github.com/vjeux/jDataView.git",
+    "fits": "git://github.com/astrojs/fitsjs.git",
+    "crossfilter": "~1.0.3"
+  }
+}
