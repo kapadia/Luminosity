@@ -2,8 +2,10 @@ Spine = require('spine')
 WebGL = require('lib/WebGL')
 
 class Image extends Spine.Controller
-  @viewportWidth  = 891
-  @viewportHeight = 893
+  @viewportWidth  = 400
+  @viewportHeight = 300
+  # @viewportWidth  = 891
+  # @viewportHeight = 893
   # @viewportWidth  = 891 * 0.5
   # @viewportHeight = 893 * 0.5
   # @viewportWidth  = 4096 * 0.125
@@ -50,6 +52,20 @@ class Image extends Spine.Controller
       scale: 1.0
       mouseDown: [null, null]
       drag: 0
+      
+    # Set up mouse interactions with canvas
+    @canvas.onmousedown = (e) =>
+      @mouseParameters.drag = 1
+      @mouseParameters.oldOffset = @mouseParameters.offset
+      @mouseParameters.mouseDown = [e.clientX, e.clientY]
+    
+    @canvas.onmousemove = (e) =>
+      return null if @mouseParameters.drag is 0
+      xDelta = e.clientX - @mouseParameters.mouseDown[0]
+      yDelta = e.clientY - @mouseParameters.mouseDown[1]
+      @mouseParameters.offset[0] = @mouseParameters.oldOffset[0] + (xDelta / @canvas.width / 1.0 * 2.0)
+      @mouseParameters.offset[1] = @mouseParameters.oldOffset[1] - (yDelta / @canvas.height / 1.0 * 2.0)
+      @drawScene()
     
     @gl       = WebGL.create3DContext(@canvas)
     @ext      = @gl.getExtension('OES_texture_float')
@@ -85,6 +101,7 @@ class Image extends Spine.Controller
       texCoordLocation    = @gl.getAttribLocation(@program, 'a_textureCoord')
       resolutionLocation  = @gl.getUniformLocation(@program, 'u_resolution')
       extremesLocation    = @gl.getUniformLocation(@program, 'u_extremes')
+      offsetLocation      = @gl.getUniformLocation(@program, 'u_offset')
       
       texCoordBuffer = @gl.createBuffer()
       @gl.bindBuffer(@gl.ARRAY_BUFFER, texCoordBuffer)
@@ -101,8 +118,10 @@ class Image extends Spine.Controller
       @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.NEAREST)
       @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.NEAREST)
       
+      # Pass the uniforms
       @gl.uniform2f(resolutionLocation, Image.viewportWidth, Image.viewportHeight)
       @gl.uniform2f(extremesLocation, minimum, maximum)
+      @gl.uniform2f(offsetLocation, 0, 0)
       
       buffer = @gl.createBuffer()
       @gl.bindBuffer(@gl.ARRAY_BUFFER, buffer)
@@ -119,6 +138,12 @@ class Image extends Spine.Controller
     [x1, x2] = [x, x + width]
     [y1, y2] = [y, y + height]
     @gl.bufferData(@gl.ARRAY_BUFFER, new Float32Array([x1, y1, x2, y1, x1, y2, x1, y2, x2, y1, x2, y2]), @gl.STATIC_DRAW)
+  
+  drawScene: ->
+    offsetLocation = @gl.getUniformLocation(@program, 'u_offset')
+    @gl.uniform2fv(offsetLocation, @mouseParameters.offset)
+    @setRectangle(0, 0, @width, @height)
+    @gl.drawArrays(@gl.TRIANGLES, 0, 6)
   
   computeHistogram: ->
     console.log 'computeHistogram'

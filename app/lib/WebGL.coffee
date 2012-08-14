@@ -4,6 +4,7 @@ WebGL =
       "attribute vec2 a_textureCoord;",
       
       "uniform vec2 u_resolution;",
+      "uniform vec2 u_offset;",
       
       "varying vec2 v_textureCoord;",
       
@@ -16,6 +17,7 @@ WebGL =
           
           # Map to clip space coordinates (-1, 1)
           "vec2 clipSpace = zeroToTwo - 1.0;",
+          "clipSpace = clipSpace + u_offset;",
           
           "gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);",
           
