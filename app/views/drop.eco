@@ -1,3 +1,7 @@
-<div id='drop'>
-  <p>DROP FITS HERE</p>
+<div id='drop' class='frame'>
+  <p class='center'>DROP FITS HERE</p>
+</div>
+
+<div id='loading' class='frame over'>
+  <progress class='center' value='0' max='100'></progress>
 </div>

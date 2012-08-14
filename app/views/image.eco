@@ -1,7 +1,7 @@
-<div class='fits-viewer'></div>
-<div class='scale'></div>
-<div class='histogram'></div>
-<select class='stretch'>
+<div class='fits-viewer dataunit'></div>
+<div class='scale dataunit'></div>
+<div class='histogram dataunit'></div>
+<select class='stretch dataunit'>
   <option value="linear">Linear</option>
   <option value="logarithm">Logarithm</option>
   <option value="sqrt">Square Root</option>

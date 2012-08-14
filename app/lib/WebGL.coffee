@@ -3,25 +3,15 @@ WebGL =
       "attribute vec2 a_position;",
       "attribute vec2 a_textureCoord;",
       
-      "uniform vec2 u_resolution;",
       "uniform vec2 u_offset;",
       "uniform float u_scale;",
       
       "varying vec2 v_textureCoord;",
       
       "void main() {",
-          # Normalize pixel coordinates
-          "vec2 zeroToOne = a_position / u_resolution;",
-          
-          # Scale from (0, 1) to (0, 2)
-          "vec2 zeroToTwo = zeroToOne * 2.0;",
-          
-          # Map to clip space coordinates (-1, 1)
-          "vec2 clipSpace = zeroToTwo - 1.0;",
-          "clipSpace = clipSpace + u_offset;",
-          "clipSpace = clipSpace * u_scale;",
-          
-          "gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);",
+          "vec2 position = a_position + u_offset;",
+          "position = position * u_scale;",
+          "gl_Position = vec4(position, 0.0, 1.0);",
           
           # Pass coordinate to fragment shader
           "v_textureCoord = a_textureCoord;",
@@ -38,7 +28,7 @@ WebGL =
         "varying vec2 v_textureCoord;",
         
         "void main() {",
-            "vec4 pixel_v = texture2D(u_tex, v_textureCoord);",
+            "vec4 pixel_v = texture2D(u_tex, vec2(v_textureCoord.s, v_textureCoord.t));",
             
             "float min = u_extremes[0];",
             "float max = u_extremes[1];",

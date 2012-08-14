@@ -16,10 +16,12 @@ class Drop extends Spine.Controller
   handleDragOver: (e) ->
     e.stopPropagation()
     e.preventDefault()
+    $("#drop").addClass('over')
   
   handleDragLeave: (e) ->
     e.stopPropagation()
     e.preventDefault()
+    $("#drop").removeClass('over')
   
   handleDrop: (e) =>
     e.stopPropagation()
@@ -43,21 +45,21 @@ class Drop extends Spine.Controller
     # Read the file
     reader = new FileReader()
     
-    # reader.onprogress = (e) =>
-    #   if e.lengthComputable
-    #     progress = document.querySelector('.percent')
-    #     loaded = e.loaded
-    #     total = e.total
-    #     percent = Math.round(100 * (loaded / total))
-    #     if percent < 100
-    #       progress.style.width = percent + '%'
-    #       progress.textContent = percent + '%'
+    reader.onprogress = (e) =>
+      if e.lengthComputable
+        progress = document.querySelector("#loading progress")
+        loaded = e.loaded
+        total = e.total
+        percent = Math.round(100 * (loaded / total))
+        if percent < 100
+          progress.value = percent
     
     reader.onloadend = (e) =>
       if e.target.readyState is FileReader.DONE
         buffer = e.target.result
         handler = new Handler({el: @el})
         handler.readBuffer(buffer)
+    $("#loading").show()
     reader.readAsArrayBuffer(file)
   
 module.exports = Drop

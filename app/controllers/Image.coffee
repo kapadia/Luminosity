@@ -44,43 +44,43 @@ class Image extends Spine.Controller
     
     # Set up variables for panning and zooming
     @mouseParameters =
-      offset: [0.0, 0.0]
-      oldOffset: [0.0, 0.0]
-      scale: 1.0
+      offset: [-@width / 2, -@height / 2]
+      oldOffset: [-@width / 2, -@height / 2]
+      scale: 0.002
       mouseDown: [null, null]
       drag: 0
-      
-    # Set up mouse interactions with canvas
-    @canvas.onmousedown = (e) =>
-      @mouseParameters.drag = 1
-      @mouseParameters.oldOffset = @mouseParameters.offset
-      @mouseParameters.mouseDown = [e.offsetX, e.offsetY]
     
-    @canvas.onmousemove = (e) =>
-      return if @mouseParameters.drag is 0
-      xDelta = e.offsetX - @mouseParameters.mouseDown[0]
-      yDelta = e.offsetY - @mouseParameters.mouseDown[1]
-      
-      @mouseParameters.offset[0] = @mouseParameters.oldOffset[0] - (xDelta / @canvas.width / @mouseParameters.scale * 2.0)
-      @mouseParameters.offset[1] = @mouseParameters.oldOffset[1] - (yDelta / @canvas.height / @mouseParameters.scale * 2.0)
-      @drawScene()
-    
-    @canvas.onmouseup = (e) =>
-      @mouseParameters.drag = 0
-      xDelta = e.offsetX - @mouseParameters.mouseDown[0]
-      yDelta = e.offsetY - @mouseParameters.mouseDown[1]
-      @mouseParameters.offset[0] = @mouseParameters.oldOffset[0] - (xDelta / @canvas.width / @mouseParameters.scale * 2.0)
-      @mouseParameters.offset[1] = @mouseParameters.oldOffset[1] - (yDelta / @canvas.height / @mouseParameters.scale * 2.0)
-      @drawScene()
-    
-    @canvas.onmouseout = (e) =>
-      @mouseParameters.drag = 0
+    # # Set up mouse interactions with canvas
+    # @canvas.onmousedown = (e) =>
+    #   @mouseParameters.drag = 1
+    #   @mouseParameters.oldOffset = @mouseParameters.offset
+    #   @mouseParameters.mouseDown = [e.clientX, e.clientY]
+    # 
+    # @canvas.onmousemove = (e) =>
+    #   return if @mouseParameters.drag is 0
+    #   xDelta = e.offsetX - @mouseParameters.mouseDown[0]
+    #   yDelta = e.offsetY - @mouseParameters.mouseDown[1]
+    #   
+    #   @mouseParameters.offset[0] = @mouseParameters.oldOffset[0] + (xDelta / @canvas.width / @mouseParameters.scale * 2.0)
+    #   @mouseParameters.offset[1] = @mouseParameters.oldOffset[1] - (yDelta / @canvas.height / @mouseParameters.scale * 2.0)
+    #   @drawScene()
+    # 
+    # @canvas.onmouseup = (e) =>
+    #   @mouseParameters.drag = 0
+    #   xDelta = e.clientX - @mouseParameters.mouseDown[0]
+    #   yDelta = e.clientY - @mouseParameters.mouseDown[1]
+    #   @mouseParameters.offset[0] = @mouseParameters.oldOffset[0] + (xDelta / @canvas.width / @mouseParameters.scale * 2.0)
+    #   @mouseParameters.offset[1] = @mouseParameters.oldOffset[1] - (yDelta / @canvas.height / @mouseParameters.scale * 2.0)
+    #   @drawScene()
+    # 
+    # @canvas.onmouseout = (e) =>
+    #   @mouseParameters.drag = 0
     
     # Listen for the mouse wheel
     @canvas.addEventListener('mousewheel', @wheelHandler, false)
     
-    @gl       = WebGL.create3DContext(@canvas)
-    @ext      = @gl.getExtension('OES_texture_float')
+    @gl = WebGL.create3DContext(@canvas)
+    @ext = @gl.getExtension('OES_texture_float')
     
     unless @ext
       alert "No OES_texture_float"
@@ -118,7 +118,6 @@ class Image extends Spine.Controller
       # Grab locations of WebGL program variables
       positionLocation    = @gl.getAttribLocation(@program, 'a_position')
       texCoordLocation    = @gl.getAttribLocation(@program, 'a_textureCoord')
-      resolutionLocation  = @gl.getUniformLocation(@program, 'u_resolution')
       extremesLocation    = @gl.getUniformLocation(@program, 'u_extremes')
       offsetLocation      = @gl.getUniformLocation(@program, 'u_offset')
       scaleLocation       = @gl.getUniformLocation(@program, 'u_scale')
@@ -129,7 +128,7 @@ class Image extends Spine.Controller
       
       @gl.enableVertexAttribArray(texCoordLocation)
       @gl.vertexAttribPointer(texCoordLocation, 2, @gl.FLOAT, false, 0, 0)
-
+      
       texture = @gl.createTexture()
       @gl.bindTexture(@gl.TEXTURE_2D, texture)
       
@@ -139,7 +138,6 @@ class Image extends Spine.Controller
       @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.NEAREST)
       
       # Pass the uniforms
-      @gl.uniform2f(resolutionLocation, Image.viewportWidth, Image.viewportHeight)
       @gl.uniform2f(extremesLocation, minimum, maximum)
       @gl.uniform2fv(offsetLocation, @mouseParameters.offset)
       @gl.uniform1f(scaleLocation, @mouseParameters.scale)
@@ -179,17 +177,34 @@ class Image extends Spine.Controller
     
     sum = 0
     bins = Image.numberOfBins
+    binSize = range / bins
+    length = pixels.length
+    
     @histogram = new Uint32Array(bins + 1)
+    # @histogram = new Array(bins + 1)
     for pixel in pixels
       sum += pixel
       
       index = Math.floor(((pixel - min) / range) * bins)
       @histogram[index] += 1
       
-    @mean = sum / pixels.length
+    @mean = sum / length
+    
+    # Compute standard deviation
+    sum = 0
+    for count, index in @histogram
+      value = min + index * binSize
+      diff = value - @mean
+      sum += (diff * diff) * count
+    @std = Math.sqrt(sum / length)
+    
     @histogramMax = Math.max.apply Math, @histogram
     @histogramMin = Math.min.apply Math, @histogram
-    console.log @histogram, @mean
+    # @histogramMin = @mean - 5 * @std
+    # @histogramMax = @mean + 5 * @std
+    
+    @histogramLowerIndex = Math.floor(((pixel - @histogramMin) / range) * bins)
+    @histogramUpperIndex = Math.floor(((pixel - @histogramMax) / range) * bins)
     
   drawHistogram: ->
     console.log 'drawHistogram'
@@ -203,13 +218,9 @@ class Image extends Spine.Controller
       bars.classed "selected", (d) ->
         s[0] <= d and d <= s[1]
       
-      [min, max] = [@item.data.min, @item.data.max]
-      f = (x) ->
-        return (max - min) / Image.numberOfBins * x + min
       extremesLocation = @gl.getUniformLocation(@program, 'u_extremes')
-      @gl.uniform2f(extremesLocation, f(s[0]), f(s[1]))
+      @gl.uniform2f(extremesLocation, s[0], s[1])
       @gl.drawArrays(@gl.TRIANGLES, 0, 6)
-      
     brushend = ->
       chart.classed "selecting", not d3.event.target.empty()
     
@@ -221,9 +232,13 @@ class Image extends Spine.Controller
     w = 530 - margin.right - margin.left
     h = 260 - margin.top - margin.bottom
     
+    # Grab some info about the data
+    data = @item.data
+    [min, max] = [data.min, data.max]
+    
     # Create scales for both axes
     x = d3.scale.linear()
-      .domain([0, Image.numberOfBins])
+      .domain([min, max])
       .range([0, w])
     
     y = d3.scale.linear()

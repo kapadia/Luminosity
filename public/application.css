@@ -1,4 +1,28 @@
 @import 'css/jquery-ui-1.8.22.custom.css';
+.frame {
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  background-color: #f3f3f3;
+}
+.frame .center {
+  left: 50%;
+  top: 50%;
+  width: 200px;
+  height: 20px;
+  margin: -10px 0 0 -100px;
+  position: absolute;
+  color: #0172e6;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 200;
+}
+.over {
+  background-color: #e5e5e5;
+}
+#loading {
+  display: none;
+}
 #progress_bar {
   margin: 10px 0;
   padding: 3px;
@@ -42,22 +66,16 @@
   font-weight: 400;
   src: local('Open Sans'), local('OpenSans'), url("fonts/cJZKeOuBrn4kERxqtaUH3bO3LdcAZYWl9Si6vvxL-qU.woff") format('woff');
 }
-.fits-viewer {
-  float: left;
-}
-.scale {
-  float: left;
-}
-.histogram {
-  float: left;
-}
-.stretch {
+.dataunit-item {
   float: left;
 }
 .chart rect {
   stroke: #fff;
   fill: #cd3e20;
   opacity: 1;
+}
+.chart rect .selected {
+  fill: #0172e6;
 }
 .brush .extent {
   fill: #0172e6;
@@ -76,7 +94,7 @@ table.tablesorter {
 }
 table.tablesorter thead tr th,
 table.tablesorter tfoot tr th {
-  background-color: #cfcfcf;
+  background-color: #e5e5e5;
   border: 1px solid #fff;
   padding: 4px;
 }
@@ -116,29 +134,8 @@ text {
 body {
   margin: 0 auto;
   background-color: #f3f3f3;
-  color: #505050;
+  color: #cfcfcf;
   font-family: 'Open Sans', sans-serif;
-}
-body #drop {
-  background-color: #f3f3f3;
-  width: 100%;
-  height: 100%;
-  position: absolute;
-}
-body #drop p {
-  left: 50%;
-  top: 50%;
-  width: 200px;
-  height: 20px;
-  margin: -10px 0 0 -100px;
-  position: absolute;
-  color: #0172e6;
-  text-align: center;
-  font-size: 18px;
-  font-weight: 200;
-}
-body #drop .over {
-  background-color: #0172e6;
 }
 .tab {
   font-size: 12px;
