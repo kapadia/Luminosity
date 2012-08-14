@@ -6,6 +6,8 @@ class Image extends Spine.Controller
   @viewportHeight = 893
   # @viewportWidth  = 891 * 0.5
   # @viewportHeight = 893 * 0.5
+  # @viewportWidth  = 4096 * 0.125
+  # @viewportHeight = 4096 * 0.125
   @numberOfBins   = 500
   
   constructor: ->
@@ -22,6 +24,8 @@ class Image extends Spine.Controller
     
     # Read the data from the image
     data = @item.data
+    [@width, @height] = [@item.header['NAXIS1'], @item.header['NAXIS2']]
+    
     data.getFrameWebGL()
     data.getExtremes()
     
@@ -32,7 +36,6 @@ class Image extends Spine.Controller
     # Setup up WebGL and interface
     @setupWebGL()
     @setupWebGLUI()
-    @canvas.addEventListener('mousewheel', @wheelHandler, false)
   
   setupWebGL: ->
     console.log 'setupWebGL'
@@ -79,31 +82,43 @@ class Image extends Spine.Controller
       
       # Grab locations of WebGL program variables
       positionLocation    = @gl.getAttribLocation(@program, 'a_position')
+      texCoordLocation    = @gl.getAttribLocation(@program, 'a_textureCoord')
       resolutionLocation  = @gl.getUniformLocation(@program, 'u_resolution')
       extremesLocation    = @gl.getUniformLocation(@program, 'u_extremes')
+      
+      texCoordBuffer = @gl.createBuffer()
+      @gl.bindBuffer(@gl.ARRAY_BUFFER, texCoordBuffer)
+      @gl.bufferData(@gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]), @gl.STATIC_DRAW)
+      
+      @gl.enableVertexAttribArray(texCoordLocation)
+      @gl.vertexAttribPointer(texCoordLocation, 2, @gl.FLOAT, false, 0, 0)
 
-      @gl.uniform2f(resolutionLocation, Image.viewportWidth, Image.viewportHeight)
-      @gl.uniform2f(extremesLocation, minimum, maximum)
-      
-      buffer = @gl.createBuffer()
-      @gl.bindBuffer(@gl.ARRAY_BUFFER, buffer)
-      @gl.bufferData(@gl.ARRAY_BUFFER, new Float32Array([
-           -1, -1, 1, -1, -1, 1,
-           -1,  1, 1, -1,  1, 1]), @gl.STATIC_DRAW)
-      @gl.enableVertexAttribArray(positionLocation)
-      @gl.vertexAttribPointer(positionLocation, 2, @gl.FLOAT, false, 0, 0)
-      
-      tex = @gl.createTexture()
-      @gl.bindTexture(@gl.TEXTURE_2D, tex)
+      texture = @gl.createTexture()
+      @gl.bindTexture(@gl.TEXTURE_2D, texture)
       
       @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_WRAP_S, @gl.CLAMP_TO_EDGE)
       @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_WRAP_T, @gl.CLAMP_TO_EDGE)
       @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MIN_FILTER, @gl.NEAREST)
       @gl.texParameteri(@gl.TEXTURE_2D, @gl.TEXTURE_MAG_FILTER, @gl.NEAREST)
       
+      @gl.uniform2f(resolutionLocation, Image.viewportWidth, Image.viewportHeight)
+      @gl.uniform2f(extremesLocation, minimum, maximum)
+      
+      buffer = @gl.createBuffer()
+      @gl.bindBuffer(@gl.ARRAY_BUFFER, buffer)
+      @gl.enableVertexAttribArray(positionLocation)
+      @gl.vertexAttribPointer(positionLocation, 2, @gl.FLOAT, false, 0, 0)
+      @setRectangle(0, 0, @width, @height)
+      @gl.drawArrays(@gl.TRIANGLES, 0, 6)
+      
     # Update texture
-    @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.LUMINANCE, Image.viewportWidth, Image.viewportHeight, 0, @gl.LUMINANCE, @gl.FLOAT, @item.data.data)
+    @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.LUMINANCE, @width, @height, 0, @gl.LUMINANCE, @gl.FLOAT, @item.data.data)
     @gl.drawArrays(@gl.TRIANGLES, 0, 6)
+  
+  setRectangle: (x, y, width, height) ->
+    [x1, x2] = [x, x + width]
+    [y1, y2] = [y, y + height]
+    @gl.bufferData(@gl.ARRAY_BUFFER, new Float32Array([x1, y1, x2, y1, x1, y2, x1, y2, x2, y1, x2, y2]), @gl.STATIC_DRAW)
   
   computeHistogram: ->
     console.log 'computeHistogram'

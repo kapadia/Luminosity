@@ -43,15 +43,15 @@ class Drop extends Spine.Controller
     # Read the file
     reader = new FileReader()
     
-    reader.onprogress = (e) =>
-      if e.lengthComputable
-        progress = document.querySelector('.percent')
-        loaded = e.loaded
-        total = e.total
-        percent = Math.round(100 * (loaded / total))
-        if percent < 100
-          progress.style.width = percent + '%'
-          progress.textContent = percent + '%'
+    # reader.onprogress = (e) =>
+    #   if e.lengthComputable
+    #     progress = document.querySelector('.percent')
+    #     loaded = e.loaded
+    #     total = e.total
+    #     percent = Math.round(100 * (loaded / total))
+    #     if percent < 100
+    #       progress.style.width = percent + '%'
+    #       progress.textContent = percent + '%'
     
     reader.onloadend = (e) =>
       if e.target.readyState is FileReader.DONE
