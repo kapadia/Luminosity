@@ -78,6 +78,7 @@ class Image extends Spine.Controller
     
     # Listen for the mouse wheel
     @canvas.addEventListener('mousewheel', @wheelHandler, false)
+    @canvas.addEventListener('DOMMouseScroll', @wheelHandler, false)
     
     @gl = WebGL.create3DContext(@canvas)
     @ext = @gl.getExtension('OES_texture_float')

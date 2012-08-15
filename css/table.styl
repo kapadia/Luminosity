@@ -1,35 +1,42 @@
+table.fits-table
+  font-size 11px
+  
+  tbody
+    height 320px
+    overflow-y scroll
+    display block
 
 table.tablesorter
-  background-color #CDCDCD
-  margin 10px 0 15px
-  width 100%
-  text-align left
-
-table.tablesorter thead tr th, table.tablesorter tfoot tr th
-  background-color $gray2
-  border 1px solid #FFF
-  padding 4px
-
-table.tablesorter thead tr .header
-  background-image url(css/images/bg.gif)
-  background-repeat no-repeat
-  background-position center right
-  cursor pointer
-
-table.tablesorter tbody td
-  color #3D3D3D
-  padding 4px
-  background-color #FAFAFA
-  vertical-align top
-
-table.tablesorter tbody tr.odd td
-  background-color #F7F7F7
-
-table.tablesorter thead tr .headerSortUp
-  background-image url(css/images/asc.gif)
-
-table.tablesorter thead tr .headerSortDown
-  background-image url(css/images/desc.gif)
-
-table.tablesorter thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp
   background-color $gray1
+  margin 10px 0 15px
+  text-align left
+  
+  thead tr th tfoot tr th
+    background-color $gray1
+    border 1px solid #FFF
+    padding 4px
+  
+  thead tr .header
+    color $red
+    background-image url(css/images/bg.gif)
+    background-repeat no-repeat
+    background-position center right
+    cursor pointer
+  
+  tbody td
+    color $gray4
+    padding 4px
+    background-color $gray2
+    vertical-align top
+  
+  tbody tr.odd td
+    background-color #F7F7F7
+  
+  thead tr .headerSortUp
+    background-image url(css/images/asc.gif)
+  
+  thead tr .headerSortDown
+    background-image url(css/images/desc.gif)
+  
+  thead tr .headerSortDown, table.tablesorter thead tr .headerSortUp
+    background-color $gray2
