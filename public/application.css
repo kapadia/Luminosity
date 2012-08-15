@@ -23,24 +23,31 @@
 #loading {
   display: none;
 }
-#progress_bar {
-  margin: 10px 0;
-  padding: 3px;
-  border: 1px solid #000;
-  font-size: 14px;
-  clear: both;
-  opacity: 0;
-  -moz-transition: opacity 1s linear;
-  -o-transition: opacity 1s linear;
-  -webkit-transition: opacity 1s linear;
+table.header {
+  width: 200px;
+  font-size: 11px;
+  float: left;
 }
-#progress_bar.loading {
-  opacity: 1;
+table.header .key {
+  text-align: right;
 }
-#progress_bar .percent {
-  background-color: #9cf;
-  height: auto;
-  width: 0;
+table.header .value {
+  text-align: left;
+}
+table.header .even {
+  background-color: #fafafa;
+}
+table.header .odd {
+  background-color: #f7f7f7;
+}
+table.header tbody {
+  height: 320px;
+  width: 200px;
+  overflow: auto;
+  display: block;
+}
+table.header tbody tr {
+  height: 16px;
 }
 @font-face {
   font-family: 'Open Sans';
@@ -66,6 +73,10 @@
   font-weight: 400;
   src: local('Open Sans'), local('OpenSans'), url("fonts/cJZKeOuBrn4kERxqtaUH3bO3LdcAZYWl9Si6vvxL-qU.woff") format('woff');
 }
+canvas {
+  padding: 0;
+  margin: 0;
+}
 .dataunit-item {
   float: left;
 }
@@ -86,28 +97,35 @@
 .fits-viewer {
   border: 1px solid #cd3e20;
 }
+table.fits-table {
+  font-size: 11px;
+}
+table.fits-table tbody {
+  height: 320px;
+  overflow-y: scroll;
+  display: block;
+}
 table.tablesorter {
-  background-color: #cdcdcd;
+  background-color: #f3f3f3;
   margin: 10px 0 15px;
-  width: 100%;
   text-align: left;
 }
-table.tablesorter thead tr th,
-table.tablesorter tfoot tr th {
-  background-color: #e5e5e5;
+table.tablesorter thead tr th tfoot tr th {
+  background-color: #f3f3f3;
   border: 1px solid #fff;
   padding: 4px;
 }
 table.tablesorter thead tr .header {
+  color: #cd3e20;
   background-image: url("css/images/bg.gif");
   background-repeat: no-repeat;
   background-position: center right;
   cursor: pointer;
 }
 table.tablesorter tbody td {
-  color: #3d3d3d;
+  color: #505050;
   padding: 4px;
-  background-color: #fafafa;
+  background-color: #e5e5e5;
   vertical-align: top;
 }
 table.tablesorter tbody tr.odd td {
@@ -120,8 +138,8 @@ table.tablesorter thead tr .headerSortDown {
   background-image: url("css/images/desc.gif");
 }
 table.tablesorter thead tr .headerSortDown,
-table.tablesorter thead tr .headerSortUp {
-  background-color: #f3f3f3;
+table.tablesorter table.tablesorter thead tr .headerSortUp {
+  background-color: #e5e5e5;
 }
 .axis path {
   fill: none;
@@ -139,24 +157,7 @@ body {
 }
 .tab {
   font-size: 12px;
-}
-table {
-  font-size: 11px;
-}
-table.header {
-  float: left;
-}
-table.header .key {
-  text-align: right;
-}
-table.header .value {
-  text-align: left;
-}
-table.header .even {
-  background-color: #fafafa;
-}
-table.header .odd {
-  background-color: #f7f7f7;
+  overflow: scroll;
 }
 .hdu {
   overflow: auto;

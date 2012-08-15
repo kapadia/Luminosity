@@ -2,7 +2,7 @@
   "dependencies": [
     "es5-shimify", 
     "json2ify", 
-    "jqueryify", 
+    "jqueryify-all", 
     "spine",
     "spine/lib/local",
     "spine/lib/ajax",
