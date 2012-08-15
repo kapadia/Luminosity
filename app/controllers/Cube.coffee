@@ -3,7 +3,7 @@ WebGL = require('lib/WebGL')
 
 class Cube extends Spine.Controller
   @viewportWidth  = 600
-  @viewportHeight = 600
+  @viewportHeight = 800
   
   constructor: ->
     console.log 'Cube'
@@ -13,10 +13,12 @@ class Cube extends Spine.Controller
     return null unless WebGL.check()
     
     # TEMP variables for scaling data
-    # @min = -0.78050774
-    # @max = 4.0023365
-    @min = -12.537979
-    @max = 177.71017
+    @min = -0.78050774
+    @max = 4.0023365
+    # @min = -0.38050774
+    # @max = 3.9023365
+    # @min = -12.537979
+    # @max = 177.71017
     
     data = @hdu.data
     @width  = data.naxis[0]
@@ -43,8 +45,9 @@ class Cube extends Spine.Controller
     
     # Set up the camera, scene and plane
     @camera = new THREE.PerspectiveCamera(75, Cube.viewportWidth / Cube.viewportHeight, 1, 10000)
-    @camera.position.z = 200
-    @camera.position.y = 200
+    @camera.position.z = 240
+    @camera.position.y = -120
+    @camera.rotation.x = Math.PI / 10
     
     @scene = new THREE.Scene()
     @geometry = new Plane(@width / 4, @height / 4)
@@ -63,7 +66,7 @@ class Cube extends Spine.Controller
         @geometry, new THREE.MeshBasicMaterial( { map: texture, opacity: 0.5, transparent: true, depthTest: false, blending: THREE.AdditiveBlending })
       )
       
-      mesh.position.y = 300 - 1.5 * frameIndex
+      mesh.position.y = 300 - 1.25 * frameIndex
       mesh.rotation.x = 90 * Math.PI / 180
       mesh.doubleSided = true
       @scene.add(mesh)
@@ -107,12 +110,16 @@ class Cube extends Spine.Controller
     @camera.position.y += ( -@mouseY - @camera.position.y ) * .0000002
     for i in [0..@scene.children.length - 1]
       @scene.children[i].rotation.z += time
-      @scene.children[i].rotation.x += time
+      # @scene.children[i].rotation.x += time
     @renderer.render(@scene, @camera)
     
   toUint8: (value) ->
-    return 0 if isNaN(value)
-    return (value - @min) / (@max - @min)
+    return @arcsinh(1) if isNaN(value)
+    value = @arcsinh(value + @min + 1)
+    min = @arcsinh(@min + 1)
+    max = @arcsinh(@max + 1)
+    return (value - min) / (max - min)
   
-  
+  arcsinh: (value) -> Math.log(value + Math.sqrt(1 + value * value))
+    
 module.exports = Cube
