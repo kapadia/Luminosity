@@ -2,7 +2,7 @@
   "dependencies": [
     "es5-shimify", 
     "json2ify", 
-    "jqueryify-all", 
+    "jqueryify-all",
     "spine",
     "spine/lib/local",
     "spine/lib/ajax",
@@ -11,5 +11,10 @@
     "jDataView/src/jdataview",
     "fits"
   ],
-  "libs": []
+  "libs": [
+    "./vendor/d3.v2.js",
+    "./vendor/ThreeWebGL.js",
+    "./vendor/ThreeExtras.js",
+    "./vendor/RequestAnimationFrame.js"
+  ]
 }

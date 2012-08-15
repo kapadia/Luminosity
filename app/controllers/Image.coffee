@@ -22,8 +22,8 @@ class Image extends Spine.Controller
     @stretch.style.display = 'none'
     
     # Read the data from the image
-    data = @item.data
-    [@width, @height] = [@item.header['NAXIS1'], @item.header['NAXIS2']]
+    data = @hdu.data
+    [@width, @height] = [@hdu.header['NAXIS1'], @hdu.header['NAXIS2']]
     
     data.getFrameWebGL()
     data.getExtremes()
@@ -101,8 +101,8 @@ class Image extends Spine.Controller
     
     # Store parameters needed for rendering
     stretch = @stretch.value
-    minimum = @item.data.min
-    maximum = @item.data.max
+    minimum = @hdu.data.min
+    maximum = @hdu.data.max
     
     unless @programs?
       @programs = {}
@@ -151,7 +151,7 @@ class Image extends Spine.Controller
       @gl.drawArrays(@gl.TRIANGLES, 0, 6)
       
     # Update texture
-    @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.LUMINANCE, @width, @height, 0, @gl.LUMINANCE, @gl.FLOAT, @item.data.data)
+    @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.LUMINANCE, @width, @height, 0, @gl.LUMINANCE, @gl.FLOAT, @hdu.data.data)
     @gl.drawArrays(@gl.TRIANGLES, 0, 6)
   
   setRectangle: (x, y, width, height) ->
@@ -169,7 +169,7 @@ class Image extends Spine.Controller
   
   computeHistogram: ->
     console.log 'computeHistogram'
-    data = @item.data
+    data = @hdu.data
     pixels = data.data
     
     min   = data.min
@@ -234,7 +234,7 @@ class Image extends Spine.Controller
     h = 260 - margin.top - margin.bottom
     
     # Grab some info about the data
-    data = @item.data
+    data = @hdu.data
     [min, max] = [data.min, data.max]
     
     # Create scales for both axes

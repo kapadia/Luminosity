@@ -5,7 +5,7 @@ class TableController extends Spine.Controller
     console.log 'Table'
     super
     
-    @html require('views/table')(@item.data)
+    @html require('views/table')(@hdu.data)
     
     # Create a sortable table
     $("#dataunit-#{@index} .fits-table").tablesorter()
@@ -23,7 +23,7 @@ class TableController extends Spine.Controller
     console.log 'createPlot'
     [axis1, axis2] = [@axes.first().val(), @axes.last().val()]
 
-    dataunit = @item.data
+    dataunit = @hdu.data
     dataunit.rowsRead = 0
 
     data = []

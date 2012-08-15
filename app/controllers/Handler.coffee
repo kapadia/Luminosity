@@ -1,5 +1,7 @@
 FITS  = require('fits')
+
 ImageController = require('controllers/Image')
+CubeController  = require('controllers/Cube')
 TableController = require('controllers/Table')
 
 class Handler extends Spine.Controller
@@ -41,11 +43,15 @@ class Handler extends Spine.Controller
       data    = hdu.data
       
       elem = $("#dataunit-#{index}")
-      args = {el: elem, item: hdu, index: index}
+      args = {el: elem, hdu: hdu, index: index}
       
-      if header.isPrimary()        
+      # Determine and initialize the appropriate handler for the HDU
+      if header.isPrimary()
         if header.hasDataUnit()
-          new ImageController args 
+          if data.isDataCube()
+            new CubeController args
+          else
+            new ImageController args
       else if header.isExtension()
         if header['XTENSION'] is 'TABLE'
           new TableController args
