@@ -1,6 +1,6 @@
 {
   "dependencies": [
-    "es5-shimify", 
+    "es5-shimify",
     "json2ify", 
     "jqueryify-all",
     "spine",
