@@ -43,38 +43,74 @@ class Image extends Spine.Controller
     @canvas   = WebGL.setupCanvas(container, Image.viewportWidth, Image.viewportHeight)
     
     # Set up variables for panning and zooming
-    @mouseParameters =
-      offset: [-@width / 2, -@height / 2]
-      oldOffset: [-@width / 2, -@height / 2]
-      scale: 0.002
-      mouseDown: [null, null]
-      drag: 0
+    @xOffset = -1.0
+    @yOffset = -1.0
+    @xOldOffset = @xOffset
+    @yOldOffset = @yOffset
+    @scale = 1.0
+    @xMouseDown = undefined
+    @yMouseDown = undefined
+    @drag = false
+
+    @canvas.onmousedown = (e) =>
+      @drag = true
+      @xOldOffset = @xOffset
+      @yOldOffset = @yOffset
+      @xMouseDown = e.clientX 
+      @yMouseDown = e.clientY
+
+    @canvas.onmouseup = (e) =>
+      @drag = false
+      xDelta = e.clientX - @xMouseDown
+      yDelta = e.clientY - @yMouseDown
+      @xOffset = @xOldOffset + (xDelta / @canvas.width / @scale * 2.0)
+      @yOffset = @yOldOffset - (yDelta / @canvas.height / @scale * 2.0)
+      @drawScene()
     
+    @canvas.onmousemove = (e) =>
+      return unless @drag
+
+      xDelta = e.clientX - @xMouseDown
+      yDelta = e.clientY - @yMouseDown
+      
+      @xOffset = @xOldOffset + (xDelta / @canvas.width / @scale * 2.0)
+      @yOffset = @yOldOffset - (yDelta / @canvas.height / @scale * 2.0)
+      @drawScene()
+    
+    # @mouseParameters =
+    #   offset: [0, 0]
+    #   oldOffset: [0, 0]
+    #   # offset: [-@width / 2, -@height / 2]
+    #   # oldOffset: [-@width / 2, -@height / 2]
+    #   scale: 0.0002
+    #   mouseDown: [null, null]
+    #   drag: 0
+    # 
     # # Set up mouse interactions with canvas
     # @canvas.onmousedown = (e) =>
-    #   @mouseParameters.drag = 1
+    #   @mouseParameters.drag = true
     #   @mouseParameters.oldOffset = @mouseParameters.offset
     #   @mouseParameters.mouseDown = [e.clientX, e.clientY]
-    # 
-    # @canvas.onmousemove = (e) =>
-    #   return if @mouseParameters.drag is 0
-    #   xDelta = e.offsetX - @mouseParameters.mouseDown[0]
-    #   yDelta = e.offsetY - @mouseParameters.mouseDown[1]
+    # # @canvas.onmouseout = (e) =>
+    # #   @mouseParameters.drag = false
+    # @canvas.onmouseup = (e) =>
+    #   @mouseParameters.drag = false
+    #   xDelta = e.clientX - @mouseParameters.mouseDown[0]
+    #   yDelta = e.clientY - @mouseParameters.mouseDown[1]
     #   
     #   @mouseParameters.offset[0] = @mouseParameters.oldOffset[0] + (xDelta / @canvas.width / @mouseParameters.scale * 2.0)
     #   @mouseParameters.offset[1] = @mouseParameters.oldOffset[1] - (yDelta / @canvas.height / @mouseParameters.scale * 2.0)
     #   @drawScene()
     # 
-    # @canvas.onmouseup = (e) =>
-    #   @mouseParameters.drag = 0
+    # @canvas.onmousemove = (e) =>
+    #   return unless @mouseParameters.drag
+    #   
     #   xDelta = e.clientX - @mouseParameters.mouseDown[0]
     #   yDelta = e.clientY - @mouseParameters.mouseDown[1]
+    #   
     #   @mouseParameters.offset[0] = @mouseParameters.oldOffset[0] + (xDelta / @canvas.width / @mouseParameters.scale * 2.0)
     #   @mouseParameters.offset[1] = @mouseParameters.oldOffset[1] - (yDelta / @canvas.height / @mouseParameters.scale * 2.0)
     #   @drawScene()
-    # 
-    # @canvas.onmouseout = (e) =>
-    #   @mouseParameters.drag = 0
     
     # Listen for the mouse wheel
     @canvas.addEventListener('mousewheel', @wheelHandler, false)
@@ -93,7 +129,7 @@ class Image extends Spine.Controller
     e.preventDefault()
     e.stopPropagation()
     factor = if e.shiftKey then 1.01 else 1.1
-    @mouseParameters.scale *= if (e.detail or e.wheelDelta) < 0 then factor else 1 / factor
+    @scale *= if (e.detail or e.wheelDelta) < 0 then factor else 1 / factor
     @drawScene()
   
   setupWebGLUI: ->
@@ -140,8 +176,8 @@ class Image extends Spine.Controller
       
       # Pass the uniforms
       @gl.uniform2f(extremesLocation, minimum, maximum)
-      @gl.uniform2fv(offsetLocation, @mouseParameters.offset)
-      @gl.uniform1f(scaleLocation, @mouseParameters.scale)
+      @gl.uniform2f(offsetLocation, @xOffset, @yOffset)
+      @gl.uniform1f(scaleLocation, @scale)
       
       buffer = @gl.createBuffer()
       @gl.bindBuffer(@gl.ARRAY_BUFFER, buffer)
@@ -162,8 +198,8 @@ class Image extends Spine.Controller
   drawScene: ->
     offsetLocation = @gl.getUniformLocation(@program, 'u_offset')
     scaleLocation = @gl.getUniformLocation(@program, 'u_scale')
-    @gl.uniform2fv(offsetLocation, @mouseParameters.offset)
-    @gl.uniform1f(scaleLocation, @mouseParameters.scale)
+    @gl.uniform2f(offsetLocation, @xOffset, @yOffset)
+    @gl.uniform1f(scaleLocation, @scale)
     @setRectangle(0, 0, @width, @height)
     @gl.drawArrays(@gl.TRIANGLES, 0, 6)
   

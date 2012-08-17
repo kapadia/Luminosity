@@ -3,13 +3,12 @@
   "version": "0.0.1",
   "dependencies": { 
     "serveup": "~0.0.4",
-    "hem": "0.1.7",
+    "hem": "git://github.com/kapadia/hem.git",
     "es5-shimify": "~0.0.1",
     "json2ify": "~0.0.1",
     "jqueryify-all": "~1.8.0",
     "spine": "~1.0.8",
     "jDataView": "git://github.com/vjeux/jDataView.git",
-    "fits": "git://github.com/astrojs/fitsjs.git",
-    "crossfilter": "~1.0.3"
+    "fits": "git://github.com/astrojs/fitsjs.git"
   }
 }

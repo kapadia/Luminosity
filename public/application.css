@@ -96,6 +96,8 @@ canvas {
 }
 .fits-viewer {
   border: 1px solid #cd3e20;
+  width: 600px;
+  height: 600px;
 }
 table.fits-table {
   font-size: 11px;

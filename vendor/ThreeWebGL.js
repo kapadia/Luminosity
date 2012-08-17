@@ -1,7 +1,6 @@
 /**
  * @author mrdoob / http://mrdoob.com/
  */
-
 var THREE = THREE || { REVISION: '50' };
 
 if ( self.console === undefined ) {
