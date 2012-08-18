@@ -1,5 +1,6 @@
-Spine = require('spine')
-WebGL = require('lib/WebGL')
+Spine   = require('spine')
+WebGL   = require('lib/WebGL')
+Workers = require('lib/Workers')
 
 class Image extends Spine.Controller
   @viewportWidth  = 600
@@ -16,17 +17,14 @@ class Image extends Spine.Controller
     @html require('views/image')()
     
     # Grab a few DOM elements
-    @stretch = document.querySelector("#dataunit-#{@index} .stretch")
+    @stretch  = document.querySelector("#dataunit-#{@index} .stretch")
+    @viewer   = document.querySelector("#dataunit-#{@index} .fits-viewer")
     
     # NOTE: Turning off stretch function for now.
     @stretch.style.display = 'none'
     
     # Read the data from the image
-    data = @hdu.data
-    [@width, @height] = [@hdu.header['NAXIS1'], @hdu.header['NAXIS2']]
-    
-    data.getFrameWebGL()
-    data.getExtremes()
+    @readImageData()
     
     # Setup histogram
     @computeHistogram()
@@ -35,6 +33,49 @@ class Image extends Spine.Controller
     # Setup up WebGL and interface
     @setupWebGL()
     @setupWebGLUI()
+    
+    @tempGrid()
+  
+  # TODO: Implement inline workers to handle this
+  readImageData: ->
+    console.log 'readImageData'
+    
+    data = @hdu.data
+    [@width, @height] = [@hdu.header['NAXIS1'], @hdu.header['NAXIS2']]
+    
+    data.getFrameWebGL()
+    data.getExtremes()
+    
+  
+  tempGrid: ->
+    # Temporary canvas for grid
+    container = document.querySelector("#dataunit-#{@index} .fits-viewer")
+    canvas = document.createElement('canvas')
+    canvas.setAttribute('id', 'grid')
+    canvas.setAttribute('width', Image.viewportWidth)
+    canvas.setAttribute('height', Image.viewportHeight)
+    container.appendChild(canvas)
+    context = canvas.getContext("2d")
+    
+    context.moveTo(Image.viewportWidth / 2, 0)
+    context.lineTo(Image.viewportWidth / 2, Image.viewportHeight)
+    
+    context.moveTo(0, Image.viewportHeight / 2)
+    context.lineTo(Image.viewportWidth, Image.viewportHeight / 2)
+    
+    context.strokeStyle = "black"
+    context.lineWidth = 0.5
+    context.stroke()
+    canvas.onmousedown = (e) =>
+      @canvas.onmousedown(e)
+    canvas.onmouseup = (e) =>
+      @canvas.onmouseup(e)
+    canvas.onmousemove = (e) =>
+      @canvas.onmousemove(e)
+    canvas.onmouseout = (e) =>
+      @canvas.onmouseout(e)
+    canvas.addEventListener('mousewheel', @wheelHandler, false)
+    canvas.addEventListener('DOMMouseScroll', @wheelHandler, false)
   
   setupWebGL: ->
     console.log 'setupWebGL'
@@ -43,17 +84,17 @@ class Image extends Spine.Controller
     @canvas   = WebGL.setupCanvas(container, Image.viewportWidth, Image.viewportHeight)
     
     # Set up variables for panning and zooming
-    @xOffset = -1.0
-    @yOffset = -1.0
+    @xOffset = 0
+    @yOffset = 0
     @xOldOffset = @xOffset
     @yOldOffset = @yOffset
-    @scale = 1.0
-    @xMouseDown = undefined
-    @yMouseDown = undefined
+    @scale = 2 * (1 / @width)
     @drag = false
 
     @canvas.onmousedown = (e) =>
       @drag = true
+      @viewer.style.cursor = "move"
+      
       @xOldOffset = @xOffset
       @yOldOffset = @yOffset
       @xMouseDown = e.clientX 
@@ -61,6 +102,11 @@ class Image extends Spine.Controller
 
     @canvas.onmouseup = (e) =>
       @drag = false
+      @viewer.style.cursor = "crosshair"
+      
+      # Prevents a NaN from being sent to the GPU
+      return null unless @xMouseDown?
+      
       xDelta = e.clientX - @xMouseDown
       yDelta = e.clientY - @yMouseDown
       @xOffset = @xOldOffset + (xDelta / @canvas.width / @scale * 2.0)
@@ -68,49 +114,33 @@ class Image extends Spine.Controller
       @drawScene()
     
     @canvas.onmousemove = (e) =>
+      # x = (-1 * (@xOffset + 0.5)) + 0.5 << 0
+      # y = (-1 * (@yOffset + 0.5)) + 0.5 << 0
+      
+      xDelta = -1 * (@canvas.width / 2 - e.offsetX) / @canvas.width / @scale * 2.0
+      yDelta = (@canvas.height / 2 - e.offsetY) / @canvas.height / @scale * 2.0
+      
+      x = ((-1 * (@xOffset + 0.5)) + xDelta) + 0.5 << 0
+      y = ((-1 * (@yOffset + 0.5)) + yDelta) + 0.5 << 0
+      
+      console.log x, y, @hdu.data.getPixel(x, y)
       return unless @drag
-
+      
       xDelta = e.clientX - @xMouseDown
       yDelta = e.clientY - @yMouseDown
       
       @xOffset = @xOldOffset + (xDelta / @canvas.width / @scale * 2.0)
       @yOffset = @yOldOffset - (yDelta / @canvas.height / @scale * 2.0)
+      
       @drawScene()
     
-    # @mouseParameters =
-    #   offset: [0, 0]
-    #   oldOffset: [0, 0]
-    #   # offset: [-@width / 2, -@height / 2]
-    #   # oldOffset: [-@width / 2, -@height / 2]
-    #   scale: 0.0002
-    #   mouseDown: [null, null]
-    #   drag: 0
-    # 
-    # # Set up mouse interactions with canvas
-    # @canvas.onmousedown = (e) =>
-    #   @mouseParameters.drag = true
-    #   @mouseParameters.oldOffset = @mouseParameters.offset
-    #   @mouseParameters.mouseDown = [e.clientX, e.clientY]
-    # # @canvas.onmouseout = (e) =>
-    # #   @mouseParameters.drag = false
-    # @canvas.onmouseup = (e) =>
-    #   @mouseParameters.drag = false
-    #   xDelta = e.clientX - @mouseParameters.mouseDown[0]
-    #   yDelta = e.clientY - @mouseParameters.mouseDown[1]
-    #   
-    #   @mouseParameters.offset[0] = @mouseParameters.oldOffset[0] + (xDelta / @canvas.width / @mouseParameters.scale * 2.0)
-    #   @mouseParameters.offset[1] = @mouseParameters.oldOffset[1] - (yDelta / @canvas.height / @mouseParameters.scale * 2.0)
-    #   @drawScene()
-    # 
-    # @canvas.onmousemove = (e) =>
-    #   return unless @mouseParameters.drag
-    #   
-    #   xDelta = e.clientX - @mouseParameters.mouseDown[0]
-    #   yDelta = e.clientY - @mouseParameters.mouseDown[1]
-    #   
-    #   @mouseParameters.offset[0] = @mouseParameters.oldOffset[0] + (xDelta / @canvas.width / @mouseParameters.scale * 2.0)
-    #   @mouseParameters.offset[1] = @mouseParameters.oldOffset[1] - (yDelta / @canvas.height / @mouseParameters.scale * 2.0)
-    #   @drawScene()
+    @canvas.onmouseout = (e) =>
+      @drag = false
+      @viewer.style.cursor = "crosshair"
+      
+    @canvas.onmouseover = (e) =>
+      @drag = false
+      @viewer.style.cursor = "crosshair"
     
     # Listen for the mouse wheel
     @canvas.addEventListener('mousewheel', @wheelHandler, false)

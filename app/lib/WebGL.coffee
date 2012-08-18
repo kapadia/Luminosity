@@ -28,7 +28,7 @@ WebGL =
         "varying vec2 v_textureCoord;",
         
         "void main() {",
-            "vec4 pixel_v = texture2D(u_tex, vec2(v_textureCoord.s, v_textureCoord.t));",
+            "vec4 pixel_v = texture2D(u_tex, v_textureCoord);",
             
             "float min = u_extremes[0];",
             "float max = u_extremes[1];",

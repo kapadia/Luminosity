@@ -98,6 +98,10 @@ canvas {
   border: 1px solid #cd3e20;
   width: 600px;
   height: 600px;
+  cursor: crosshair;
+}
+.fits-viewer canvas {
+  position: absolute;
 }
 table.fits-table {
   font-size: 11px;
