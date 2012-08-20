@@ -32,4 +32,5 @@
   </tbody>
 </table>
 
+<div class='scatter3d'></div>
 <div class='plot'></div>

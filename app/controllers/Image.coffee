@@ -33,10 +33,8 @@ class Image extends Spine.Controller
     # Setup up WebGL and interface
     @setupWebGL()
     @setupWebGLUI()
-    
-    @tempGrid()
   
-  # TODO: Implement inline workers to handle this
+  # TODO: Handle this with inline workers
   readImageData: ->
     console.log 'readImageData'
     
@@ -45,7 +43,6 @@ class Image extends Spine.Controller
     
     data.getFrameWebGL()
     data.getExtremes()
-    
   
   tempGrid: ->
     # Temporary canvas for grid
@@ -84,11 +81,13 @@ class Image extends Spine.Controller
     @canvas   = WebGL.setupCanvas(container, Image.viewportWidth, Image.viewportHeight)
     
     # Set up variables for panning and zooming
-    @xOffset = 0
-    @yOffset = 0
+    @xOffset = -@width / 2
+    @yOffset = -@height / 2
     @xOldOffset = @xOffset
     @yOldOffset = @yOffset
-    @scale = 2 * (1 / @width)
+    @scale = 2 / @width
+    @minScale = 1 / (Image.viewportWidth * Image.viewportWidth)
+    @maxScale = 2
     @drag = false
 
     @canvas.onmousedown = (e) =>
@@ -114,9 +113,6 @@ class Image extends Spine.Controller
       @drawScene()
     
     @canvas.onmousemove = (e) =>
-      # x = (-1 * (@xOffset + 0.5)) + 0.5 << 0
-      # y = (-1 * (@yOffset + 0.5)) + 0.5 << 0
-      
       xDelta = -1 * (@canvas.width / 2 - e.offsetX) / @canvas.width / @scale * 2.0
       yDelta = (@canvas.height / 2 - e.offsetY) / @canvas.height / @scale * 2.0
       
@@ -160,6 +156,10 @@ class Image extends Spine.Controller
     e.stopPropagation()
     factor = if e.shiftKey then 1.01 else 1.1
     @scale *= if (e.detail or e.wheelDelta) < 0 then factor else 1 / factor
+    console.log @scale
+    # Probably not the most efficient way to do this ...
+    @scale = if @scale > @maxScale then @maxScale else @scale
+    @scale = if @scale < @minScale then @minScale else @scale
     @drawScene()
   
   setupWebGLUI: ->
