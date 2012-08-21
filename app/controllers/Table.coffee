@@ -25,6 +25,60 @@ class TableController extends Spine.Controller
       @trigger 'axisChange'
     @bind 'axisChange', @createPlot
   
+  @createAxes3D: (plot, size) ->
+    v = (x, y, z) => return new THREE.Vertex(new THREE.Vector3(x, y, z))
+    
+    lineGeo = new THREE.Geometry()
+    lineGeo.vertices.push(
+      v(-1 * size, 0, 0), v(size, 0, 0),
+      v(0, -1 * size, 0), v(0, size, 0),
+      v(0, 0, -1 * size), v(0, 0, size),
+
+      v(-1 * size, size, -1 * size), v(size, size, -1 * size),
+      v(-1 * size, -1 * size, -1 * size), v(size, -1 * size, -1 * size),
+      v(-1 * size, size, size), v(size, size, size),
+      v(-1 * size, -1 * size, size), v(size, -1 * size, size),
+
+      v(-1 * size, 0, size), v(size, 0, size),
+      v(-1 * size, 0, -1 * size), v(size, 0, -1 * size),
+      v(-1 * size, size, 0), v(size, size, 0),
+      v(-1 * size, -1 * size, 0), v(size, -1 * size, 0),
+
+      v(size, -1 * size, -1 * size), v(size, size, -1 * size),
+      v(-1 * size, -1 * size, -1 * size), v(-1 * size, size, -1 * size),
+      v(size, -1 * size, size), v(size, size, size),
+      v(-1 * size, -1 * size, size), v(-1 * size, size, size),
+
+      v(0, -1 * size, size), v(0, size, size),
+      v(0, -1 * size, -1 * size), v(0, size, -1 * size),
+      v(size, -1 * size, 0), v(size, size, 0),
+      v(-1 * size, -1 * size, 0), v(-1 * size, size, 0),
+
+      v(size, size, -1 * size), v(size, size, size),
+      v(size, -1 * size, -1 * size), v(size, -1 * size, size),
+      v(-1 * size, size, -1 * size), v(-1 * size, size, size),
+      v(-1 * size, -1 * size, -1 * size), v(-1 * size, -1 * size, size),
+
+      v(-1 * size, 0, -1 * size), v(-1 * size, 0, size),
+      v(size, 0, -1 * size), v(size, 0, size),
+      v(0, size, -1 * size), v(0, size, size),
+      v(0, -1 * size, -1 * size), v(0, -1 * size, size)
+    )
+    
+    lineMat = new THREE.LineBasicMaterial({color: 0x808080, lineWidth: 1})
+    line = new THREE.Line(lineGeo, lineMat)
+    line.type = THREE.Lines
+    plot.add(line)
+  
+  @createAxesLabel3D: (plot, labels, distance) ->
+    axes = ['x', 'x', 'y', 'y', 'z', 'z']
+    for label, index in labels
+      axis = axes[index]
+      
+      title = ThreeHelpers.createText2D(label)
+      title.position[axis] = Math.pow(-1, index + 1) * distance
+      plot.add(title)
+  
   createScatter3D: =>
     console.log 'createScatter3D'
     
@@ -53,72 +107,12 @@ class TableController extends Spine.Controller
     # Construct the axes
     v = (x, y, z) => return new THREE.Vertex(new THREE.Vector3(x, y, z))
     
-    lineGeo = new THREE.Geometry()
-    lineGeo.vertices.push(
-      v(-20, 0, 0), v(20, 0, 0),
-      v(0, -20, 0), v(0, 20, 0),
-      v(0, 0, -20), v(0, 0, 20),
-
-      v(-20, 20, -20), v(20, 20, -20),
-      v(-20, -20, -20), v(20, -20, -20),
-      v(-20, 20, 20), v(20, 20, 20),
-      v(-20, -20, 20), v(20, -20, 20),
-
-      v(-20, 0, 20), v(20, 0, 20),
-      v(-20, 0, -20), v(20, 0, -20),
-      v(-20, 20, 0), v(20, 20, 0),
-      v(-20, -20, 0), v(20, -20, 0),
-
-      v(20, -20, -20), v(20, 20, -20),
-      v(-20, -20, -20), v(-20, 20, -20),
-      v(20, -20, 20), v(20, 20, 20),
-      v(-20, -20, 20), v(-20, 20, 20),
-
-      v(0, -20, 20), v(0, 20, 20),
-      v(0, -20, -20), v(0, 20, -20),
-      v(20, -20, 0), v(20, 20, 0),
-      v(-20, -20, 0), v(-20, 20, 0),
-
-      v(20, 20, -20), v(20, 20, 20),
-      v(20, -20, -20), v(20, -20, 20),
-      v(-20, 20, -20), v(-20, 20, 20),
-      v(-20, -20, -20), v(-20, -20, 20),
-
-      v(-20, 0, -20), v(-20, 0, 20),
-      v(20, 0, -20), v(20, 0, 20),
-      v(0, 20, -20), v(0, 20, 20),
-      v(0, -20, -20), v(0, -20, 20)
-    )
+    # Construct the axes
+    distance = 20
+    labels = ['-X', 'X', '-Y', 'Y', '-Z', 'Z']
     
-    lineMat = new THREE.LineBasicMaterial({color: 0x808080, lineWidth: 1})
-    line = new THREE.Line(lineGeo, lineMat)
-    line.type = THREE.Lines
-    @scatterPlot.add(line)
-    
-    # Create and add labels to the axes
-    titleX = ThreeHelpers.createText2D('-X')
-    titleX.position.x = -20
-    @scatterPlot.add(titleX)
-    
-    titleX = ThreeHelpers.createText2D('X')
-    titleX.position.x = 20
-    @scatterPlot.add(titleX)
-    
-    titleY = ThreeHelpers.createText2D('-Y')
-    titleY.position.y = -20
-    @scatterPlot.add(titleY)
-    
-    titleY = ThreeHelpers.createText2D('Y')
-    titleY.position.y = 20
-    @scatterPlot.add(titleY)
-    
-    titleZ = ThreeHelpers.createText2D('-Z')
-    titleZ.position.z = -20
-    @scatterPlot.add(titleZ)
-    
-    titleZ = ThreeHelpers.createText2D('Z')
-    titleZ.position.z = 20
-    @scatterPlot.add(titleZ)
+    TableController.createAxes3D(@scatterPlot, distance)
+    TableController.createAxesLabel3D(@scatterPlot, labels, distance)
     
     # Construct the scatter plot
     mat = new THREE.ParticleBasicMaterial({vertexColors: true, size: 0.10, color: 0xff0000})
