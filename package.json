@@ -8,7 +8,6 @@
     "json2ify": "~0.0.1",
     "jqueryify-all": "~1.8.0",
     "spine": "~1.0.8",
-    "jDataView": "git://github.com/vjeux/jDataView.git",
     "fits": "git://github.com/astrojs/fitsjs.git"
   }
 }

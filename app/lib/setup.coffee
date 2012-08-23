@@ -8,6 +8,5 @@ require('spine/lib/ajax')
 require('spine/lib/manager')
 require('spine/lib/route')
 
-require('jDataView/src/jdataview')
 require('lib/jquery-ui-1.8.22.custom')
 require('lib/jquery.tablesorter')
