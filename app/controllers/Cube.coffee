@@ -21,14 +21,9 @@ class Cube extends Spine.Controller
     # @max = 177.71017
     
     data = @hdu.data
-    @width  = data.naxis[0]
-    @height = data.naxis[1]
+    @width  = data.width
+    @height = data.height
     @depth  = data.naxis[2]
-    
-    # Read the data
-    data.getFrame() for i in [1..@depth]  
-    pixels = data.data
-    length = @width * @height
     
     # Create a renderer and grab the GL context
     @renderer = new THREE.WebGLRenderer({antialias: false})
@@ -50,13 +45,13 @@ class Cube extends Spine.Controller
     @camera.rotation.x = Math.PI / 10
     
     @scene = new THREE.Scene()
-    @geometry = new Plane(@width / 4, @height / 4)
+    @geometry = new THREE.PlaneGeometry(@width / 4, @height / 4)
     
     for frameIndex in [1..@depth]
-      frame = new Float32Array(length)
-      offset = (frameIndex - 1) * (@width * @height)
-      for index in [0..length]
-        frame[index] = @toUint8(pixels[offset + index])
+      frame = data.getFrame()
+      
+      for pixel, index in frame
+        frame[index] = @toUint8(pixel)
       
       # Create the texture
       texture = @createTexture(@width, @height, frame)
