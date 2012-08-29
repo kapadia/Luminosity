@@ -60,7 +60,6 @@ class Cube extends Spine.Controller
       mesh = new THREE.Mesh(
         @geometry, new THREE.MeshBasicMaterial( { map: texture, opacity: 0.5, transparent: true, depthTest: false, blending: THREE.AdditiveBlending })
       )
-      
       mesh.position.y = 300 - 1.25 * frameIndex
       mesh.rotation.x = 90 * Math.PI / 180
       mesh.doubleSided = true

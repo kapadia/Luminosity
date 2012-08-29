@@ -26,7 +26,7 @@ class TableController extends Spine.Controller
     @bind 'axisChange', @createPlot
   
   @createAxes3D: (plot, size) ->
-    v = (x, y, z) => return new THREE.Vertex(new THREE.Vector3(x, y, z))
+    v = (x, y, z) => return new THREE.Vector3(x, y, z)
     
     lineGeo = new THREE.Geometry()
     lineGeo.vertices.push(
@@ -105,7 +105,7 @@ class TableController extends Spine.Controller
     @scatterPlot = new THREE.Object3D()
     
     # Construct the axes
-    v = (x, y, z) => return new THREE.Vertex(new THREE.Vector3(x, y, z))
+    v = (x, y, z) => return new THREE.Vector3(x, y, z)
     
     # Construct the axes
     distance = 20
@@ -124,7 +124,7 @@ class TableController extends Spine.Controller
       x = row[0]
       y = row[1]
       z = row[3]
-      pointGeo.vertices.push(new THREE.Vertex(new THREE.Vector3(x, y, z)))
+      pointGeo.vertices.push(new THREE.Vector3(x, y, z))
       pointGeo.colors.push(new THREE.Color().setHSV(10, 84, 80))
 
     points = new THREE.ParticleSystem(pointGeo, mat)

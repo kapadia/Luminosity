@@ -24,15 +24,20 @@ class Image extends Spine.Controller
     @stretch.style.display = 'none'
     
     # Read the data from the image
-    @readImageData()
-    
-    # Setup histogram
-    @computeHistogram()
-    @drawHistogram()
-    
-    # Setup up WebGL and interface
-    @setupWebGL()
-    @setupWebGLUI()
+    setTimeout (=>
+      @readImageData()
+
+      # Setup histogram
+      @computeHistogram()
+      @drawHistogram()
+
+      # Setup up WebGL and interface
+      @setupWebGL()
+      @setupWebGLUI()
+      
+      # # Delete reference to array
+      # delete @hdu.data.data
+    ), 10
   
   # TODO: Handle this with inline workers
   readImageData: ->
@@ -41,7 +46,9 @@ class Image extends Spine.Controller
     data = @hdu.data
     [@width, @height] = [@hdu.header['NAXIS1'], @hdu.header['NAXIS2']]
     
-    data.getFrameWebGL()
+    # Initialize a Float32Array for WebGL
+    data.data = new Float32Array(@width * @height)
+    data.getFrame()
     data.getExtremes()
   
   tempGrid: ->
@@ -156,7 +163,7 @@ class Image extends Spine.Controller
     e.stopPropagation()
     factor = if e.shiftKey then 1.01 else 1.1
     @scale *= if (e.detail or e.wheelDelta) < 0 then factor else 1 / factor
-    console.log @scale
+    
     # Probably not the most efficient way to do this ...
     @scale = if @scale > @maxScale then @maxScale else @scale
     @scale = if @scale < @minScale then @minScale else @scale
