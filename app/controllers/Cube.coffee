@@ -24,6 +24,8 @@ class Cube extends Spine.Controller
     @width  = data.width
     @height = data.height
     @depth  = data.naxis[2]
+    @minimums = []
+    @maximums = []
     
     # Create a renderer and grab the GL context
     @renderer = new THREE.WebGLRenderer({antialias: false})
@@ -39,16 +41,19 @@ class Cube extends Spine.Controller
     [@windowHalfX, @windowHalfY] = [Cube.viewportWidth / 2, Cube.viewportHeight / 2]
     
     # Set up the camera, scene and plane
-    @camera = new THREE.PerspectiveCamera(75, Cube.viewportWidth / Cube.viewportHeight, 1, 10000)
+    @camera = new THREE.PerspectiveCamera(45, Cube.viewportWidth / Cube.viewportHeight, 1, 10000)
     @camera.position.z = 240
-    @camera.position.y = -120
-    @camera.rotation.x = Math.PI / 10
-    
     @scene = new THREE.Scene()
+    @object3d = new THREE.Object3D()
+    
     @geometry = new THREE.PlaneGeometry(@width / 4, @height / 4)
     
     for frameIndex in [1..@depth]
       frame = data.getFrame()
+      
+      [@min, @max] = data.getExtremes()
+      @minimums.push @min
+      @maximums.push @max
       
       for pixel, index in frame
         frame[index] = @toUint8(pixel)
@@ -60,15 +65,35 @@ class Cube extends Spine.Controller
       mesh = new THREE.Mesh(
         @geometry, new THREE.MeshBasicMaterial( { map: texture, opacity: 0.5, transparent: true, depthTest: false, blending: THREE.AdditiveBlending })
       )
-      mesh.position.y = 300 - 1.25 * frameIndex
+      mesh.position.y = 300 - 0.5 * frameIndex
       mesh.rotation.x = 90 * Math.PI / 180
       mesh.doubleSided = true
-      @scene.add(mesh)
+      @object3d.add(mesh)
     
+    @scene.add(@object3d)
     @container.appendChild(@renderer.domElement)
-    @container.addEventListener('mousemove', @onMouseMove, false)
     
-    @animate()
+    # Mouse interactions
+    @down = false
+    [@sx, @sy] = [0, 0]
+    @container.onmousedown = (e) =>
+      @down = true
+      @sx = e.clientX
+      @sy = e.clientY
+    @container.onmouseup = (e) =>
+      @down = false
+    @container.onmousemove = (e) =>
+      if @down
+        dx = e.clientX - @sx
+        dy = e.clientY - @sy
+        @object3d.rotation.y += dx * 0.01
+        @object3d.rotation.x += dy * 0.01
+        @object3d.rotation.z += dx * 0.01
+        @sx += dx
+        @sy += dy
+        @renderer.render(@scene, @camera)
+    
+    @renderer.render(@scene, @camera)
     
   createTexture: (width, height, data) ->
     texture = new THREE.Texture()
@@ -108,12 +133,16 @@ class Cube extends Spine.Controller
     @renderer.render(@scene, @camera)
     
   toUint8: (value) ->
-    return @arcsinh(1) if isNaN(value)
-    value = @arcsinh(value + @min + 1)
-    min = @arcsinh(@min + 1)
-    max = @arcsinh(@max + 1)
+    return @scaledArcsinh(1) if isNaN(value)
+    value = @scaledArcsinh(value + @min + 1)
+    min = @scaledArcsinh(@min + 1)
+    max = @scaledArcsinh(@max + 1)
     return (value - min) / (max - min)
   
-  arcsinh: (value) -> Math.log(value + Math.sqrt(1 + value * value))
+  scaledArcsinh: (value) =>
+    return @arcsinh(value / -0.033) / @arcsinh(1.0 / -0.033)
+    
+  arcsinh: (value) =>
+    Math.log(value + Math.sqrt(1 + value * value))
     
 module.exports = Cube

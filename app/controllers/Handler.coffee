@@ -55,6 +55,13 @@ class Handler extends Spine.Controller
       else if header.isExtension()
         if header['XTENSION'] is 'TABLE'
           new TableController args
+        else if header['XTENSION'] is 'BINTABLE'
+          if header.contains('ZIMAGE')
+            new ImageController args
+          else
+            throw 'Binary Table Handler not yet implemented'
+        else if header.extensionType is 'IMAGE'
+          new ImageController args
 
 
 module.exports = Handler

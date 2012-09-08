@@ -17,7 +17,6 @@ class TableController extends Spine.Controller
     @axes = $("#dataunit-#{@index} select.axis")
     @plot = $("#dataunit-#{@index} .plot")
     
-    # TEST: WebGL scatter plot
     @createScatter3D()
     
     # Bind events for plots
@@ -118,7 +117,7 @@ class TableController extends Spine.Controller
     mat = new THREE.ParticleBasicMaterial({vertexColors: true, size: 0.10, color: 0xff0000})
     pointCount = dataunit.rows
     pointGeo = new THREE.Geometry()
-
+    
     for rowNumber in [0..pointCount - 1]
       row = dataunit.getRow()
       x = row[0]
@@ -126,7 +125,7 @@ class TableController extends Spine.Controller
       z = row[3]
       pointGeo.vertices.push(new THREE.Vector3(x, y, z))
       pointGeo.colors.push(new THREE.Color().setHSV(10, 84, 80))
-
+    
     points = new THREE.ParticleSystem(pointGeo, mat)
     @scatterPlot.add(points)
     @scene.fog = new THREE.FogExp2(0xFFFFFF, 0.0035)

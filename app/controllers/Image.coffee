@@ -11,7 +11,7 @@ class Image extends Spine.Controller
     console.log 'Image'
     super
     
-    # Check fro WebGL
+    # Check for WebGL
     return null unless WebGL.check()
     
     @html require('views/image')()
@@ -43,12 +43,27 @@ class Image extends Spine.Controller
   readImageData: ->
     console.log 'readImageData'
     
+    progress = document.querySelector(".read-image")
+    
     data = @hdu.data
-    [@width, @height] = [@hdu.header['NAXIS1'], @hdu.header['NAXIS2']]
+    [@width, @height] = [data.width, data.height]
     
     # Initialize a Float32Array for WebGL
     data.data = new Float32Array(@width * @height)
-    data.getFrame()
+    
+    data.totalRowsRead = data.width * data.frame
+    data.rowsRead = 0
+    
+    height = data.height
+    while height--
+      data.getRow()
+      percent = Math.round(100 * (data.rowsRead / data.height))
+      console.log percent
+      if percent < 100
+        progress.value = percent
+      
+    $(".read-image").hide()
+    data.frame += 1
     data.getExtremes()
   
   tempGrid: ->
