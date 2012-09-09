@@ -14,7 +14,7 @@ class Handler extends Spine.Controller
   readBuffer: (buffer) ->
     @fits = new FITS.File(buffer)
     @renderTabs()
-    @readData()
+    @readData(buffer)
   
   renderTabs: ->
     hdus = @fits.hdus
@@ -37,13 +37,13 @@ class Handler extends Spine.Controller
       index = keyCode - 49
       @tabs.tabs('select', index)
   
-  readData: =>
+  readData: (buffer) =>
     for hdu, index in @fits.hdus
       header  = hdu.header
       data    = hdu.data
       
       elem = $("#dataunit-#{index}")
-      args = {el: elem, hdu: hdu, index: index}
+      args = {el: elem, hdu: hdu, index: index, buffer: buffer}
       
       # Determine and initialize the appropriate handler for the HDU
       if header.isPrimary()

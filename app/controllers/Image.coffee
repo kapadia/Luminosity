@@ -14,6 +14,9 @@ class Image extends Spine.Controller
     # Check for WebGL
     return null unless WebGL.check()
     
+    # For inline workers
+    window.URL = window.URL or window.webkitURL
+    
     @html require('views/image')()
     
     # Grab a few DOM elements
@@ -24,77 +27,98 @@ class Image extends Spine.Controller
     @stretch.style.display = 'none'
     
     # Read the data from the image
-    setTimeout (=>
-      @readImageData()
+    @bind 'dataready', @finishSetup
+    @readImageData()
+  
+  finishSetup: ->
+    # Setup histogram
+    @computeHistogram()
+    @drawHistogram()
 
-      # Setup histogram
-      @computeHistogram()
-      @drawHistogram()
-
-      # Setup up WebGL and interface
-      @setupWebGL()
-      @setupWebGLUI()
-      
-      # # Delete reference to array
-      # delete @hdu.data.data
-    ), 10
+    # Setup up WebGL and interface
+    @setupWebGL()
+    @setupWebGLUI()
+    
+    # # Delete reference to array
+    # delete @hdu.data.data
   
   # TODO: Handle this with inline workers
   readImageData: ->
     console.log 'readImageData'
     
-    progress = document.querySelector(".read-image")
-    
-    data = @hdu.data
-    [@width, @height] = [data.width, data.height]
+    dataunit = @hdu.data
+    [@width, @height] = [dataunit.width, dataunit.height]
     
     # Initialize a Float32Array for WebGL
-    data.data = new Float32Array(@width * @height)
+    dataunit.data = new Float32Array(@width * @height)
     
-    data.totalRowsRead = data.width * data.frame
-    data.rowsRead = 0
+    dataunit.totalRowsRead = dataunit.width * dataunit.frame
+    dataunit.rowsRead = 0
     
-    height = data.height
-    while height--
-      data.getRow()
-      percent = Math.round(100 * (data.rowsRead / data.height))
-      console.log percent
-      if percent < 100
-        progress.value = percent
-      
+    height = dataunit.height
+    rowsRead = 0
+    
+    #
+    # This code allows for a progress bar to update
+    # when the data is being interpretted by fitsjs
+    
+    # readImageRow = (progressFn) =>
+    #   data.getRow()
+    #   rowsRead += 1
+    #   
+    #   progressFn()
+    #   
+    #   if rowsRead < height
+    #     setTimeout ( =>
+    #       readImageRow progressFn
+    #     ), 0
+    #   else
+    #     data.frame += 1
+    #     data.getExtremes()
+    #     
+    #     # Hide the progress bar
+    #     $(".read-image").hide()
+    #     
+    #     @trigger 'dataready'
+    # 
+    # readImageRow ( ->
+    #   progress = document.querySelector(".read-image")
+    #   percent = Math.round(100 * (rowsRead / height))
+    #   progress.value = percent
+    # )
+    
+    #
+    # This code uses an inline worker to offload the task.
+    #
+    
+    # Set up an object to send to inline worker
+    msg =
+      buffer: @buffer
+      index: @index
+      width: @width
+      height: @height
+    
+    # Inline worker
+    blob = new Blob([Workers.Image])
+    blobUrl = window.URL.createObjectURL(blob)
+    
+    # Hide the progress bar
     $(".read-image").hide()
-    data.frame += 1
-    data.getExtremes()
-  
-  tempGrid: ->
-    # Temporary canvas for grid
-    container = document.querySelector("#dataunit-#{@index} .fits-viewer")
-    canvas = document.createElement('canvas')
-    canvas.setAttribute('id', 'grid')
-    canvas.setAttribute('width', Image.viewportWidth)
-    canvas.setAttribute('height', Image.viewportHeight)
-    container.appendChild(canvas)
-    context = canvas.getContext("2d")
     
-    context.moveTo(Image.viewportWidth / 2, 0)
-    context.lineTo(Image.viewportWidth / 2, Image.viewportHeight)
-    
-    context.moveTo(0, Image.viewportHeight / 2)
-    context.lineTo(Image.viewportWidth, Image.viewportHeight / 2)
-    
-    context.strokeStyle = "black"
-    context.lineWidth = 0.5
-    context.stroke()
-    canvas.onmousedown = (e) =>
-      @canvas.onmousedown(e)
-    canvas.onmouseup = (e) =>
-      @canvas.onmouseup(e)
-    canvas.onmousemove = (e) =>
-      @canvas.onmousemove(e)
-    canvas.onmouseout = (e) =>
-      @canvas.onmouseout(e)
-    canvas.addEventListener('mousewheel', @wheelHandler, false)
-    canvas.addEventListener('DOMMouseScroll', @wheelHandler, false)
+    worker = new Worker(blobUrl)
+    worker.addEventListener 'message', ((e) =>
+      data = e.data
+      
+      dataunit.data = data.data
+      dataunit.min = data.min
+      dataunit.max = data.max
+      dataunit.frame = data.frame
+      
+      @buffer = null
+      @trigger 'dataready'
+      $("#dataunit-#{@index} .spinner").remove()
+    ), false
+    worker.postMessage(msg)
   
   setupWebGL: ->
     console.log 'setupWebGL'
