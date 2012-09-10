@@ -6,9 +6,46 @@ Workers =
   Image: [
     "importScripts('http://0.0.0.0:9294/lib/fits.js');",
     
+    "var computeHistogram;",
+
+    "computeHistogram = function(min, max, bins, data) {",
+      "var binSize, bins, count, data, diff, index, length, max, min, pixel, pixels, range, sum, value, _i, _j, _len, _len1, _ref;",
+      "var histogram, mean, std, histogramMin, histogramMax, histogramLowerIndex, histogramUpperIndex;",
+
+      "range = max - min;",
+      "sum = 0;",
+      "bins = bins;",
+      "binSize = range / bins;",
+      "length = data.length;",
+      "histogram = new Uint32Array(bins + 1);",
+      "for (_i = 0, _len = data.length; _i < _len; _i++) {",
+        "pixel = data[_i];",
+        "sum += pixel;",
+        "index = Math.floor(((pixel - min) / range) * bins);",
+        "histogram[index] += 1;",
+      "}",
+      "mean = sum / length;",
+      "sum = 0;",
+      "_ref = histogram;",
+      "for (index = _j = 0, _len1 = _ref.length; _j < _len1; index = ++_j) {",
+        "count = _ref[index];",
+        "value = min + index * binSize;",
+        "diff = value - mean;",
+        "sum += (diff * diff) * count;",
+      "}",
+      "std = Math.sqrt(sum / length);",
+      "histogramMax = Math.max.apply(Math, histogram);",
+      "histogramMin = Math.min.apply(Math, histogram);",
+      "histogramLowerIndex = Math.floor(((pixel - histogramMin) / range) * bins);",
+      "histogramUpperIndex = Math.floor(((pixel - histogramMax) / range) * bins);",
+
+      "return [histogram, min, max];",
+    "};",
+    
     "self.addEventListener('message', (function (e) {",
-      "var msg, data, f, hdu, header, dataunit, width, height;",
-      "var FITS = require('fits');"
+      "var msg, data, f, hdu, header, dataunit, width, height, stats;",
+      
+      "var FITS = require('fits');",
       "data = e.data;",
       
       "f = new FITS.File(data.buffer);",
@@ -20,11 +57,15 @@ Workers =
       "dataunit.getFrame();",
       "dataunit.getExtremes();",
       
+      # Compute statistics
+      # "stats = computeHistogram(dataunit.min, dataunit.max, data.bins, dataunit.data);",
+      
       "msg = {",
         "data: dataunit.data,",
         "min: dataunit.min,",
         "max: dataunit.max,",
-        "frame: dataunit.frame",
+        "frame: dataunit.frame,",
+        # "stats: stats",
       "};",
       "self.postMessage(msg);",
     "}), false);"

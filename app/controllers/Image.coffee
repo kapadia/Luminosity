@@ -60,7 +60,8 @@ class Image extends Spine.Controller
     
     #
     # This code allows for a progress bar to update
-    # when the data is being interpretted by fitsjs
+    # when the data is being interpretted by fitsjs.
+    # It is VERY slow.
     
     # readImageRow = (progressFn) =>
     #   data.getRow()
@@ -92,33 +93,47 @@ class Image extends Spine.Controller
     #
     
     # Set up an object to send to inline worker
-    msg =
-      buffer: @buffer
-      index: @index
-      width: @width
-      height: @height
+    # msg =
+    #   buffer: @buffer
+    #   index: @index
+    #   bins: Image.numberOfBins
+    # 
+    # # Inline worker
+    # blob = new Blob([Workers.Image])
+    # blobUrl = window.URL.createObjectURL(blob)
+    # 
+    # # Hide the progress bar
+    # $(".read-image").hide()
+    # 
+    # worker = new Worker(blobUrl)
+    # worker.addEventListener 'message', ((e) =>
+    #   data = e.data
+    #   console.log data
+    #   
+    #   dataunit.data = data.data
+    #   dataunit.min = data.min
+    #   dataunit.max = data.max
+    #   dataunit.frame = data.frame
+    #   # @histogram = data.stats[0]
+    #   # @mean = data.stats[1]
+    #   # @std = data.stats[2]
+    #   
+    #   @buffer = null
+    #   @trigger 'dataready'
+    #   $("#dataunit-#{@index} .spinner").remove()
+    # ), false
+    # worker.postMessage(msg)
     
-    # Inline worker
-    blob = new Blob([Workers.Image])
-    blobUrl = window.URL.createObjectURL(blob)
+    #
+    # This is brute force code.  It seems most stable but is a terrible
+    # user experience locking the browser.
+    #
     
-    # Hide the progress bar
+    dataunit.getRow() while height--
     $(".read-image").hide()
-    
-    worker = new Worker(blobUrl)
-    worker.addEventListener 'message', ((e) =>
-      data = e.data
-      
-      dataunit.data = data.data
-      dataunit.min = data.min
-      dataunit.max = data.max
-      dataunit.frame = data.frame
-      
-      @buffer = null
-      @trigger 'dataready'
-      $("#dataunit-#{@index} .spinner").remove()
-    ), false
-    worker.postMessage(msg)
+    dataunit.frame += 1
+    dataunit.getExtremes()
+    @trigger 'dataready'
   
   setupWebGL: ->
     console.log 'setupWebGL'
@@ -294,7 +309,6 @@ class Image extends Spine.Controller
     length = pixels.length
     
     @histogram = new Uint32Array(bins + 1)
-    # @histogram = new Array(bins + 1)
     for pixel in pixels
       sum += pixel
       
