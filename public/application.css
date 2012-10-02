@@ -103,6 +103,15 @@ canvas {
 .fits-viewer canvas {
   position: absolute;
 }
+progress .read-image {
+  width: 200px;
+  height: 20px;
+}
+.spinner {
+  position: absolute;
+  top: 316px;
+  left: 500px;
+}
 table.fits-table {
   font-size: 11px;
 }

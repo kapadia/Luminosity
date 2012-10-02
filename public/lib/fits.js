@@ -107,15 +107,42 @@
             })(dataType);
           } else {
             (function(dataType) {
-              var accessor;
-              accessor = function() {
-                var data, _j;
-                data = [];
-                for (i = _j = 1; 1 <= length ? _j <= length : _j >= length; i = 1 <= length ? ++_j : --_j) {
-                  data.push(BinaryTable.dataAccessors[dataType](_this.view));
-                }
-                return data;
-              };
+              var accessor, numBytes;
+              if (dataType === 'X') {
+                numBytes = Math.log(length) / Math.log(2);
+                accessor = function() {
+                  var bit, bitarray, byte, byte2bits, data, _j, _k, _len;
+                  byte2bits = function(byte) {
+                    var bitarray;
+                    bitarray = [];
+                    i = 128;
+                    while (i >= 1) {
+                      bitarray.push((byte & i ? 1 : 0));
+                      i /= 2;
+                    }
+                    return bitarray;
+                  };
+                  data = [];
+                  for (i = _j = 1; 1 <= numBytes ? _j <= numBytes : _j >= numBytes; i = 1 <= numBytes ? ++_j : --_j) {
+                    byte = _this.view.getUint8();
+                    bitarray = byte2bits(byte);
+                    for (_k = 0, _len = bitarray.length; _k < _len; _k++) {
+                      bit = bitarray[_k];
+                      data.push(bit);
+                    }
+                  }
+                  return data.slice(0, (length - 1) + 1 || 9e9);
+                };
+              } else {
+                accessor = function() {
+                  var data, _j;
+                  data = [];
+                  for (i = _j = 1; 1 <= length ? _j <= length : _j >= length; i = 1 <= length ? ++_j : --_j) {
+                    data.push(BinaryTable.dataAccessors[dataType](_this.view));
+                  }
+                  return data;
+                };
+              }
               return _this.accessors.push(accessor);
             })(dataType);
           }
@@ -239,7 +266,14 @@
               break;
             case "GZIP_COMPRESSED_DATA":
               (function(dataType) {
-                return accessor = _this._accessor(dataType);
+                return accessor = function() {
+                  var data;
+                  data = _this._accessor(dataType);
+                  if (data == null) {
+                    return null;
+                  }
+                  return data;
+                };
               })(dataType);
               break;
             default:
@@ -793,7 +827,7 @@
     };
 
     File.prototype.checkEOF = function() {
-      if (this.view.offset === this.length) {
+      if (this.view.offset >= this.length) {
         return this.eof = true;
       }
     };
@@ -1691,9 +1725,11 @@
 
     Tabular.dataAccessors = {
       L: function(view) {
-        var value;
-        value = view.getInt8() === 84 ? true : false;
-        return value;
+        if (view.getInt8() === 84) {
+          return true;
+        } else {
+          return false;
+        }
       },
       X: function(view) {
         throw "Data type not yet implemented";

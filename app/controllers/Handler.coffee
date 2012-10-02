@@ -1,8 +1,9 @@
 FITS  = require('fits')
 
-ImageController = require('controllers/Image')
-CubeController  = require('controllers/Cube')
-TableController = require('controllers/Table')
+ImageController     = require('controllers/Image')
+CubeController      = require('controllers/Cube')
+TableController     = require('controllers/Table')
+BinTableController  = require('controllers/BinaryTable')
 
 class Handler extends Spine.Controller
   elements:
@@ -59,7 +60,7 @@ class Handler extends Spine.Controller
           if header.contains('ZIMAGE')
             new ImageController args
           else
-            throw 'Binary Table Handler not yet implemented'
+            new BinTableController args
         else if header.extensionType is 'IMAGE'
           new ImageController args
 
