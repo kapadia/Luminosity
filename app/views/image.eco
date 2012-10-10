@@ -1,12 +1,12 @@
 <progress class='read-image' value='0' max='100'></progress>
-<div class='fits-viewer dataunit'>
+<div class='fits-viewer'>
   <div class='spinner'>
     <img src="css/images/spinner.gif" />
   </div>
 </div>
-<div class='scale dataunit'></div>
-<div class='histogram dataunit'></div>
-<select class='stretch dataunit'>
+<div class='scale'></div>
+<div class='histogram'></div>
+<select class='stretch'>
   <option value="linear">Linear</option>
   <option value="logarithm">Logarithm</option>
   <option value="sqrt">Square Root</option>

@@ -20,14 +20,13 @@
     </tr>
   </thead>
   <tbody>
-  <% for index in [1..10]: %>
-    <% row = @getRow() %>
-    <% rowClass = if index % 2 then 'odd' else 'even' %>
+  <% for row, index in @table: %>
+  <% rowClass = if index % 2 then 'odd' else 'even' %>
     <tr>
       <% for value in row: %>
         <td><%= value %></td>
       <% end %>
-    </tr>
+    </tr>  
   <% end %>
   </tbody>
 </table>

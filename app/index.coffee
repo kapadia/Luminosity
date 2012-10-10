@@ -1,7 +1,7 @@
 require('lib/setup')
 
 Spine = require('spine')
-Drop = require('controllers/Drop')
+Drop  = require('controllers/Drop')
 
 class Luminosity extends Spine.Controller
   elements:

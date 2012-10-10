@@ -356,7 +356,7 @@ class Image extends Spine.Controller
       right: 20
       bottom: 60
       left: 10
-    w = 530 - margin.right - margin.left
+    w = 390 - margin.right - margin.left
     h = 260 - margin.top - margin.bottom
     
     # Grab some info about the data
