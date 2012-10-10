@@ -11,7 +11,7 @@
   </select>
 </div>
 
-<table class='fits-table tablesorter'>
+<table class='fits-table'>
   <thead>
     <tr class='column-names'>
       <% for column in @columns: %>
