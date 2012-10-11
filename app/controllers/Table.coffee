@@ -10,12 +10,10 @@ class TableController extends Spine.Controller
     
     @html require('views/table')(@hdu.data)
     
-    # Create a sortable table
-    $("#dataunit-#{@index} .fits-table").tablesorter()
-    
     # Store DOM elements
-    @axes = $("#dataunit-#{@index} select.axis")
-    @plot = $("#dataunit-#{@index} .plot")
+    #hdu-#{@index}
+    @axes = $("#hdu-#{@index} select.axis")
+    @plot = $("#hdu-#{@index} .plot")
     
     @createScatter3D()
     
@@ -86,7 +84,7 @@ class TableController extends Spine.Controller
     dataunit.rowsRead = 0
     
     # Setup the parent div
-    @scatterContainer = document.querySelector("#dataunit-#{@index} .scatter3d")
+    @scatterContainer = document.querySelector("#hdu-#{@index} .scatter3d")
     @scatterContainer.width   = TableController.scatterWidth
     @scatterContainer.height  = TableController.scatterHeight
     

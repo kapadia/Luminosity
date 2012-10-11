@@ -14,7 +14,7 @@ class BinaryTable extends Spine.Controller
     
     while number--
       table.push @hdu.data.getRow()
-    
+    console.log table
     info = {columns: @hdu.data.columns, table: table}
     @html require('views/bintable')(info)
     

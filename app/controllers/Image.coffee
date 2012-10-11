@@ -20,8 +20,8 @@ class Image extends Spine.Controller
     @html require('views/image')()
     
     # Grab a few DOM elements
-    @stretch  = document.querySelector("#dataunit-#{@index} .stretch")
-    @viewer   = document.querySelector("#dataunit-#{@index} .fits-viewer")
+    @stretch  = document.querySelector("#hdu-#{@index} .stretch")
+    @viewer   = document.querySelector("#hdu-#{@index} .fits-viewer")
     
     # NOTE: Turning off stretch function for now.
     @stretch.style.display = 'none'
@@ -138,7 +138,7 @@ class Image extends Spine.Controller
   setupWebGL: ->
     console.log 'setupWebGL'
     
-    container = document.querySelector("#dataunit-#{@index} .fits-viewer")
+    container = document.querySelector("#hdu-#{@index} .fits-viewer")
     @canvas   = WebGL.setupCanvas(container, Image.viewportWidth, Image.viewportHeight)
     
     # Set up variables for panning and zooming

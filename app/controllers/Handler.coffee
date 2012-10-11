@@ -6,44 +6,57 @@ TableController     = require('controllers/Table')
 BinTableController  = require('controllers/BinaryTable')
 
 class Handler extends Spine.Controller
+  events:
+    'click button.hdu'  : 'selectHDU'
+  
   elements:
-    '#header-tabs' : 'tabs'
+    '#header': 'header'
   
   constructor: ->
     super
     
   readBuffer: (buffer) ->
     @fits = new FITS.File(buffer)
-    @renderTabs()
-    @readData(buffer)
-  
-  renderTabs: ->
+    
     hdus = @fits.hdus
     @html require('views/hdus')(hdus)
     
-    # Store the current tab on selection
-    options =
-      select: (e, ui) =>
-        @currentTab = ui.index
-    @tabs.tabs(options)
-    @currentTab = 0   # Default to the first tab
+    @currentHDU = 0
+    section = $('section')
+    margin = parseInt(section.css('margin').match(/(\d+)/))
+    @hduHeight = section.outerHeight() + margin
     
-    # Keyboard shortcuts for tabs
-    window.addEventListener('keypress', @shortcuts, false)
+    # Set up scroll event
+    window.addEventListener('scroll', @scroll, false)
+    
+    @readData(buffer)
   
-  shortcuts: (e) =>
-    numTabs = @tabs.tabs('length')
-    keyCode = e.keyCode
-    if keyCode in [49..57]
-      index = keyCode - 49
-      @tabs.tabs('select', index)
+  selectHDU: (e) =>
+    selectedHDU = parseInt(e.target.dataset['index'])
+    if selectedHDU is @currentHDU
+      @showHeader(@currentHDU)
+    else
+      @header.hide()
+      @currentHDU = selectedHDU
+      $('html, body').animate({
+        scrollTop: @hduHeight * @currentHDU
+      })
+  
+  showHeader: (index) =>
+    header = @fits.getHDU(index).header
+    @header.html require('views/header')({cards: header.cards})
+    @header.toggle()
+  
+  scroll: (e) =>
+    @currentHDU = Math.floor(e.target.body.scrollTop / @hduHeight)
+    console.log @currentHDU
   
   readData: (buffer) =>
     for hdu, index in @fits.hdus
       header  = hdu.header
       data    = hdu.data
       
-      elem = $("#dataunit-#{index}")
+      elem = $("#hdu-#{index} .dataunit")
       args = {el: elem, hdu: hdu, index: index, buffer: buffer}
       
       # Determine and initialize the appropriate handler for the HDU

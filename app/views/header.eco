@@ -1,0 +1,8 @@
+<table class='header'>
+  <% for key, value of @cards: %>
+  <tr>
+    <td><%= key %></td>
+    <td><%= value[1] %></td>
+  </tr>
+  <% end %>
+</table>

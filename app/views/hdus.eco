@@ -1,28 +1,18 @@
-<div id="header-tabs">
-  <ul>
+<div id='hdus'>
   <% for hdu, index in @: %>
-    <li class='tab'>
-      <a href='#hdu-<%= index %>'>HDU <%= index %></a>
-    </li>
+  <% type = if hdu.header.extensionType? then hdu.header.extensionType.toLowerCase() else 'primary' %>
+  <button id='hdu-button-<%- index %>' class='hdu <%- type %>' data-type='<%- type %>' data-index='<%- index %>'>HDU <%- index %> (<%- type.toUpperCase() %>)</button>
   <% end %>
-  </ul>
+</div>
 
-  <% for hdu, index in @: %>
-  <div id='hdu-<%= index %>' class='hdu'>
-    <% cards = hdu.header.cards %>
-    <table class='header'>
-      <% row = 0 %>
-      <% for key, value of cards: %>
-      <% rowClass = if row % 2 then 'odd' else 'even' %>
-      <tr class='<%= rowClass %>'>
-        <td class='key'><%= key %></td>
-        <td class='value'><%= value[1] %></td>
-      </tr>
-      <% row += 1 %>
-      <% end %>
-    </table>
-    <div id='dataunit-<%= index %>' class='dataunit'></div>
-  </div>
-  <% end %>
+<div id='header' style='display: none;'></div>
 
+<% for hdu, index in @: %>
+<section id='hdu-<%= index %>' class='hdu'>
+  <article class='dataunit'></article>
+</section>
+<% end %>
+
+<div id="toolbar">
+  <p>Toolbar Goes Here ...</p>
 </div>
