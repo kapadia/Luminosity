@@ -27,7 +27,9 @@ class Handler extends Spine.Controller
     @hduHeight = section.outerHeight() + margin
     
     # Set up scroll event
-    window.addEventListener('scroll', @scroll, false)
+    $('#luminosity').scroll( (e) =>
+      @scroll(e.target.scrollTop)
+    )
     
     @readData(buffer)
   
@@ -38,7 +40,7 @@ class Handler extends Spine.Controller
     else
       @header.hide()
       @currentHDU = selectedHDU
-      $('html, body').animate({
+      $('#luminosity').animate({
         scrollTop: @hduHeight * @currentHDU
       })
   
@@ -47,9 +49,8 @@ class Handler extends Spine.Controller
     @header.html require('views/header')({cards: header.cards})
     @header.toggle()
   
-  scroll: (e) =>
-    @currentHDU = Math.floor(e.target.body.scrollTop / @hduHeight)
-    console.log @currentHDU
+  scroll: (value) =>
+    @currentHDU = Math.floor(value / @hduHeight)
   
   readData: (buffer) =>
     for hdu, index in @fits.hdus

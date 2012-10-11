@@ -8,7 +8,8 @@ class TableController extends Spine.Controller
     console.log 'Table', ThreeHelpers
     super
     
-    @html require('views/table')(@hdu.data)
+    @rows = @hdu.data.rows
+    @render()
     
     # Store DOM elements
     #hdu-#{@index}
@@ -21,6 +22,15 @@ class TableController extends Spine.Controller
     @axes.change (e) =>
       @trigger 'axisChange'
     @bind 'axisChange', @createPlot
+  
+  render: ->
+    number = if @rows < 10 then @rows else 10
+    table = []
+    
+    while number--
+      table.push @hdu.data.getRow()
+    info = {columns: @hdu.data.columns, table: table}
+    @html require('views/table')(info)
   
   @createAxes3D: (plot, size) ->
     v = (x, y, z) => return new THREE.Vector3(x, y, z)

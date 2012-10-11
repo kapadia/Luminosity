@@ -1,4 +1,4 @@
-<div class='axes'>
+<div class='axes' style='display: none;'>
   <select class='axis'>
   <% for column, index in @columns: %>
     <option value='<%= index %>'><%= column %></option>
@@ -11,7 +11,7 @@
   </select>
 </div>
 
-<table class='fits-table tablesorter'>
+<table class='fits-table'>
   <thead>
     <tr class='column-names'>
       <% for column in @columns: %>
@@ -20,17 +20,15 @@
     </tr>
   </thead>
   <tbody>
-  <% for index in [1..@rows]: %>
-    <% row = @getRow() %>
-    <% rowClass = if index % 2 then 'odd' else 'even' %>
+  <% for row, index in @table: %>
     <tr>
       <% for value in row: %>
         <td><%= value %></td>
       <% end %>
-    </tr>
+    </tr>  
   <% end %>
   </tbody>
 </table>
 
-<div class='scatter3d'></div>
-<div class='plot'></div>
+<div class='scatter3d' style='display: none;'></div>
+<div class='plot' style='display: none;'></div>
