@@ -12,7 +12,6 @@ class TableController extends Spine.Controller
     @render()
     
     # Store DOM elements
-    #hdu-#{@index}
     @axes = $("#hdu-#{@index} select.axis")
     @plot = $("#hdu-#{@index} .plot")
     
@@ -24,7 +23,7 @@ class TableController extends Spine.Controller
     @bind 'axisChange', @createPlot
   
   render: ->
-    number = if @rows < 10 then @rows else 10
+    number = if @rows < 10 then @rows else 100
     table = []
     
     while number--

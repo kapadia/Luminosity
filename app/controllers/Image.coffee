@@ -373,7 +373,7 @@ class Image extends Spine.Controller
       .range([0, h])
     
     # Create a chart object
-    chart = d3.select("#dataunit-#{@index} .histogram").append('svg')
+    chart = d3.select("#hdu-#{@index} .histogram").append('svg')
       .attr('class', 'chart')
       .attr('width', w + margin.right + margin.left)
       .attr('height', h + margin.top + margin.bottom)
