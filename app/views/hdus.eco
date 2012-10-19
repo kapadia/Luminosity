@@ -5,7 +5,7 @@
   <% end %>
 </div>
 
-<div id='header' style='display: none;'></div>
+<div id='header'></div>
 
 <% for hdu, index in @: %>
 <section id='hdu-<%= index %>' class='hdu'>

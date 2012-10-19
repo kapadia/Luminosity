@@ -177,8 +177,8 @@ class Image extends Spine.Controller
       xDelta = -1 * (@canvas.width / 2 - e.offsetX) / @canvas.width / @scale * 2.0
       yDelta = (@canvas.height / 2 - e.offsetY) / @canvas.height / @scale * 2.0
       
-      x = ((-1 * (@xOffset + 0.5)) + xDelta) + 0.5 << 0
-      y = ((-1 * (@yOffset + 0.5)) + yDelta) + 0.5 << 0
+      x = ((-1 * (@xOffset + 0.5)) + xDelta) + 1.5 << 0
+      y = ((-1 * (@yOffset + 0.5)) + yDelta) + 1.5 << 0
       
       console.log x, y, @hdu.data.getPixel(x, y)
       return unless @drag

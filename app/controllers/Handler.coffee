@@ -38,7 +38,7 @@ class Handler extends Spine.Controller
     if selectedHDU is @currentHDU
       @showHeader(@currentHDU)
     else
-      @header.hide()
+      @header.removeClass('shown')
       @currentHDU = selectedHDU
       $('#luminosity').animate({
         scrollTop: @hduHeight * @currentHDU
@@ -47,7 +47,7 @@ class Handler extends Spine.Controller
   showHeader: (index) =>
     header = @fits.getHDU(index).header
     @header.html require('views/header')({cards: header.cards})
-    @header.toggle()
+    @header.addClass('shown')
   
   scroll: (value) =>
     @currentHDU = Math.floor(value / @hduHeight)
