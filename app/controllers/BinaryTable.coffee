@@ -5,10 +5,10 @@ class BinaryTable extends Spine.Controller
     'input[name=number]'  : 'rowNumber'
   
   events:
-    'click input[name=submit]'    : 'selectRows'
-    'click input[name=next]'      : 'nextRows'
-    'click input[name=prev]'      : 'prevRows'
     'keydown input[name=number]'  : 'blockLetter'
+    'click input[name=submit]'    : 'updateRows'
+    'click input[name=next]'      : 'updateRows'
+    'click input[name=prev]'      : 'updateRows'
   
   @permittedKeys = [48..57]
   @permittedKeys.push(8)
@@ -35,62 +35,30 @@ class BinaryTable extends Spine.Controller
     permittedKeys.push(8)
     unless keyCode in permittedKeys
       e.preventDefault()
-    
-  # Methods for controlling which data are displayed on the table
-  selectRows: (e) =>
-    rowsRead = parseInt(@rowNumber.val())
-    dataunit = @hdu.data
-    
-    unless @checkRow(rowsRead)
-      alert("NO!")
-      return null
-    
-    count = dataunit.rows - rowsRead
-    count = if count < 10 then count else 10
-    count -= 1
-    
-    table = []
-    for i in [rowsRead..rowsRead+count]
-      table.push dataunit.getRow(i)
-    info = {columns: dataunit.columns, table: table}
-    @html require('views/bintable')(info)
   
-  nextRows: (e) =>
+  updateRows: (e) =>
     dataunit = @hdu.data
-    
-    rowsRead = dataunit.rowsRead
-    
-    unless @checkRow(rowsRead)
-      alert("NO!")
-      return null
-    
-    count = dataunit.rows - rowsRead
-    count = if count < 10 then count else 10
-    
-    table = []
-    for i in [rowsRead..rowsRead+count]
-      table.push dataunit.getRow(i)
-    
-    info = {columns: dataunit.columns, table: table}
-    @html require('views/bintable')(info)
-    
-  prevRows: (e) =>
-    dataunit = @hdu.data
-    
-    rowsRead = dataunit.rowsRead - 2 * 10 - 1
-    
-    unless @checkRow(rowsRead)
-      alert("NO!")
-      return null
+    switch e.target.name
+      when 'next'
+        rowsRead = dataunit.rowsRead
+      when 'prev'
+        rowsRead = dataunit.rowsRead - 2 * 10
+      when 'submit'
+        rowsRead = parseInt(@rowNumber.val())
     
     count = dataunit.rows - rowsRead
     count = if count < 10 then count else 10
     count -= 1
     
+    unless @checkRow(rowsRead)
+      alert("NO!")
+      return null
+    
     table = []
     for i in [rowsRead..rowsRead+count]
       table.push dataunit.getRow(i)
-    
+      
+    # Would be better to call render here
     info = {columns: dataunit.columns, table: table}
     @html require('views/bintable')(info)
   
