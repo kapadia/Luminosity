@@ -51,15 +51,12 @@ class BinaryTable extends Spine.Controller
     
     table = []
     for i in [rowsRead..rowsRead+count]
-      row = dataunit.getRow(i)
-      console.log row
-      table.push row
+      table.push dataunit.getRow(i)
     info = {columns: dataunit.columns, table: table}
     @html require('views/bintable')(info)
   
   nextRows: (e) =>
     dataunit = @hdu.data
-    console.log 'nextRows', dataunit.rowsRead
     
     rowsRead = dataunit.rowsRead
     
@@ -69,11 +66,9 @@ class BinaryTable extends Spine.Controller
     
     count = dataunit.rows - rowsRead
     count = if count < 10 then count else 10
-    console.log 'count = ', count
     
     table = []
     for i in [rowsRead..rowsRead+count]
-      console.log i
       table.push dataunit.getRow(i)
     
     info = {columns: dataunit.columns, table: table}
@@ -81,18 +76,20 @@ class BinaryTable extends Spine.Controller
     
   prevRows: (e) =>
     dataunit = @hdu.data
-    console.log 'prevRows', dataunit.rowsRead
     
-    rowsRead = dataunit.rowsRead - 2 * 10
+    rowsRead = dataunit.rowsRead - 2 * 10 - 1
     
     unless @checkRow(rowsRead)
       alert("NO!")
       return null
     
+    count = dataunit.rows - rowsRead
+    count = if count < 10 then count else 10
+    count -= 1
+    
     table = []
-    for i in [rowsRead..rowsRead+9]
-      console.log i
-      table.push dataunit.getRow(row = i)
+    for i in [rowsRead..rowsRead+count]
+      table.push dataunit.getRow(i)
     
     info = {columns: dataunit.columns, table: table}
     @html require('views/bintable')(info)
