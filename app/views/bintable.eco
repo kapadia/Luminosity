@@ -19,21 +19,23 @@
   <input type='submit' name='next' value='Next'>
 </div>
 
-<table class='fits-table'>
-  <thead>
-    <tr class='column-names'>
-      <% for column in @columns: %>
-      <th><%= column %></th>
-      <% end %>
-    </tr>
-  </thead>
-  <tbody>
-  <% for row, index in @table: %>
-    <tr>
-      <% for value in row: %>
-        <td><%= value %></td>
-      <% end %>
-    </tr>  
-  <% end %>
-  </tbody>
-</table>
+<div class='table-container'>
+  <table class='fits-table'>
+    <thead>
+      <tr class='column-names'>
+        <% for column in @columns: %>
+        <th><%= column %></th>
+        <% end %>
+      </tr>
+    </thead>
+    <tbody>
+    <% for row, index in @table: %>
+      <tr>
+        <% for value in row: %>
+          <td><%= value %></td>
+        <% end %>
+      </tr>  
+    <% end %>
+    </tbody>
+  </table>
+</div>
