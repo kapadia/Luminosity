@@ -38,17 +38,22 @@ class BinaryTable extends Spine.Controller
     
   # Methods for controlling which data are displayed on the table
   selectRows: (e) =>
-    rowNumber = parseInt(@rowNumber.val()) - 1
+    rowsRead = parseInt(@rowNumber.val())
     dataunit = @hdu.data
-    dataunit.rowsRead = rowNumber
     
-    # Determine the number of rows to grab
-    numRows = dataunit.rows - rowNumber
-    numRows = if numRows < 10 then numRows else 10
+    unless @checkRow(rowsRead)
+      alert("NO!")
+      return null
+    
+    count = dataunit.rows - rowsRead
+    count = if count < 10 then count else 10
+    count -= 1
     
     table = []
-    for i in [0..numRows]
-      table.push dataunit.getRow()
+    for i in [rowsRead..rowsRead+count]
+      row = dataunit.getRow(i)
+      console.log row
+      table.push row
     info = {columns: dataunit.columns, table: table}
     @html require('views/bintable')(info)
   
@@ -62,8 +67,12 @@ class BinaryTable extends Spine.Controller
       alert("NO!")
       return null
     
+    count = dataunit.rows - rowsRead
+    count = if count < 10 then count else 10
+    console.log 'count = ', count
+    
     table = []
-    for i in [rowsRead..rowsRead+9]
+    for i in [rowsRead..rowsRead+count]
       console.log i
       table.push dataunit.getRow(i)
     
@@ -74,7 +83,7 @@ class BinaryTable extends Spine.Controller
     dataunit = @hdu.data
     console.log 'prevRows', dataunit.rowsRead
     
-    rowsRead = dataunit.rowsRead - 20
+    rowsRead = dataunit.rowsRead - 2 * 10
     
     unless @checkRow(rowsRead)
       alert("NO!")
