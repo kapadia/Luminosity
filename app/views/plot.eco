@@ -1,0 +1,9 @@
+<div class='heading'>
+  <h3><%- @name %></h3>
+  <select>
+    <% for column, index of @columns: %>
+    <option value='<%- index %>'><%- column %></option>
+    <% end %>
+  </select>
+</div>
+<div class='plot'></div>

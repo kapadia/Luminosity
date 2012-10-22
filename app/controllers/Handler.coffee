@@ -7,13 +7,14 @@ BinTableController  = require('controllers/BinaryTable')
 
 class Handler extends Spine.Controller
   events:
-    'click button.hdu'  : 'selectHDU'
+    'click button.hdu'    : 'selectHDU'
   
   elements:
     '#header': 'header'
   
   constructor: ->
     super
+    window.addEventListener('keydown', @shortcuts, false)
     
   readBuffer: (buffer) ->
     @fits = new FITS.File(buffer)
@@ -38,7 +39,7 @@ class Handler extends Spine.Controller
     if selectedHDU is @currentHDU
       @showHeader(@currentHDU)
     else
-      @header.removeClass('shown')
+      @header.hide()
       @currentHDU = selectedHDU
       $('#luminosity').animate({
         scrollTop: @hduHeight * @currentHDU
@@ -47,7 +48,7 @@ class Handler extends Spine.Controller
   showHeader: (index) =>
     header = @fits.getHDU(index).header
     @header.html require('views/header')({cards: header.cards})
-    @header.addClass('shown')
+    @header.toggle()
   
   scroll: (value) =>
     @currentHDU = Math.floor(value / @hduHeight)
@@ -77,6 +78,12 @@ class Handler extends Spine.Controller
             new BinTableController args
         else if header.extensionType is 'IMAGE'
           new ImageController args
-
-
+  
+  shortcuts: (e) =>
+    keyCode = e.keyCode
+    
+    # Escape
+    if keyCode is 27
+      $('.modal').hide()
+  
 module.exports = Handler

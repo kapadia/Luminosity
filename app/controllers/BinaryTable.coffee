@@ -1,14 +1,22 @@
 Spine = require('spine')
+Histogram = require('controllers/Histogram')
+Scatter2D = require('controllers/Scatter2D')
+Scatter3D = require('controllers/Scatter3D')
 
 class BinaryTable extends Spine.Controller
+  @numericDataType = /(\d*)([B|I|J|K|E|D])/
+  
   elements:
     'input[name=number]'  : 'rowNumber'
   
   events:
-    'keydown input[name=number]'  : 'blockLetter'
-    'click input[name=submit]'    : 'updateRows'
-    'click input[name=next]'      : 'updateRows'
-    'click input[name=prev]'      : 'updateRows'
+    'keydown input[name=number]'    : 'blockLetter'
+    'click input[name=submit]'      : 'updateRows'
+    'click input[name=next]'        : 'updateRows'
+    'click input[name=prev]'        : 'updateRows'
+    'click input[name=histogram]'   : 'toggleHistogram'
+    'click input[name=scatter-2d]'  : 'toggleScatter2D'
+    'click input[name=scatter-3d]'  : 'toggleScatter3D'
   
   @permittedKeys: [48..57]
   @.permittedKeys.push(8)
@@ -20,6 +28,17 @@ class BinaryTable extends Spine.Controller
     
     @render()
     
+    # Initialize a plot objects
+    columns = @getNumericalColumns()
+    @histogramElem = $("#hdu-#{@index} .histogram")
+    @histogram = new Histogram({el: @histogramElem, hdu: @hdu, index: @index, columns: columns})
+    
+    @scatter2dElem = $("#hdu-#{@index} .scatter-2d")
+    @scatter2d = new Scatter2D({el: @scatter2dElem, hdu: @hdu, index: @index, columns: columns})
+    
+    @scatter3dElem = $("#hdu-#{@index} .scatter-3d")
+    @scatter3d = new Scatter3D({el: @scatter3dElem, hdu: @hdu, index: @index, columns: columns})
+    
   render: =>
     number = if @rows < 10 then @rows else 10
     table = []
@@ -28,7 +47,7 @@ class BinaryTable extends Spine.Controller
       table.push @hdu.data.getRow()
     info = {columns: @hdu.data.columns, table: table}
     @html require('views/bintable')(info)
-    
+  
   blockLetter: (e) ->
     keyCode = e.keyCode
     unless keyCode in BinaryTable.permittedKeys
@@ -42,7 +61,6 @@ class BinaryTable extends Spine.Controller
         rowsRead = dataunit.rowsRead
       when 'prev'
         rowsRead = Math.max(dataunit.rowsRead - 2 * 10, 0)
-        
       when 'submit'
         rowsRead = parseInt(@rowNumber.val())
     
@@ -67,5 +85,22 @@ class BinaryTable extends Spine.Controller
     return false if number < 0
     return false if number > dataunit.rows - 1
     return true
+    
+  getNumericalColumns: ->
+    columns = {}
+    header = @hdu.header
+    dataunit = @hdu.data
+    cols = dataunit.cols
+    for i in [1..cols]
+      form = "TFORM#{i}"
+      type = "TTYPE#{i}"
+      match = header[form].match(BinaryTable.numericDataType)
+      if match?
+        columns[header[type]] = i - 1
+    return columns
+  
+  toggleHistogram: => @histogramElem.toggle()
+  toggleScatter2D: => @scatter2dElem.toggle()
+  toggleScatter3D: => @scatter3dElem.toggle()
     
 module.exports = BinaryTable

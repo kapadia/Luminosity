@@ -17,7 +17,14 @@
   <input type='submit' name='submit' value='Go'>
   <input type='submit' name='prev' value='Previous'>
   <input type='submit' name='next' value='Next'>
+  <input type='submit' name='histogram' value='Histogram'>
+  <input type='submit' name='scatter-2d' value='Scatter 2D'>
+  <input type='submit' name='scatter-3d' value='Scatter 3D'>
 </div>
+
+<div class='plot histogram modal'></div>
+<div class='plot scatter-2d modal'></div>
+<div class='plot scatter-3d modal'></div>
 
 <div class='table-container'>
   <table class='fits-table'>
