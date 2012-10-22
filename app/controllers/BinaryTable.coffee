@@ -10,8 +10,8 @@ class BinaryTable extends Spine.Controller
     'click input[name=next]'      : 'updateRows'
     'click input[name=prev]'      : 'updateRows'
   
-  @permittedKeys = [48..57]
-  @permittedKeys.push(8)
+  @permittedKeys: [48..57]
+  @.permittedKeys.push(8)
   
   constructor: ->
     super
@@ -31,18 +31,18 @@ class BinaryTable extends Spine.Controller
     
   blockLetter: (e) ->
     keyCode = e.keyCode
-    permittedKeys = [48..57]
-    permittedKeys.push(8)
-    unless keyCode in permittedKeys
+    unless keyCode in BinaryTable.permittedKeys
       e.preventDefault()
   
   updateRows: (e) =>
     dataunit = @hdu.data
+    
     switch e.target.name
       when 'next'
         rowsRead = dataunit.rowsRead
       when 'prev'
-        rowsRead = dataunit.rowsRead - 2 * 10
+        rowsRead = Math.max(dataunit.rowsRead - 2 * 10, 0)
+        
       when 'submit'
         rowsRead = parseInt(@rowNumber.val())
     
