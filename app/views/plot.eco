@@ -1,9 +1,11 @@
 <div class='heading'>
   <h3><%- @name %></h3>
-  <select>
+  <% for i in [1..@axes]: %>
+  <select data-axis='<%- @axes - i + 1 %>'>
     <% for column, index of @columns: %>
     <option value='<%- index %>'><%- column %></option>
     <% end %>
   </select>
+  <% end %>
 </div>
-<div class='plot'></div>
+<div class='graph'></div>

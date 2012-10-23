@@ -3,17 +3,17 @@ class Histogram extends Spine.Controller
   name: 'Histogram'
   
   events:
-    'change select' : 'draw'
+    'change .histogram select[data-axis=1]' : 'draw'
   
   constructor: ->
     super
     console.log 'Histogram'
     
     @render()
-    @plot = $("#hdu-#{@index} .histogram .plot")
+    @plot = $("#hdu-#{@index} .histogram .graph")
   
   render: ->
-    attrs = {columns: @columns, name: @name}
+    attrs = {columns: @columns, name: @name, axes: 1}
     @html require('views/plot')(attrs)
   
   draw: (e) ->
@@ -28,7 +28,6 @@ class Histogram extends Spine.Controller
       row = dataunit.getRow(i - 1)
       values.push(row[columnIndex])
     
-    console.log values
     margin =
       top: 20
       right: 20
@@ -52,7 +51,7 @@ class Histogram extends Spine.Controller
       .scale(y)
       .orient("left")
     
-    svg = d3.select("#hdu-#{@index} .histogram .plot").append('svg')
+    svg = d3.select("#hdu-#{@index} .histogram .graph").append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
           .append('g')
