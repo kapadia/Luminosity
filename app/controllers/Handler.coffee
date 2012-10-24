@@ -7,10 +7,10 @@ BinTableController  = require('controllers/BinaryTable')
 
 class Handler extends Spine.Controller
   events:
-    'click button.hdu'    : 'selectHDU'
+    'click button.hdu'  : 'selectHDU'
   
   elements:
-    '#header': 'header'
+    '#header' : 'header'
   
   constructor: ->
     super

@@ -6,6 +6,7 @@
 </div>
 
 <div id='header' class='modal'></div>
+<div id='info'></div>
 
 <% for hdu, index in @: %>
 <section id='hdu-<%= index %>' class='hdu'>
