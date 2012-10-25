@@ -1,25 +1,12 @@
+Graph = require('controllers/Graph')
 
-class Histogram extends Spine.Controller
+class Histogram extends Graph
   name: 'Histogram'
+  axes: 1
   
   events:
     'change .histogram select[data-axis=1]' : 'draw'
     'click .histogram button[name=save]'    : 'savePlot'
-  
-  constructor: ->
-    super
-    console.log 'Histogram'
-    
-    @render()
-    @plot = $("#hdu-#{@index} .histogram .graph")
-    @axis1 = $("#hdu-#{@index} .histogram select[data-axis=1]")
-    
-    @saveButton = $("#hdu-#{@index} .histogram button[name=save]")
-    @saveButton.prop('disabled', true)
-  
-  render: ->
-    attrs = {columns: @columns, name: @name, axes: 1}
-    @html require('views/plot')(attrs)
   
   draw: =>
     index1 = @axis1.val()
@@ -100,25 +87,9 @@ class Histogram extends Spine.Controller
         .attr("height", (d) => return height - @y(d))
 
   zoom: =>
-    @svg.select(".x.axis").call(@xAxis)
-    @svg.select(".y.axis").call(@yAxis)
+    super
     @svg.selectAll(".bar")
       .attr("x", (d, i) => return @x(i))
       .attr("y", (d) => return @y(d))
-  
-  savePlot: =>
-    xlabel = @axis1.find("option:selected").text()
-    
-    svg = @plot.find('svg')
-    svg.attr('xmlns', 'http://www.w3.org/2000/svg')
-    svg.attr('version', '1.1')
-    window.URL = window.URL or window.webkitURL
-    blob = new Blob([@plot.html()], {type: 'image/svg+xml'})
-    
-    a = document.createElement('a')
-    a.download = "#{xlabel}.svg"
-    a.type = 'image/svg+xml'
-    a.href = window.URL.createObjectURL(blob)
-    a.click()
     
 module.exports = Histogram

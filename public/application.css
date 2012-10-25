@@ -1,4 +1,4 @@
-@import 'css/jquery-ui-1.8.22.custom.css';
+@import url("http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,400italic,700|Open+Sans+Condensed:700,300");
 .frame {
   width: 100%;
   height: 100%;
@@ -23,55 +23,91 @@
 #loading {
   display: none;
 }
-table.header {
-  width: 200px;
+button.hdu {
+  font-size: 9px;
+  font-weight: 700;
+  padding: 4px 8px;
+  margin: 0px;
+  color: #f3f3f3;
+}
+button.primary {
+  background-color: #505050;
+}
+button.table {
+  background-color: #505050;
+}
+button.bintable {
+  background-color: #505050;
+}
+button.image {
+  background-color: #505050;
+}
+section {
+  margin: 0 auto;
+  height: 90%;
+  border: 1px solid #0172e6;
+  margin: 40px 40px;
+  overflow: visible;
+}
+section article.dataunit {
+  width: 100%;
+  height: 100%;
+}
+#header {
+  width: 50%;
+  height: 50%;
+  overflow: scroll;
+  display: none;
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  padding: 20px;
+  border: solid 1px #bbb;
+  background: #fff;
+  -webkit-box-shadow: 0px 3px 6px rgba(0,0,0,0.25);
+}
+#header table.header {
   font-size: 11px;
-  float: left;
+  color: #505050;
+  width: 300px;
+  border: 0;
+  overflow: scroll;
 }
-table.header .key {
-  text-align: right;
-}
-table.header .value {
-  text-align: left;
-}
-table.header .even {
-  background-color: #fafafa;
-}
-table.header .odd {
-  background-color: #f7f7f7;
-}
-table.header tbody {
-  height: 320px;
-  width: 200px;
+#header table.header tbody {
   overflow: auto;
   display: block;
+  width: 100%;
 }
-table.header tbody tr {
+#header table.header tbody tr {
+  background-color: #fafafa;
+  width: 100%;
   height: 16px;
 }
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
+#header table.header tbody tr:hover {
+  background: #f3f3f3;
+}
+#header table.header tbody tr td:first-child {
+  width: 100px;
   font-weight: 700;
-  src: local('Open Sans Bold'), local('OpenSans-Bold'), url("fonts/k3k702ZOKiLJc3WVjuplzKRDOzjiPcYnFooOUGCOsRk.woff") format('woff');
+  text-align: right;
+  padding-right: 4px;
 }
-@font-face {
-  font-family: 'Open Sans Condensed';
-  font-style: normal;
-  font-weight: 700;
-  src: local('Open Sans Condensed Bold'), local('OpenSans-CondensedBold'), url("fonts/gk5FxslNkTTHtojXrkp-xM6Eyu0BCqAfob_z3hhzRFzr7w4p9aSvGirXi6XmeXNA.woff") format('woff');
+#header table.header tbody tr td:last-child {
+  width: 200px;
+  text-align: left;
+  padding-left: 4px;
 }
-@font-face {
-  font-family: 'Open Sans Condensed';
-  font-style: normal;
-  font-weight: 300;
-  src: local('Open Sans Cond Light'), local('OpenSans-CondensedLight'), url("fonts/gk5FxslNkTTHtojXrkp-xGAzD5WKQVN4wSyA0MYYi4rr7w4p9aSvGirXi6XmeXNA.woff") format('woff');
+#header table.header tbody tr:nth-child(2n+1) {
+  background-color: #f7f7f7;
 }
-@font-face {
-  font-family: 'Open Sans';
-  font-style: normal;
-  font-weight: 400;
-  src: local('Open Sans'), local('OpenSans'), url("fonts/cJZKeOuBrn4kERxqtaUH3bO3LdcAZYWl9Si6vvxL-qU.woff") format('woff');
+#info {
+  position: fixed;
+  display: none;
+  width: 120px;
+  height: 30px;
+  z-index: 2000;
+  font-size: 11px;
+  color: #505050;
 }
 canvas {
   padding: 0;
@@ -106,7 +142,7 @@ canvas {
   cursor: crosshair;
 }
 .fits-viewer canvas {
-  position: absolute;
+  position: relative;
 }
 progress .read-image {
   width: 200px;
@@ -118,9 +154,19 @@ progress .read-image {
   top: 316px;
   left: 500px;
 }
+div.controls {
+  font-size: 11px;
+  color: #505050;
+}
+.table-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
 table.fits-table {
   font-size: 11px;
-  width: 800px;
+  width: 100%;
+  height: 100%;
   text-align: left;
   border-spacing: 0;
   border-collapse: collapse;
@@ -128,43 +174,113 @@ table.fits-table {
 }
 table.fits-table thead {
   display: table-header-group;
+  color: #505050;
+}
+table.fits-table thead th {
+  padding: 10px 12px;
+  color: #f3f3f3;
+  text-shadow: 1px 1px 1px #1e90ff;
+  background-color: #0172e6;
+  text-align: center;
+}
+table.fits-table thead th:not(:last-child) {
+  border-right: 1px solid #f3f3f3;
+}
+table.fits-table thead tr td {
+  padding-right: 10px;
 }
 table.fits-table tbody {
   display: table-row-group;
+  overflow: auto;
 }
 table.fits-table tbody tr {
   display: table-row;
 }
 table.fits-table tbody tr:hover {
-  background: #f3f3f3;
+  background: #e5e5e5;
 }
 table.fits-table tbody tr td {
-  color: #131313;
-  border-top: 1px solid #0172e6;
+  color: #505050;
+  padding: 2px 4px;
+  border-top: 1px solid ;
+  text-align: center;
 }
-.axis path {
-  fill: none;
-  stroke: #505050;
-  stroke-width: 2px;
+.plot {
+  border: 1px solid #505050;
+  width: 50%;
+  height: 50%;
+  overflow: scroll;
+  display: none;
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  padding: 20px;
+  border: solid 1px #bbb;
+  background: #fff;
+  -webkit-box-shadow: 0px 3px 6px rgba(0,0,0,0.25);
 }
-text {
+.plot .heading {
+  border-bottom: 1px solid #505050;
+  width: 100%;
+  height: 30px;
+  overflow: auto;
+}
+.plot .heading h3 {
+  font-size: 16px;
+  color: #505050;
+  float: left;
+  margin: 0px;
+}
+.plot .heading select {
+  float: right;
+  vertical-align: text-bottom;
+}
+.plot .heading button {
+  float: right;
+}
+.plot .graph {
+  clear: both;
+  width: 100%;
+  height: 80%;
+}
+.plot .graph text {
+  font-family: 'Open Sans', sans-serif;
   font-size: 11px;
 }
+.plot .graph text.label {
+  fill: #0172e6;
+}
+html,
 body {
   margin: 0 auto;
   background-color: #f3f3f3;
   color: #cfcfcf;
   font-family: 'Open Sans', sans-serif;
 }
-.tab {
-  font-size: 12px;
-  overflow: scroll;
-}
-.hdu {
+#luminosity {
+  height: 100%;
   overflow: auto;
 }
-.dataunit {
-  float: left;
+#luminosity #hdus {
+  width: 100%;
+  background-color: #e5e5e5;
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  z-index: 2;
+}
+#luminosity #toolbar {
+  width: 100%;
+  height: 16px;
+  background-color: #cfcfcf;
+  color: #e5e5e5;
+  position: fixed;
+  bottom: 0px;
+  left: 0px;
+  z-index: 2;
+}
+input {
+  color: #505050;
 }
 .plot {
   float: left;
