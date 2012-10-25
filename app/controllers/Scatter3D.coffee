@@ -1,7 +1,9 @@
+Graph = require('controllers/Graph')
 ThreeHelpers = require('lib/ThreeHelpers')
 
-class Scatter3D extends Spine.Controller
+class Scatter3D extends Graph
   name: 'Scatter 3D'
+  axes: 3
   
   events:
     'change .scatter-3d select[data-axis=1]' : 'draw'
@@ -19,10 +21,6 @@ class Scatter3D extends Spine.Controller
     
     @setup()
     @setupMouseInteractions()
-    
-  render: ->
-    attrs = {columns: @columns, name: @name, axes: 3}
-    @html require('views/plot')(attrs)
 
   draw: =>
     console.log 'draw'

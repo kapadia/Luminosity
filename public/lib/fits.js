@@ -106,7 +106,7 @@
               return _this.accessors.push(accessor);
             })(dataType);
           } else {
-            (function(dataType) {
+            (function(dataType, length) {
               var accessor, numBytes;
               if (dataType === 'X') {
                 numBytes = Math.log(length) / Math.log(2);
@@ -133,6 +133,15 @@
                   }
                   return data.slice(0, (length - 1) + 1 || 9e9);
                 };
+              } else if (dataType === 'A') {
+                accessor = function() {
+                  var data, _j;
+                  data = '';
+                  for (i = _j = 1; 1 <= length ? _j <= length : _j >= length; i = 1 <= length ? ++_j : --_j) {
+                    data += BinaryTable.dataAccessors[dataType](_this.view);
+                  }
+                  return data.trim();
+                };
               } else {
                 accessor = function() {
                   var data, _j;
@@ -144,7 +153,7 @@
                 };
               }
               return _this.accessors.push(accessor);
-            })(dataType);
+            })(dataType, length);
           }
         }
       }
@@ -210,7 +219,7 @@
         this.ztile.push(ztile);
       }
       this.width = header["ZNAXIS1"];
-      this.height = header["ZNAXIS2"];
+      this.height = header["ZNAXIS2"] || 1;
       this.algorithmParameters = {};
       i = 1;
       while (true) {
@@ -222,7 +231,9 @@
         this.algorithmParameters[header[key]] = header[value];
         i += 1;
       }
-      this["setDefaultParameters_" + this.zcmptype]();
+      if (this.zcmptype === 'RICE_1') {
+        this.setRiceDefaults();
+      }
       this.zmaskcmp = CompImage.setValue(header, "ZMASKCMP", void 0);
       this.zquantiz = CompImage.setValue(header, "ZQUANTIZ", "LINEAR_SCALING");
       this.bzero = CompImage.setValue(header, "BZERO", 0);
@@ -251,7 +262,7 @@
                   var data, pixels;
                   data = _this._accessor(dataType);
                   if (data == null) {
-                    return null;
+                    return new Float32Array(_this.ztiles[0]);
                   }
                   pixels = new CompImage.typedArray[_this.algorithmParameters["BYTEPIX"]](_this.ztile[0]);
                   CompImage.Rice(data, length, _this.algorithmParameters["BLOCKSIZE"], _this.algorithmParameters["BYTEPIX"], pixels, _this.ztile[0]);
@@ -267,12 +278,18 @@
             case "GZIP_COMPRESSED_DATA":
               (function(dataType) {
                 return accessor = function() {
-                  var data;
+                  var data, index, item, _j, _len;
                   data = _this._accessor(dataType);
-                  if (data == null) {
+                  if (data != null) {
+                    data = new Float32Array(_this.width);
+                    for (index = _j = 0, _len = data.length; _j < _len; index = ++_j) {
+                      item = data[index];
+                      data[index] = NaN;
+                    }
+                    return data;
+                  } else {
                     return null;
                   }
-                  return data;
                 };
               })(dataType);
               break;
@@ -311,11 +328,12 @@
 
     CompImage.prototype.defineGetRow = function() {
       var hasBlanks;
+      this.totalRowsRead = 0;
       hasBlanks = (this.zblank != null) || (this.blank != null) || this.columnNames.hasOwnProperty("ZBLANK");
       return this.getRow = hasBlanks ? this.getRowHasBlanks : this.getRowNoBlanks;
     };
 
-    CompImage.prototype.setDefaultParameters_RICE_1 = function() {
+    CompImage.prototype.setRiceDefaults = function() {
       if (!this.algorithmParameters.hasOwnProperty("BLOCKSIZE")) {
         this.algorithmParameters["BLOCKSIZE"] = 32;
       }
@@ -1070,7 +1088,7 @@
       var i, line, lineWidth, maxNumLines, numLines, _i, _ref, _results;
       lineWidth = 80;
       numLines = block.length / lineWidth;
-      maxNumLines = 180;
+      maxNumLines = 600;
       numLines = numLines < maxNumLines ? numLines : maxNumLines;
       _results = [];
       for (i = _i = 0, _ref = numLines - 1; 0 <= _ref ? _i <= _ref : _i >= _ref; i = 0 <= _ref ? ++_i : --_i) {
@@ -1297,10 +1315,10 @@
         args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
         key = "ZCMPTYPE";
         value = arguments[0];
-        if (value !== "GZIP_1" && value !== "RICE_1" && value !== "PLIO_1" && value !== "HCOMPRESS_1") {
+        if (value !== 'GZIP_1' && value !== 'RICE_1' && value !== 'PLIO_1' && value !== 'HCOMPRESS_1') {
           throw "" + key + " value " + value + " is not permitted";
         }
-        if (value !== "RICE_1") {
+        if (value !== 'RICE_1' && value !== 'GZIP_1') {
           throw "Compress type " + value + " is not yet implement";
         }
         return value;
@@ -1389,7 +1407,7 @@
         this.naxis.push(header["NAXIS" + i]);
       }
       this.width = header["NAXIS1"];
-      this.height = header["NAXIS2"];
+      this.height = header["NAXIS2"] || 1;
       this.rowByteSize = this.width * Math.abs(bitpix) / 8;
       this.totalRowsRead = 0;
       this.length = this.naxis.reduce(function(a, b) {
@@ -1557,7 +1575,7 @@
 
   FITS = {};
 
-  FITS.VERSION = '0.1.0';
+  FITS.VERSION = '0.1.5';
 
   FITS.HDU = require('./fits.hdu');
 
@@ -1649,6 +1667,7 @@
 }, "fits.table": function(exports, require, module) {// Generated by CoffeeScript 1.3.3
 (function() {
   var Table, Tabular,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1658,11 +1677,11 @@
 
     __extends(Table, _super);
 
-    Table.formPattern = /([AIFED])(\d+)\.(\d+)/;
+    Table.formPattern = /([AIFED])(\d+)\.*(\d+)*/;
 
     Table.dataAccessors = {
       A: function(value) {
-        return value;
+        return value.trim();
       },
       I: function(value) {
         return parseInt(value);
@@ -1679,18 +1698,15 @@
     };
 
     function Table(view, header) {
+      this.getRow = __bind(this.getRow, this);
+
       var form, i, match, _fn, _i, _ref,
         _this = this;
       Table.__super__.constructor.apply(this, arguments);
       _fn = function() {
         var accessor, dataType, decimals, length, _ref1;
         _ref1 = match.slice(1), dataType = _ref1[0], length = _ref1[1], decimals = _ref1[2];
-        accessor = function() {
-          var value, _j;
-          value = "";
-          for (i = _j = 1; 1 <= length ? _j <= length : _j >= length; i = 1 <= length ? ++_j : --_j) {
-            value += _this.view.getChar();
-          }
+        accessor = function(value) {
           return Table.dataAccessors[dataType](value);
         };
         return _this.accessors.push(accessor);
@@ -1701,6 +1717,29 @@
         _fn();
       }
     }
+
+    Table.prototype.getRow = function(row) {
+      var i, index, value, _i, _j, _len, _ref;
+      if (row == null) {
+        row = null;
+      }
+      if (row != null) {
+        this.rowsRead = row;
+      }
+      this.current = this.begin + this.rowsRead * this.rowByteSize;
+      this.view.seek(this.current);
+      row = "";
+      for (i = _i = 1, _ref = this.rowByteSize; 1 <= _ref ? _i <= _ref : _i >= _ref; i = 1 <= _ref ? ++_i : --_i) {
+        row += this.view.getChar();
+      }
+      row = row.trim().split(/\s+/);
+      for (index = _j = 0, _len = row.length; _j < _len; index = ++_j) {
+        value = row[index];
+        row[index] = this.accessors[index](value);
+      }
+      this.rowsRead += 1;
+      return row;
+    };
 
     return Table;
 
@@ -1714,6 +1753,7 @@
 }, "fits.tabular": function(exports, require, module) {// Generated by CoffeeScript 1.3.3
 (function() {
   var Data, Tabular,
+    __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; },
     __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
@@ -1772,6 +1812,7 @@
     };
 
     function Tabular(view, header) {
+      this.getRow = __bind(this.getRow, this);
       Tabular.__super__.constructor.apply(this, arguments);
       this.rowByteSize = header["NAXIS1"];
       this.rows = header["NAXIS2"];
@@ -1782,8 +1823,14 @@
       this.accessors = [];
     }
 
-    Tabular.prototype.getRow = function() {
-      var accessor, row, _i, _len, _ref;
+    Tabular.prototype.getRow = function(row) {
+      var accessor, _i, _len, _ref;
+      if (row == null) {
+        row = null;
+      }
+      if (row != null) {
+        this.rowsRead = row;
+      }
       this.current = this.begin + this.rowsRead * this.rowByteSize;
       this.view.seek(this.current);
       row = [];
