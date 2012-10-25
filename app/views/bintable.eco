@@ -12,9 +12,7 @@
 </div>
 
 <div class='controls'>
-  <label>Row Number:</label>
-  <input type='text' name='number'>
-  <input type='submit' name='submit' value='Go'>
+  <input type='text' name='number' size='<%- @rows.toString().length %>'> of <%- @rows - 1 %>
   <input type='submit' name='prev' value='Previous'>
   <input type='submit' name='next' value='Next'>
   <input type='submit' name='histogram' value='Histogram'>
@@ -36,13 +34,6 @@
       </tr>
     </thead>
     <tbody>
-    <% for row, index in @table: %>
-      <tr>
-        <% for value in row: %>
-          <td><%= value %></td>
-        <% end %>
-      </tr>  
-    <% end %>
     </tbody>
   </table>
 </div>

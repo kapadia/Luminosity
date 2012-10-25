@@ -11,7 +11,7 @@ class BinaryTable extends Spine.Controller
   
   events:
     'keydown input[name=number]'    : 'blockLetter'
-    'click input[name=submit]'      : 'updateRows'
+    'keyup input[name=number]'      : 'updateRows'
     'click input[name=next]'        : 'updateRows'
     'click input[name=prev]'        : 'updateRows'
     'click input[name=histogram]'   : 'toggleHistogram'
@@ -19,14 +19,25 @@ class BinaryTable extends Spine.Controller
     'click input[name=scatter-3d]'  : 'toggleScatter3D'
   
   @permittedKeys: [48..57]
-  @.permittedKeys.push(8)
+  @.permittedKeys.push(8)   # Delete
+  @.permittedKeys.push(91)  # Shift
+  @.permittedKeys.push(16)  # Command
+  @.permittedKeys.push(37)  # Left arrow
+  @.permittedKeys.push(39)  # Right array
   
   constructor: ->
     super
-    console.log 'BinaryTable'
     @rows = @hdu.data.rows
     
     @render()
+    @tbody = @el.find('tbody')
+    
+    # Populate table with first ten rows
+    number = if @rows < 10 then @rows else 10
+    table = []
+    while number--
+      table.push @hdu.data.getRow()
+    @tbody.html require('views/tbody')({table: table})
     
     # Initialize a plot objects
     columns = @getNumericalColumns()
@@ -40,12 +51,7 @@ class BinaryTable extends Spine.Controller
     @scatter3d = new Scatter3D({el: @scatter3dElem, hdu: @hdu, index: @index, columns: columns})
     
   render: =>
-    number = if @rows < 10 then @rows else 10
-    table = []
-    
-    while number--
-      table.push @hdu.data.getRow()
-    info = {columns: @hdu.data.columns, table: table}
+    info = {columns: @hdu.data.columns, rows: @hdu.data.rows}
     @html require('views/bintable')(info)
   
   blockLetter: (e) ->
@@ -61,29 +67,25 @@ class BinaryTable extends Spine.Controller
         rowsRead = dataunit.rowsRead
       when 'prev'
         rowsRead = Math.max(dataunit.rowsRead - 2 * 10, 0)
-      when 'submit'
+      when 'number'
+        @rowNumber.val(0) if @rowNumber.val() is ''
         rowsRead = parseInt(@rowNumber.val())
+    
+    return null unless @checkRow(rowsRead)
     
     count = dataunit.rows - rowsRead
     count = if count < 10 then count else 10
     count -= 1
     
-    unless @checkRow(rowsRead)
-      alert("NO!")
-      return null
-    
     table = []
     for i in [rowsRead..rowsRead+count]
       table.push dataunit.getRow(i)
-      
-    # Would be better to call render here
-    info = {columns: dataunit.columns, table: table}
-    @html require('views/bintable')(info)
+    
+    @tbody.html require('views/tbody')({table: table})
   
   checkRow: (number) =>
-    dataunit = @hdu.data
     return false if number < 0
-    return false if number > dataunit.rows - 1
+    return false if number > @hdu.data.rows - 1
     return true
     
   getNumericalColumns: ->

@@ -1,0 +1,7 @@
+<% for row, index in @table: %>
+  <tr>
+    <% for value in row: %>
+      <td><%= value %></td>
+    <% end %>
+  </tr>  
+<% end %>
