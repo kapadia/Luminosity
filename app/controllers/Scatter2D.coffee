@@ -4,8 +4,9 @@ class Scatter2D extends Spine.Controller
   formatter: d3.format(".3f")
   
   events:
-    'change .scatter-2d select[data-axis=1]' : 'draw'
-    'change .scatter-2d select[data-axis=2]' : 'draw'
+    'change .scatter-2d select[data-axis=1]'  : 'draw'
+    'change .scatter-2d select[data-axis=2]'  : 'draw'
+    'click .scatter-2d button[name=save]'     : 'savePlot'
     
   constructor: ->
     super
@@ -17,15 +18,23 @@ class Scatter2D extends Spine.Controller
     @axis1  = $("#hdu-#{@index} .scatter-2d select[data-axis=1]")
     @axis2  = $("#hdu-#{@index} .scatter-2d select[data-axis=2]")
     
+    @saveButton = $("#hdu-#{@index} .scatter-2d button[name=save]")
+    @saveButton.prop('disabled', true)
+    
   render: ->
     attrs = {columns: @columns, name: @name, axes: 2}
     @html require('views/plot')(attrs)
     
   draw: =>
-    @plot.empty()
-    
     index1 = @axis1.val()
     index2 = @axis2.val()
+    
+    if index1 is '-1' or index2 is '-1'
+      @saveButton.prop('disabled', true)
+      return null
+    @saveButton.prop('disabled', false)
+    
+    @plot.empty()
     
     # Get labels for the axes
     xlabel = @axis1.find("option:selected").text()
@@ -131,5 +140,21 @@ class Scatter2D extends Spine.Controller
     @svg.selectAll(".dot")
       .attr("cx", (d, i) => return @x(@xdata[i]))
       .attr("cy", (d, i) => return @y(@ydata[i]))
-    
+  
+  savePlot: =>
+    xlabel = @axis1.find("option:selected").text()
+    ylabel = @axis2.find("option:selected").text()
+
+    svg = @plot.find('svg')
+    svg.attr('xmlns', 'http://www.w3.org/2000/svg')
+    svg.attr('version', '1.1')
+    window.URL = window.URL or window.webkitURL
+    blob = new Blob([@plot.html()], {type: 'image/svg+xml'})
+
+    a = document.createElement('a')
+    a.download = "#{xlabel}_vs_#{ylabel}.svg"
+    a.type = 'image/svg+xml'
+    a.href = window.URL.createObjectURL(blob)
+    a.click()
+  
 module.exports = Scatter2D

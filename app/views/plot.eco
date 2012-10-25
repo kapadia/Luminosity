@@ -1,8 +1,11 @@
 <div class='heading'>
   <h3><%- @name %></h3>
-  <button type='button' name='save'>save</button>
+  <% unless @name is 'Scatter 3D': %>
+    <button type='button' name='save'>save</button>
+  <% end %>
   <% for i in [1..@axes]: %>
   <select data-axis='<%- @axes - i + 1 %>'>
+    <option value='-1'>select axis</option>
     <% for column, index of @columns: %>
     <option value='<%- index %>'><%- column %></option>
     <% end %>

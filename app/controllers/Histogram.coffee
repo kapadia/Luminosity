@@ -12,22 +12,40 @@ class Histogram extends Spine.Controller
     
     @render()
     @plot = $("#hdu-#{@index} .histogram .graph")
+    @axis1 = $("#hdu-#{@index} .histogram select[data-axis=1]")
+    
+    @saveButton = $("#hdu-#{@index} .histogram button[name=save]")
+    @saveButton.prop('disabled', true)
   
   render: ->
     attrs = {columns: @columns, name: @name, axes: 1}
     @html require('views/plot')(attrs)
   
-  draw: (e) ->
+  draw: =>
+    index1 = @axis1.val()
+    
+    if index1 is '-1'
+      @saveButton.prop('disabled', true)
+      return null
+    @saveButton.prop('disabled', false)
+    
     @plot.empty()
     
-    values = []
-    columnIndex =  e.target.value
+    # Get label for the axis
+    xlabel = @axis1.find("option:selected").text()
+    
+    # Get units if they are available
+    header = @hdu.header
+    unit1Key = "TUNIT#{parseInt(index1) + 1}"
+    xlabel += " (#{header[unit1Key]})" if header.contains(unit1Key)
+    
+    xdata = []
     
     dataunit = @hdu.data
     rows = dataunit.rows
     for i in [1..rows]
       row = dataunit.getRow(i - 1)
-      values.push(row[columnIndex])
+      xdata.push(row[index1])
     
     margin =
       top: 20
@@ -43,7 +61,7 @@ class Histogram extends Spine.Controller
       .domain([0, rows])
     @y = d3.scale.linear()
       .range([height, 0])
-      .domain(d3.extent(values))
+      .domain(d3.extent(xdata))
       
     @xAxis = d3.svg.axis()
       .scale(@x)
@@ -59,15 +77,21 @@ class Histogram extends Spine.Controller
           .append('g')
             .attr('transform', "translate(#{margin.left}, #{margin.top})")     
     @svg.append("g")
-          .attr("class", "x axis")
-          .attr("transform", "translate(0," + height + ")")
-          .call(@xAxis)
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(@xAxis)
+      .append("text")
+        .attr("class", "label")
+        .attr("x", width)
+        .attr("y", -6)
+        .style("text-anchor", "end")
+        .text(xlabel)
     @svg.append("g")
           .attr("class", "y axis")
           .call(@yAxis)
     
     @svg.selectAll(".bar")
-        .data(values)
+        .data(xdata)
       .enter().append("rect")
         .attr("class", "bar")
         .attr("x", (d, i) => return @x(i))
@@ -83,11 +107,16 @@ class Histogram extends Spine.Controller
       .attr("y", (d) => return @y(d))
   
   savePlot: =>
+    xlabel = @axis1.find("option:selected").text()
+    
+    svg = @plot.find('svg')
+    svg.attr('xmlns', 'http://www.w3.org/2000/svg')
+    svg.attr('version', '1.1')
     window.URL = window.URL or window.webkitURL
     blob = new Blob([@plot.html()], {type: 'image/svg+xml'})
     
     a = document.createElement('a')
-    a.download = 'plot.svg'
+    a.download = "#{xlabel}.svg"
     a.type = 'image/svg+xml'
     a.href = window.URL.createObjectURL(blob)
     a.click()

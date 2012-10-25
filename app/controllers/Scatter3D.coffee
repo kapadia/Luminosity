@@ -18,7 +18,7 @@ class Scatter3D extends Spine.Controller
     @axis3 = $("#hdu-#{@index} .scatter-3d select[data-axis=3]")
     
     @setup()
-    # @setupMouseInteractions()
+    @setupMouseInteractions()
     
   render: ->
     attrs = {columns: @columns, name: @name, axes: 3}
