@@ -4,6 +4,7 @@ class Histogram extends Spine.Controller
   
   events:
     'change .histogram select[data-axis=1]' : 'draw'
+    'click .histogram button[name=save]'    : 'savePlot'
   
   constructor: ->
     super
@@ -80,5 +81,15 @@ class Histogram extends Spine.Controller
     @svg.selectAll(".bar")
       .attr("x", (d, i) => return @x(i))
       .attr("y", (d) => return @y(d))
-
+  
+  savePlot: =>
+    window.URL = window.URL or window.webkitURL
+    blob = new Blob([@plot.html()], {type: 'image/svg+xml'})
+    
+    a = document.createElement('a')
+    a.download = 'plot.svg'
+    a.type = 'image/svg+xml'
+    a.href = window.URL.createObjectURL(blob)
+    a.click()
+    
 module.exports = Histogram

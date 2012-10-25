@@ -1,5 +1,6 @@
 <div class='heading'>
   <h3><%- @name %></h3>
+  <button type='button' name='save'>save</button>
   <% for i in [1..@axes]: %>
   <select data-axis='<%- @axes - i + 1 %>'>
     <% for column, index of @columns: %>
