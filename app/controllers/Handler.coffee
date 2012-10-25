@@ -1,16 +1,15 @@
-FITS  = require('fits')
+FITS = require('fits')
 
-ImageController     = require('controllers/Image')
-CubeController      = require('controllers/Cube')
-TableController     = require('controllers/Table')
-BinTableController  = require('controllers/BinaryTable')
+Image = require('controllers/Image')
+Cube  = require('controllers/Cube')
+Table = require('controllers/Table')
 
 class Handler extends Spine.Controller
   events:
     'click button.hdu'  : 'selectHDU'
   
   elements:
-    '#header' : 'header'
+    '#header'     : 'header'
   
   constructor: ->
     super
@@ -21,16 +20,14 @@ class Handler extends Spine.Controller
     
     hdus = @fits.hdus
     @html require('views/hdus')(hdus)
+    @root = $('#luminosity')
     
     @currentHDU = 0
     section = $('section')
     margin = parseInt(section.css('margin').match(/(\d+)/))
     @hduHeight = section.outerHeight() + margin
     
-    # Set up scroll event
-    $('#luminosity').scroll( (e) =>
-      @scroll(e.target.scrollTop)
-    )
+    @root.scroll((e) => @scroll(e.target.scrollTop))
     
     @readData(buffer)
   
@@ -41,17 +38,14 @@ class Handler extends Spine.Controller
     else
       @header.hide()
       @currentHDU = selectedHDU
-      $('#luminosity').animate({
-        scrollTop: @hduHeight * @currentHDU
-      })
+      @root.animate({scrollTop: @hduHeight * @currentHDU})
   
   showHeader: (index) =>
     header = @fits.getHDU(index).header
     @header.html require('views/header')({cards: header.cards})
     @header.toggle()
   
-  scroll: (value) =>
-    @currentHDU = Math.floor(value / @hduHeight)
+  scroll: (value) => @currentHDU = Math.floor(value / @hduHeight)
   
   readData: (buffer) =>
     for hdu, index in @fits.hdus
@@ -61,23 +55,23 @@ class Handler extends Spine.Controller
       elem = $("#hdu-#{index} .dataunit")
       args = {el: elem, hdu: hdu, index: index, buffer: buffer}
       
-      # Determine and initialize the appropriate handler for the HDU
+      # Initialize the appropriate handler for the HDU
       if header.isPrimary()
         if header.hasDataUnit()
           if data.isDataCube()
-            new CubeController args
+            new Cube args
           else
-            new ImageController args
+            new Image args
       else if header.isExtension()
         if header['XTENSION'] is 'TABLE'
-          new TableController args
+          new Table args
         else if header['XTENSION'] is 'BINTABLE'
           if header.contains('ZIMAGE')
-            new ImageController args
+            new Image args
           else
-            new BinTableController args
+            new Table args
         else if header.extensionType is 'IMAGE'
-          new ImageController args
+          new Image args
   
   shortcuts: (e) =>
     keyCode = e.keyCode

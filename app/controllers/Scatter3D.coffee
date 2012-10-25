@@ -149,5 +149,14 @@ class Scatter3D extends Graph
     line = new THREE.Line(lineGeo, lineMat)
     line.type = THREE.Lines
     plot.add(line)
-    
+
+  @createAxesLabel3D: (plot, labels, distance) ->
+    axes = ['x', 'x', 'y', 'y', 'z', 'z']
+    for label, index in labels
+      axis = axes[index]
+
+      title = ThreeHelpers.createText2D(label)
+      title.position[axis] = Math.pow(-1, index + 1) * distance
+      plot.add(title)
+
 module.exports = Scatter3D

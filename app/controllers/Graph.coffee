@@ -1,6 +1,5 @@
 
 class Graph extends Spine.Controller
-  name: 'Graph'
   
   # Must be initialized with an axes (1, 2, 3)
   constructor: ->

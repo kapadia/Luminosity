@@ -1,239 +1,115 @@
-ThreeHelpers = require('lib/ThreeHelpers')
+Spine = require('spine')
+Histogram = require('controllers/Histogram')
+Scatter2D = require('controllers/Scatter2D')
+Scatter3D = require('controllers/Scatter3D')
 
-class TableController extends Spine.Controller
-  @scatterWidth   = 600
-  @scatterHeight  = 600
+class Table extends Spine.Controller
+  @binary = /(\d*)([BIJKED])/
+  @ascii = /([IFED])(\d+)\.*(\d+)*/
+  
+  elements:
+    'input[name=number]'  : 'rowNumber'
+  
+  events:
+    'keydown input[name=number]'    : 'blockLetter'
+    'keyup input[name=number]'      : 'updateRows'
+    'click input[name=next]'        : 'updateRows'
+    'click input[name=prev]'        : 'updateRows'
+    'click input[name=histogram]'   : 'toggleHistogram'
+    'click input[name=scatter-2d]'  : 'toggleScatter2D'
+    'click input[name=scatter-3d]'  : 'toggleScatter3D'
+  
+  @permittedKeys: [48..57]
+  @.permittedKeys.push(8)   # Delete
+  @.permittedKeys.push(91)  # Shift
+  @.permittedKeys.push(16)  # Command
+  @.permittedKeys.push(37)  # Left arrow
+  @.permittedKeys.push(39)  # Right array
   
   constructor: ->
-    console.log 'Table', ThreeHelpers
     super
-    
     @rows = @hdu.data.rows
+    
     @render()
+    @tbody = @el.find('tbody')
     
-    # Store DOM elements
-    @axes = $("#hdu-#{@index} select.axis")
-    @plot = $("#hdu-#{@index} .plot")
-    
-    @createScatter3D()
-    
-    # Bind events for plots
-    @axes.change (e) =>
-      @trigger 'axisChange'
-    @bind 'axisChange', @createPlot
-  
-  render: ->
-    number = if @rows < 10 then @rows else 100
+    # Populate table with first ten rows
+    number = if @rows < 10 then @rows else 10
     table = []
-    
     while number--
       table.push @hdu.data.getRow()
-    info = {columns: @hdu.data.columns, table: table}
-    @html require('views/table')(info)
-  
-  @createAxes3D: (plot, size) ->
-    v = (x, y, z) => return new THREE.Vector3(x, y, z)
+    @tbody.html require('views/tbody')({table: table})
     
-    lineGeo = new THREE.Geometry()
-    lineGeo.vertices.push(
-      v(-1 * size, 0, 0), v(size, 0, 0),
-      v(0, -1 * size, 0), v(0, size, 0),
-      v(0, 0, -1 * size), v(0, 0, size),
-
-      v(-1 * size, size, -1 * size), v(size, size, -1 * size),
-      v(-1 * size, -1 * size, -1 * size), v(size, -1 * size, -1 * size),
-      v(-1 * size, size, size), v(size, size, size),
-      v(-1 * size, -1 * size, size), v(size, -1 * size, size),
-
-      v(-1 * size, 0, size), v(size, 0, size),
-      v(-1 * size, 0, -1 * size), v(size, 0, -1 * size),
-      v(-1 * size, size, 0), v(size, size, 0),
-      v(-1 * size, -1 * size, 0), v(size, -1 * size, 0),
-
-      v(size, -1 * size, -1 * size), v(size, size, -1 * size),
-      v(-1 * size, -1 * size, -1 * size), v(-1 * size, size, -1 * size),
-      v(size, -1 * size, size), v(size, size, size),
-      v(-1 * size, -1 * size, size), v(-1 * size, size, size),
-
-      v(0, -1 * size, size), v(0, size, size),
-      v(0, -1 * size, -1 * size), v(0, size, -1 * size),
-      v(size, -1 * size, 0), v(size, size, 0),
-      v(-1 * size, -1 * size, 0), v(-1 * size, size, 0),
-
-      v(size, size, -1 * size), v(size, size, size),
-      v(size, -1 * size, -1 * size), v(size, -1 * size, size),
-      v(-1 * size, size, -1 * size), v(-1 * size, size, size),
-      v(-1 * size, -1 * size, -1 * size), v(-1 * size, -1 * size, size),
-
-      v(-1 * size, 0, -1 * size), v(-1 * size, 0, size),
-      v(size, 0, -1 * size), v(size, 0, size),
-      v(0, size, -1 * size), v(0, size, size),
-      v(0, -1 * size, -1 * size), v(0, -1 * size, size)
-    )
+    # Initialize a plot objects
+    columns = @getNumericalColumns()
+    console.log "columns = ", columns
     
-    lineMat = new THREE.LineBasicMaterial({color: 0x808080, lineWidth: 1})
-    line = new THREE.Line(lineGeo, lineMat)
-    line.type = THREE.Lines
-    plot.add(line)
-  
-  @createAxesLabel3D: (plot, labels, distance) ->
-    axes = ['x', 'x', 'y', 'y', 'z', 'z']
-    for label, index in labels
-      axis = axes[index]
-      
-      title = ThreeHelpers.createText2D(label)
-      title.position[axis] = Math.pow(-1, index + 1) * distance
-      plot.add(title)
-  
-  createScatter3D: =>
-    console.log 'createScatter3D'
+    @histogramElem = $("#hdu-#{@index} .histogram")
+    @histogram = new Histogram({el: @histogramElem, hdu: @hdu, index: @index, columns: columns})
     
-    # Grab the data
+    @scatter2dElem = $("#hdu-#{@index} .scatter-2d")
+    @scatter2d = new Scatter2D({el: @scatter2dElem, hdu: @hdu, index: @index, columns: columns})
+    
+    @scatter3dElem = $("#hdu-#{@index} .scatter-3d")
+    @scatter3d = new Scatter3D({el: @scatter3dElem, hdu: @hdu, index: @index, columns: columns})
+    
+  render: =>
+    info = {columns: @hdu.data.columns, rows: @hdu.data.rows}
+    @html require('views/bintable')(info)
+  
+  blockLetter: (e) ->
+    keyCode = e.keyCode
+    unless keyCode in Table.permittedKeys
+      e.preventDefault()
+  
+  updateRows: (e) =>
     dataunit = @hdu.data
-    dataunit.rowsRead = 0
     
-    # Setup the parent div
-    @scatterContainer = document.querySelector("#hdu-#{@index} .scatter3d")
-    @scatterContainer.width   = TableController.scatterWidth
-    @scatterContainer.height  = TableController.scatterHeight
+    switch e.target.name
+      when 'next'
+        rowsRead = dataunit.rowsRead
+      when 'prev'
+        rowsRead = Math.max(dataunit.rowsRead - 2 * 10, 0)
+      when 'number'
+        @rowNumber.val(0) if @rowNumber.val() is ''
+        rowsRead = parseInt(@rowNumber.val())
     
-    # Setup THREE 
-    @renderer = new THREE.WebGLRenderer({antialias: true})
-    @renderer.setSize(TableController.scatterWidth, TableController.scatterHeight)
-    @renderer.setClearColorHex(0xEEEEEE, 1.0)
-    @renderer.clear()
+    return null unless @checkRow(rowsRead)
     
-    @camera = new THREE.PerspectiveCamera(45, TableController.scatterWidth / TableController.scatterHeight, 1, 10000)
-    @camera.position.z = 20
+    count = dataunit.rows - rowsRead
+    count = if count < 10 then count else 10
+    count -= 1
     
-    @scene = new THREE.Scene()
+    table = []
+    for i in [rowsRead..rowsRead+count]
+      table.push dataunit.getRow(i)
     
-    @scatterPlot = new THREE.Object3D()
-    
-    # Construct the axes
-    v = (x, y, z) => return new THREE.Vector3(x, y, z)
-    
-    # Construct the axes
-    distance = 20
-    labels = ['-X', 'X', '-Y', 'Y', '-Z', 'Z']
-    
-    TableController.createAxes3D(@scatterPlot, distance)
-    TableController.createAxesLabel3D(@scatterPlot, labels, distance)
-    
-    # Construct the scatter plot
-    mat = new THREE.ParticleBasicMaterial({vertexColors: true, size: 0.10, color: 0xff0000})
-    pointCount = dataunit.rows
-    pointGeo = new THREE.Geometry()
-    
-    for rowNumber in [0..pointCount - 1]
-      row = dataunit.getRow()
-      x = row[0]
-      y = row[1]
-      z = row[3]
-      pointGeo.vertices.push(new THREE.Vector3(x, y, z))
-      pointGeo.colors.push(new THREE.Color().setHSV(10, 84, 80))
-    
-    points = new THREE.ParticleSystem(pointGeo, mat)
-    @scatterPlot.add(points)
-    @scene.fog = new THREE.FogExp2(0xFFFFFF, 0.0035)
-    @scene.add(@scatterPlot)
-    
-    @renderer.render(@scene, @camera)
-    @scatterContainer.appendChild(@renderer.domElement)
-    
-    # Setup mouse interactions
-    @down = false
-    [@sx, @sy] = [0, 0]
-    @scatterContainer.onmousedown = (e) =>
-      @down = true
-      @sx = e.clientX
-      @sy = e.clientY
-    @scatterContainer.onmouseup = (e) =>
-      @down = false
-    @scatterContainer.onmousemove = (e) =>
-      if @down
-        dx = e.clientX - @sx
-        dy = e.clientY - @sy
-        @scatterPlot.rotation.y += dx * 0.01
-        @scatterPlot.rotation.x += dy * 0.01
-        @scatterPlot.rotation.z += dx * 0.01
-        # @camera.position.y += dy
-        @sx += dx
-        @sy += dy
-        @renderer.render(@scene, @camera)
+    @tbody.html require('views/tbody')({table: table})
   
-  createPlot: =>
-    console.log 'createPlot'
-    [axis1, axis2] = [@axes.first().val(), @axes.last().val()]
+  checkRow: (number) =>
+    return false if number < 0
+    return false if number > @hdu.data.rows - 1
+    return true
     
+  getNumericalColumns: ->
+    columns = {}
+    header = @hdu.header
     dataunit = @hdu.data
-    dataunit.rowsRead = 0
-
-    data = []
-    for column, index in dataunit.columns
-      data.push([])
-
-    for row in [1..dataunit.rows]
-      for value, index in dataunit.getRow()
-        data[index].push value
-
-    # Using D3 to create a scatter plot
-    @plot.empty()
-
-    width = 600
-    height = 300
-    margin = {top: 20, right: 15, bottom: 60, left: 60}
-
-    xdata = data[axis1]
-    ydata = data[axis2]
-
-    x = d3.scale.linear().domain([d3.min(xdata), d3.max(xdata)]).range([0, width])
-    y = d3.scale.linear().domain([d3.min(ydata), d3.max(ydata)]).range([0, height])
-
-    chart = d3.select("#dataunit-#{@index} .plot")
-      .append('svg:svg')
-      .attr('width', width + margin.right + margin.left)
-      .attr('height', height + margin.top + margin.bottom)
-      .attr('class', 'chart')
-
-    main = chart.append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
-      .attr('width', width)
-      .attr('height', height)
-      .attr('class', 'main')
-
-    xAxis = d3.svg.axis()
-      .scale(x)
-      .orient('bottom')
-
-    main.append('g')
-      .attr('transform', 'translate(0,' + height + ')')
-      .attr('class', 'main axis date')
-      .call(xAxis)
-
-    yAxis = d3.svg.axis()
-      .scale(y)
-      .orient('left')
-
-    main.append('g')
-      .attr('transform', 'translate(0,0)')
-      .attr('class', 'main axis date')
-      .call(yAxis)
-
-    g = main.append("svg:g")
-
-    g.selectAll("scatter-dots")
-      .data(ydata)
-      .enter().append("svg:circle")
-        .attr("cy", (d) ->
-          return y(d)
-        )
-        .attr("cx", (d, i) ->
-          return x(xdata[i])
-        )
-        .attr("r", 1)
-        .style("opacity", 0.6)
-        .style("stroke", "#CD3E20")
-
-
-module.exports = TableController
+    cols = dataunit.cols
+    
+    pattern = if header['XTENSION'] is 'TABLE' then Table.ascii else Table.binary
+    
+    for i in [1..cols]
+      form = "TFORM#{i}"
+      type = "TTYPE#{i}"
+      console.log header[form]
+      match = header[form].match(pattern)
+      if match?
+        columns[header[type]] = i - 1
+    return columns
+  
+  toggleHistogram: => @histogramElem.toggle()
+  toggleScatter2D: => @scatter2dElem.toggle()
+  toggleScatter3D: => @scatter3dElem.toggle()
+    
+module.exports = Table
