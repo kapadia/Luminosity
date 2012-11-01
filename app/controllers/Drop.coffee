@@ -2,16 +2,22 @@ Handler = require('controllers/Handler')
 
 class Drop extends Spine.Controller
   
+  events:
+    'click #help' : 'showHelp'
+
   @getExtension: (filename) -> filename.split('.').pop()
-  
+
   constructor: ->
     super
-    @html require('views/drop')()
+    
+    @html require('views/drop')({developer: 'amit', domain: 'zooniverse.org'})
     
     @drop = document.getElementById('drop')
     @drop.addEventListener('dragover', @handleDragOver, false)
     @drop.addEventListener('dragleave', @handleDragLeave, false)
     @drop.addEventListener('drop', @handleDrop, false)
+    
+    window.addEventListener('keydown', @shortcuts, false)
   
   handleDragOver: (e) ->
     e.stopPropagation()
@@ -61,5 +67,14 @@ class Drop extends Spine.Controller
         handler.readBuffer(buffer)
     $("#loading").show()
     reader.readAsArrayBuffer(file)
+
+  showHelp: => $('.help').toggle()
   
+  shortcuts: (e) =>
+    keyCode = e.keyCode
+
+    # Escape
+    if keyCode is 27
+      $('.modal').hide()
+    
 module.exports = Drop

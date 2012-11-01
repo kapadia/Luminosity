@@ -13,7 +13,6 @@ class Handler extends Spine.Controller
   
   constructor: ->
     super
-    window.addEventListener('keydown', @shortcuts, false)
     
   readBuffer: (buffer) ->
     @fits = new FITS.File(buffer)
@@ -72,12 +71,5 @@ class Handler extends Spine.Controller
             new Table args
         else if header.extensionType is 'IMAGE'
           new Image args
-  
-  shortcuts: (e) =>
-    keyCode = e.keyCode
-    
-    # Escape
-    if keyCode is 27
-      $('.modal').hide()
   
 module.exports = Handler

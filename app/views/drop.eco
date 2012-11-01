@@ -5,3 +5,21 @@
 <div id='loading' class='frame over'>
   <progress class='center' value='0' max='100'></progress>
 </div>
+
+<div id='help'>?</div>
+<div class='help modal'>
+  <p><b>Luminosity</b> is a web application for visualizing astronomical data.</p>
+  <p>This application is built using the latest web standards, as such it requires a modern browser.  The application strives to support all variations of FITS files.  The following extensions are supported:</p>
+  <ul>
+  <li>Images</li>
+  <li>Compressed Images (using the Rice algorithm)</li>
+  <li>ASCII Tables</li>
+  <li>Binary Tables</li>
+  <li>Data Cubes (experimental)</li>
+  </ul>
+
+  <p>This application is a result of the <a class='bold' href='http://www.astrojs.org'>astrojs</a> project.</p>
+  <p>If you are interested in participating in this open source project, please fork it from the <a href='https://github.com/kapadia/Luminosity'>GitHub repository</a>.
+  
+  <p>For bugs, complaints, praises, words of encouragement, feature requests, or any other feedback, please email <%- @developer %>&#64;<%- @domain %> or submit a <a href='https://github.com/kapadia/Luminosity/issues/new'>GitHub issue</a>.</p>
+</div>

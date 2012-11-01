@@ -20,7 +20,7 @@ class Luminosity extends Spine.Controller
     
     # # Set some styles dynamically
     $("body").css('height', window.innerHeight)
-    # window.onresize = ->
+    # window.onresize = ->  
     #   $(".hdu").css('height', window.innerHeight)
       
     # Initialize controllers
