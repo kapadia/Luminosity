@@ -39,8 +39,8 @@ class Scatter2D extends Graph
     for i in [1..rows]
       row = dataunit.getRow(i - 1)
       datum = {}
-      datum[xlabel] = row[@key1]
-      datum[ylabel] = row[@key2]
+      datum[@key1] = row[@key1]
+      datum[@key2] = row[@key2]
       @data.push datum
     
     margin =
