@@ -93,12 +93,12 @@ class Scatter2D extends Graph
         .style("text-anchor", "end")
         .text(ylabel)
     
-    # @svg.append('g')
-    #   .attr('class', 'brush')
-    #   .call(d3.svg.brush().x(@x).y(@y)
-    #   .on('brushstart', @brushstart)
-    #   .on('brush', @brushmove)
-    #   .on('brushend', @brushstart))
+    @svg.append('g')
+      .attr('class', 'brush')
+      .call(d3.svg.brush().x(@x).y(@y)
+      .on('brushstart', @brushstart)
+      .on('brush', @brushmove)
+      .on('brushend', @brushstart))
     
     @circles = @svg.append('g').selectAll('circle')
         .data(@data)
@@ -133,21 +133,16 @@ class Scatter2D extends Graph
       .attr("cx", (d) => return @x(d[@key1]))
       .attr("cy", (d) => return @y(d[@key2]))
   
-  # brushstart: =>
-  #   console.log 'brushstart'
-  #   @svg.classed("selecting", true)
-  #   
-  # brushmove: =>
-  #   e = d3.event.target.extent()
-  #   @circles.classed('selected', =>
-  #     console.log arguments
-  #     throw 'blah'
-  #     d = arguments[0]
-  #     return e[0][0] <= d[0] and d[0] <= e[1][0] and e[0][1] <= d[1] and d[1] <= e[1][1]
-  #   )
-  # 
-  # brushend: =>
-  #   console.log 'brushend'
-  #   @svg.classed('selecting', !d3.event.target.empty())
+  brushstart: =>
+    @svg.classed("selecting", true)
+    
+  brushmove: =>
+    e = d3.event.target.extent()
+    @circles.classed('selected', (d) =>
+      return e[0][0] <= d[@key1] and d[@key1] <= e[1][0] and e[0][1] <= d[@key2] and d[@key2] <= e[1][1]
+    )
+  
+  brushend: =>
+    @svg.classed('selecting', !d3.event.target.empty())
   
 module.exports = Scatter2D
