@@ -3,7 +3,9 @@ Handler = require('controllers/Handler')
 class Drop extends Spine.Controller
   
   events:
-    'click #help' : 'showHelp'
+    'click #help'     : 'showHelp'
+    'click #tutorial' : 'showTutorial'
+    'click .arrow'    : 'beginTutorial'
 
   @getExtension: (filename) -> filename.split('.').pop()
 
@@ -75,7 +77,23 @@ class Drop extends Spine.Controller
 
   showHelp: =>
     $('.requirements').hide()
-    $('.help').toggle()
+    $('#tutorial-modal').hide()
+    $('#help-modal').toggle()
+  
+  showTutorial: =>
+    $('.requirements').hide()
+    $('#help-modal').hide()
+    $('#tutorial-modal').toggle()
+  
+  beginTutorial: =>
+    console.log 'beginTutorial'
+    xhr = new XMLHttpRequest()
+    xhr.open('GET', 'tutorial/demo.fits')
+    xhr.responseType = 'arraybuffer'
+    xhr.onload = =>
+      handler = new Handler({el: @el})
+      handler.readBuffer(xhr.response)
+    xhr.send()
   
   shortcuts: (e) =>
     keyCode = e.keyCode

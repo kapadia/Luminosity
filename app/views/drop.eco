@@ -6,8 +6,10 @@
   <progress class='center' value='0' max='100'></progress>
 </div>
 
-<div id='help'>?</div>
-<div class='help modal'>
+<div id='help' class='help-button'>?</div>
+<div id='tutorial' class='help-button'>></div>
+
+<div id='help-modal' class='help modal'>
   <p><b>Luminosity</b> is a web application for visualizing astronomical data.</p>
   <p>This application is built using the latest web standards, as such it requires a modern browser.  The application strives to support all variations of FITS files.  The following extensions are supported:</p>
   <ul>
@@ -22,6 +24,15 @@
   <p>If you are interested in participating in this open source project, please fork it from the <a href='https://github.com/kapadia/Luminosity'>GitHub repository</a>.
   
   <p>For bugs, complaints, praises, words of encouragement, feature requests, or any other feedback, please email <%- @developer %>&#64;<%- @domain %> or submit a <a href='https://github.com/kapadia/Luminosity/issues/new'>GitHub issue</a>.</p>
+</div>
+
+<div id='tutorial-modal' class='tutorial modal'>
+  <p>This is a tutorial for <b>Luminosity</b>.</p>
+  
+  <p>We'll send over a FITS files that contains a beautiful image of M101 and a binary table of bright point sources from the image.</p>
+  
+  <p>Click the arrow to continue.</p>
+  <span class='arrow'>&rarr;</span>
 </div>
 
 <div class='requirements modal'>
