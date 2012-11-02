@@ -42,7 +42,6 @@ class Table extends Spine.Controller
     
     # Initialize a plot objects
     columns = @getNumericalColumns()
-    console.log "columns = ", columns
     
     @histogramElem = $("#hdu-#{@index} .histogram")
     @histogram = new Histogram({el: @histogramElem, hdu: @hdu, index: @index, columns: columns})
@@ -102,7 +101,6 @@ class Table extends Spine.Controller
     for i in [1..cols]
       form = "TFORM#{i}"
       type = "TTYPE#{i}"
-      console.log header[form]
       match = header[form].match(pattern)
       if match?
         columns[header[type]] = i - 1

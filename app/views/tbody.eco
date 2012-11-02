@@ -1,6 +1,6 @@
 <% for row, index in @table: %>
   <tr>
-    <% for value in row: %>
+    <% for key, value of row: %>
       <td><%= value %></td>
     <% end %>
   </tr>  

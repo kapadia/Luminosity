@@ -22,8 +22,8 @@ class Scatter2D extends Graph
     @plot.empty()
     
     # Get labels for the axes
-    xlabel = @axis1.find("option:selected").text()
-    ylabel = @axis2.find("option:selected").text()
+    @key1 = xlabel = @axis1.find("option:selected").text()
+    @key2 = ylabel = @axis2.find("option:selected").text()
     
     # Get units if they are available
     header = @hdu.header
@@ -32,15 +32,16 @@ class Scatter2D extends Graph
     xlabel += " (#{header[unit1Key]})" if header.contains(unit1Key)
     ylabel += " (#{header[unit2Key]})" if header.contains(unit2Key)
     
-    @xdata = []
-    @ydata = []
+    @data = []
     
     dataunit = @hdu.data
     rows = dataunit.rows
     for i in [1..rows]
       row = dataunit.getRow(i - 1)
-      @xdata.push(row[index1])
-      @ydata.push(row[index2])
+      datum = {}
+      datum[xlabel] = row[@key1]
+      datum[ylabel] = row[@key2]
+      @data.push datum
     
     margin =
       top: 20
@@ -53,10 +54,10 @@ class Scatter2D extends Graph
     
     @x = d3.scale.linear()
       .range([0, width])
-      .domain(d3.extent(@xdata))
+      .domain(d3.extent(@data, (d) => return d[@key1]))
     @y = d3.scale.linear()
       .range([height, 0])
-      .domain(d3.extent(@ydata))
+      .domain(d3.extent(@data, (d) => return d[@key2]))
     
     @xAxis = d3.svg.axis()
       .scale(@x)
@@ -64,7 +65,7 @@ class Scatter2D extends Graph
     @yAxis = d3.svg.axis()
       .scale(@y)
       .orient("left")
-      
+    
     @svg = d3.select("#hdu-#{@index} .scatter-2d .graph").append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
@@ -91,22 +92,29 @@ class Scatter2D extends Graph
         .attr("dy", ".71em")
         .style("text-anchor", "end")
         .text(ylabel)
-          
-    @svg.selectAll(".dot")
-        .data(@ydata)
-      .enter().append("circle")
-        .attr("class", "dot")
-        .attr("r", 1.5)
-        .attr("cx", (d, i) => return @x(@xdata[i]))
-        .attr("cy", (d, i) => return @y(@ydata[i]))
-        .on("mouseover", @showInfo)
-        .on("mouseout", @hideInfo)
+    
+    # @svg.append('g')
+    #   .attr('class', 'brush')
+    #   .call(d3.svg.brush().x(@x).y(@y)
+    #   .on('brushstart', @brushstart)
+    #   .on('brush', @brushmove)
+    #   .on('brushend', @brushstart))
+    
+    @circles = @svg.append('g').selectAll('circle')
+        .data(@data)
+      .enter().append('circle')
+        .attr('class', 'dot')
+        .attr('r', 1.5)
+        .attr('cx', (d) => return @x(d[@key1]))
+        .attr('cy', (d) => return @y(d[@key2]))
+        .on('mouseover', @showInfo)
+        .on('mouseout', @hideInfo)
   
   showInfo: (d, i) =>
     item = d3.select(@svg.selectAll(".dot")[0][i])
     item.attr("r", 4)
     item.style("fill", d3.rgb(255, 0, 0))
-    @info.html("(#{@formatter(@xdata[i])}, #{@formatter(@ydata[i])})")
+    @info.html("(#{@formatter(d[@key1])}, #{@formatter(d[@key2])})")
     @info.css({
       'top': d3.event.pageY - 25,
       'left': d3.event.pageX - 100
@@ -122,7 +130,24 @@ class Scatter2D extends Graph
   zoom: =>
     super
     @svg.selectAll(".dot")
-      .attr("cx", (d, i) => return @x(@xdata[i]))
-      .attr("cy", (d, i) => return @y(@ydata[i]))
+      .attr("cx", (d) => return @x(d[@key1]))
+      .attr("cy", (d) => return @y(d[@key2]))
+  
+  # brushstart: =>
+  #   console.log 'brushstart'
+  #   @svg.classed("selecting", true)
+  #   
+  # brushmove: =>
+  #   e = d3.event.target.extent()
+  #   @circles.classed('selected', =>
+  #     console.log arguments
+  #     throw 'blah'
+  #     d = arguments[0]
+  #     return e[0][0] <= d[0] and d[0] <= e[1][0] and e[0][1] <= d[1] and d[1] <= e[1][1]
+  #   )
+  # 
+  # brushend: =>
+  #   console.log 'brushend'
+  #   @svg.classed('selecting', !d3.event.target.empty())
   
 module.exports = Scatter2D

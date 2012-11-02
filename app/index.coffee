@@ -17,7 +17,7 @@ class Luminosity extends Spine.Controller
     $("body").css('height', window.innerHeight)
     # window.onresize = ->  
     #   $(".hdu").css('height', window.innerHeight)
-      
+    
     # Initialize controllers
     drop = new Drop({el: @luminosity})
     
