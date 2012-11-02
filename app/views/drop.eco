@@ -23,3 +23,12 @@
   
   <p>For bugs, complaints, praises, words of encouragement, feature requests, or any other feedback, please email <%- @developer %>&#64;<%- @domain %> or submit a <a href='https://github.com/kapadia/Luminosity/issues/new'>GitHub issue</a>.</p>
 </div>
+
+<div class='requirements modal'>
+<p><b>Luminosity</b> is built using the latest web standards, and requires a modern browser.  Sadly, your browser is not supported.  If you would like to use this web application, we suggest one of the following:
+<ul>
+  <li>Google Chrome</li>
+  <li>Mozilla Firefox (>= 15)</li>
+  <li>Apple Safari (>= 6)</li>
+</ul>
+</div>

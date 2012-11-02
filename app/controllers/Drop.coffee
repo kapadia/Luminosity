@@ -16,8 +16,11 @@ class Drop extends Spine.Controller
     @drop.addEventListener('dragover', @handleDragOver, false)
     @drop.addEventListener('dragleave', @handleDragLeave, false)
     @drop.addEventListener('drop', @handleDrop, false)
+    @disabled = true
     
     window.addEventListener('keydown', @shortcuts, false)
+  
+  enable: -> @disabled = false
   
   handleDragOver: (e) ->
     e.stopPropagation()
@@ -32,6 +35,7 @@ class Drop extends Spine.Controller
   handleDrop: (e) =>
     e.stopPropagation()
     e.preventDefault()
+    return null if @disabled
     
     files = e.dataTransfer.files
     
@@ -65,10 +69,13 @@ class Drop extends Spine.Controller
         buffer = e.target.result
         handler = new Handler({el: @el})
         handler.readBuffer(buffer)
+        
     $("#loading").show()
     reader.readAsArrayBuffer(file)
 
-  showHelp: => $('.help').toggle()
+  showHelp: =>
+    $('.requirements').hide()
+    $('.help').toggle()
   
   shortcuts: (e) =>
     keyCode = e.keyCode
