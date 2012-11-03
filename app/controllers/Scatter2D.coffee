@@ -9,7 +9,7 @@ class Scatter2D extends Graph
     'change .scatter-2d select[data-axis=1]'  : 'draw'
     'change .scatter-2d select[data-axis=2]'  : 'draw'
     'click .scatter-2d button[name=save]'     : 'savePlot'
-    
+  
   draw: =>
     index1 = @axis1.val()
     index2 = @axis2.val()
@@ -42,6 +42,14 @@ class Scatter2D extends Graph
       datum[@key1] = row[@key1]
       datum[@key2] = row[@key2]
       @data.push datum
+    
+    # Initialize crossfilter object
+    @cross = crossfilter(@data)
+    @all = @cross.groupAll()
+    @dim1 = @cross.dimension( (d) => d[@key1])
+    @dim2 = @cross.dimension( (d) => d[@key2])
+    @group1 = @dim1.group()
+    @group2 = @dim2.group()
     
     margin =
       top: 20
@@ -138,10 +146,16 @@ class Scatter2D extends Graph
     
   brushmove: =>
     e = d3.event.target.extent()
-    @circles.classed('selected', (d) =>
+    @circles.classed 'selected', (d) =>
       return e[0][0] <= d[@key1] and d[@key1] <= e[1][0] and e[0][1] <= d[@key2] and d[@key2] <= e[1][1]
-    )
-  
+    
+    x1 = e[0][0]
+    x2 = e[1][0]
+    y1 = e[0][1]
+    y2 = e[1][1]
+    @dim1.filter([x1, x2])
+    console.log @dim1.top(Infinity)
+    
   brushend: =>
     @svg.classed('selecting', !d3.event.target.empty())
   

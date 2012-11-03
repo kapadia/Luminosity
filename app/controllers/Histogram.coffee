@@ -77,19 +77,19 @@ class Histogram extends Graph
           .attr("class", "y axis")
           .call(@yAxis)
     
-    @svg.selectAll(".bar")
-        .data(@data)
-      .enter().append("rect")
-        .attr("class", "bar")
-        .attr("x", (d, i) => return @x(i))
-        .attr("width", @x(2) - @x(1))
-        .attr("y", (d) => return @y(d))
-        .attr("height", (d) => return height - @y(d))
+    @bars = @svg.selectAll(".bar")
+              .data(@data)
+            .enter().append("rect")
+              .attr("class", "bar")
+              .attr("x", (d, i) => return @x(i))
+              .attr("width", @x(2) - @x(1))
+              .attr("y", (d) => return @y(d))
+              .attr("height", (d) => return height - @y(d))
 
   zoom: =>
     super
     @svg.selectAll(".bar")
       .attr("x", (d, i) => return @x(i))
       .attr("y", (d) => return @y(d))
-    
+
 module.exports = Histogram
