@@ -25,6 +25,9 @@ class Scatter2D extends Graph
     @key1 = xlabel = @axis1.find("option:selected").text()
     @key2 = ylabel = @axis2.find("option:selected").text()
     
+    # Trigger event with column names
+    @trigger 'onColumnChange', xlabel, ylabel
+    
     # Get units if they are available
     header = @hdu.header
     unit1Key = "TUNIT#{parseInt(index1) + 1}"
@@ -45,14 +48,6 @@ class Scatter2D extends Graph
       datum[@key1] = row[@key1]
       datum[@key2] = row[@key2]
       @data.push datum
-    
-    # Initialize crossfilter object
-    @cross = crossfilter(@data)
-    @all = @cross.groupAll()
-    @dim1 = @cross.dimension( (d) => d[@key1])
-    @dim2 = @cross.dimension( (d) => d[@key2])
-    @group1 = @dim1.group()
-    @group2 = @dim2.group()
     
     margin =
       top: 20
@@ -109,7 +104,7 @@ class Scatter2D extends Graph
       .call(d3.svg.brush().x(@x).y(@y)
       .on('brushstart', @brushstart)
       .on('brush', @brushmove)
-      .on('brushend', @brushstart))
+      .on('brushend', @brushend))
     
     @circles = @svg.append('g').selectAll('circle')
         .data(@data)
@@ -152,14 +147,9 @@ class Scatter2D extends Graph
     @circles.classed 'selected', (d) =>
       return e[0][0] <= d[@key1] and d[@key1] <= e[1][0] and e[0][1] <= d[@key2] and d[@key2] <= e[1][1]
     
-    x1 = e[0][0]
-    x2 = e[1][0]
-    y1 = e[0][1]
-    y2 = e[1][1]
-    @dim1.filter([x1, x2])
-    console.log @dim1.top(Infinity)
-    
   brushend: =>
+    e = d3.event.target.extent()
+    @trigger 'brushend', e
     @svg.classed('selecting', !d3.event.target.empty())
   
 module.exports = Scatter2D

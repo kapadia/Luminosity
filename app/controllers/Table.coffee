@@ -68,7 +68,20 @@ class Table extends Spine.Controller
     @scatter3dElem = $("#hdu-#{@index} .scatter-3d")
     @scatter3d = new Scatter3D({el: @scatter3dElem, hdu: @hdu, index: @index, columns: columns})
     
-    @cross = new Cross({hdu: @hdu, index: @index})
+    setTimeout =>
+      @cross = new Cross({hdu: @hdu, index: @index})
+      
+      @scatter2d.bind 'onColumnChange', (col1, col2) =>
+        @cross.setDimensions(col1, col2)
+        @cross.setGroups(col1, col2)
+        
+      @scatter2d.bind 'brushend', (d) =>
+        @cross.applyFilter(d)
+        
+      @cross.bind 'dataFiltered', @renderRows
+    , 0
+    
+    
     
   render: =>
     info = {columns: @hdu.data.columns, rows: @hdu.data.rows}
