@@ -26,12 +26,10 @@ class Crossfilter extends Spine.Controller
     [x1, y1] = d[0]
     [x2, y2] = d[1]
     
+    console.log [x1, x2]
+    console.log [y1, y2]
     @dimension1.filter [x1, x2]
     @dimension2.filter [y1, y2]
-    
-    rows = @dimension1.top(4)
-    for row in rows
-      console.log row[@column1], row[@column2]
     
     @trigger 'dataFiltered', @dimension1.top(10)
     
