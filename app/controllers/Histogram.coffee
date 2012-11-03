@@ -19,20 +19,20 @@ class Histogram extends Graph
     @plot.empty()
     
     # Get label for the axis
-    xlabel = @axis1.find("option:selected").text()
+    @key1 = xlabel = @axis1.find("option:selected").text()
     
     # Get units if they are available
     header = @hdu.header
     unit1Key = "TUNIT#{parseInt(index1) + 1}"
     xlabel += " (#{header[unit1Key]})" if header.contains(unit1Key)
     
-    xdata = []
+    @data = []
     
     dataunit = @hdu.data
     rows = dataunit.rows
     for i in [1..rows]
       row = dataunit.getRow(i - 1)
-      xdata.push(row[index1])
+      @data.push row[@key1]
     
     margin =
       top: 20
@@ -48,7 +48,7 @@ class Histogram extends Graph
       .domain([0, rows])
     @y = d3.scale.linear()
       .range([height, 0])
-      .domain(d3.extent(xdata))
+      .domain(d3.extent(@data))
       
     @xAxis = d3.svg.axis()
       .scale(@x)
@@ -78,7 +78,7 @@ class Histogram extends Graph
           .call(@yAxis)
     
     @svg.selectAll(".bar")
-        .data(xdata)
+        .data(@data)
       .enter().append("rect")
         .attr("class", "bar")
         .attr("x", (d, i) => return @x(i))

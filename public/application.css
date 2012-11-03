@@ -1,4 +1,50 @@
 @import url("http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,400italic,700|Open+Sans+Condensed:700,300");
+.modal {
+  border: 1px solid #505050;
+  width: 50%;
+  height: 50%;
+  overflow: scroll;
+  display: none;
+  position: absolute;
+  top: 25%;
+  left: 25%;
+  padding: 20px;
+  border: solid 1px #bbb;
+  background: #fff;
+  -moz-box-shadow: 0px 3px 6px rgba(0,0,0,0.25);
+  -webkit-box-shadow: 0px 3px 6px rgba(0,0,0,0.25);
+  box-shadow: 0px 3px 6px rgba(0,0,0,0.25);
+  color: #505050;
+  font-size: 12px;
+}
+.requirements {
+  opacity: 0;
+  height: 30%;
+}
+.tutorial {
+  padding: 10px;
+  height: 200px;
+  width: 25%;
+  top: 36%;
+  left: 37%;
+}
+.tutorial p {
+  padding: 2px;
+}
+.tutorial p:last {
+  padding: 0px;
+  margin: 0px;
+}
+.arrow {
+  padding: 6px;
+  font-size: 18px;
+  font-weight: 700;
+  float: right;
+}
+.arrow:hover {
+  color: #cd3e20;
+  cursor: pointer;
+}
 .frame {
   width: 100%;
   height: 100%;
@@ -22,6 +68,39 @@
 }
 #loading {
   display: none;
+}
+.help-button {
+  position: fixed;
+  bottom: 10px;
+  font-weight: 700;
+  font-size: 20px;
+  color: #505050;
+  width: 28px;
+  height: 28px;
+  -moz-border-radius: 14px;
+  -webkit-border-radius: 14px;
+  border-radius: 14px;
+  border: 1px solid #505050;
+  text-align: center;
+}
+.help-button:hover {
+  color: #cd3e20;
+  cursor: pointer;
+}
+#tutorial {
+  right: 60px;
+}
+#help {
+  right: 20px;
+}
+.help a {
+  color: #0172e6;
+}
+.help a:hover {
+  color: #0172e6;
+}
+.help a.bold {
+  font-weight: 700;
 }
 button.hdu {
   font-size: 9px;
@@ -249,6 +328,9 @@ table.fits-table tbody tr td {
 }
 .plot .graph text.label {
   fill: #0172e6;
+}
+circle.selected {
+  fill: #cd3e20;
 }
 html,
 body {
