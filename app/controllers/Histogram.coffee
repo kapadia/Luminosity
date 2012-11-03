@@ -34,6 +34,11 @@ class Histogram extends Graph
       row = dataunit.getRow(i - 1)
       @data.push row[@key1]
     
+    numBins = parseInt(@data.length / 10)
+    bins = d3.layout.histogram().bins(numBins)(@data)
+    firstBin = bins[0]
+    lastBin = bins[bins.length-1]
+    
     margin =
       top: 20
       right: 20
@@ -45,10 +50,12 @@ class Histogram extends Graph
     
     @x = d3.scale.linear()
       .range([0, width])
-      .domain([0, rows])
+      .domain([firstBin.x, lastBin.x])
+      # .domain([0, rows])
     @y = d3.scale.linear()
       .range([height, 0])
-      .domain(d3.extent(@data))
+      .domain([firstBin.y, lastBin.y])
+      # .domain(d3.extent(@data))
       
     @xAxis = d3.svg.axis()
       .scale(@x)
@@ -77,14 +84,18 @@ class Histogram extends Graph
           .attr("class", "y axis")
           .call(@yAxis)
     
-    @bars = @svg.selectAll(".bar")
-              .data(@data)
-            .enter().append("rect")
-              .attr("class", "bar")
-              .attr("x", (d, i) => return @x(i))
-              .attr("width", @x(2) - @x(1))
-              .attr("y", (d) => return @y(d))
-              .attr("height", (d) => return height - @y(d))
+    @bars = @svg.selectAll('.bar')
+              .data(bins)
+            .enter().append('rect')
+              .attr('class', 'bar')
+              .attr('x', (d) => return @x(d.x))
+              .attr('width', width / numBins)
+              .attr('y', (d) => return @y(d.y))
+              .attr('height', (d) => return height - @y(d.y))
+              # .attr("x", (d, i) => return @x(i))
+              # .attr("width", @x(2) - @x(1))
+              # .attr("y", (d) => return @y(d))
+              # .attr("height", (d) => return height - @y(d))
 
   zoom: =>
     super
