@@ -6,9 +6,9 @@ class Scatter2D extends Graph
   formatter: d3.format(".3f")
   
   events:
-    'change .scatter-2d select[data-axis=1]'  : 'draw'
-    'change .scatter-2d select[data-axis=2]'  : 'draw'
-    'click .scatter-2d button[name=save]'     : 'savePlot'
+    "change .scatter-2d select[data-axis='1']"  : 'draw'
+    "change .scatter-2d select[data-axis='2']"  : 'draw'
+    "click .scatter-2d button[name='save']"     : 'savePlot'
   
   draw: =>
     index1 = @axis1.val()
@@ -55,8 +55,8 @@ class Scatter2D extends Graph
       bottom: 60
       left: 50
       
-    width = @el.innerWidth() - margin.left - margin.right - parseInt(@el.css('padding-left')) - parseInt(@el.css('padding-right'))
-    height = @el.innerHeight() - margin.top - margin.bottom - parseInt(@el.css('padding-top')) - parseInt(@el.css('padding-bottom'))
+    width = @el.width() - margin.left - margin.right - parseInt(@el.css('padding-left')) - parseInt(@el.css('padding-right'))
+    height = @el.height() - margin.top - margin.bottom - parseInt(@el.css('padding-top')) - parseInt(@el.css('padding-bottom'))
     
     @x = d3.scale.linear()
       .range([0, width])

@@ -5,8 +5,8 @@ class Histogram extends Graph
   axes: 1
   
   events:
-    'change .histogram select[data-axis=1]' : 'draw'
-    'click .histogram button[name=save]'    : 'savePlot'
+    "change .histogram select[data-axis='1']" : 'draw'
+    "click .histogram button[name='save']"    : 'savePlot'
   
   draw: =>
     index1 = @axis1.val()
@@ -40,8 +40,8 @@ class Histogram extends Graph
       bottom: 60
       left: 50
     
-    width = @el.innerWidth() - margin.left - margin.right - parseInt(@el.css('padding-left')) - parseInt(@el.css('padding-right'))
-    height = @el.innerHeight() - margin.top - margin.bottom - parseInt(@el.css('padding-top')) - parseInt(@el.css('padding-bottom'))
+    width = @el.width() - margin.left - margin.right - parseInt(@el.css('padding-left')) - parseInt(@el.css('padding-right'))
+    height = @el.height() - margin.top - margin.bottom - parseInt(@el.css('padding-top')) - parseInt(@el.css('padding-bottom'))
     
     @x = d3.scale.linear()
       .range([0, width])

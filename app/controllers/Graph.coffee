@@ -14,7 +14,7 @@ class Graph extends Spine.Controller
     @info = $('#info')
     
     for axis in [1..@axes]
-      @["axis#{axis}"] = @root.find("select[data-axis=#{axis}]")
+      @["axis#{axis}"] = @root.find("select[data-axis='#{axis}']")
 
     @saveButton = @root.find('button[name=save]')
     @saveButton.prop('disabled', true)

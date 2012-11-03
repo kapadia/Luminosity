@@ -6,18 +6,17 @@ class Scatter3D extends Graph
   axes: 3
   
   events:
-    'change .scatter-3d select[data-axis=1]' : 'draw'
-    'change .scatter-3d select[data-axis=2]' : 'draw'
-    'change .scatter-3d select[data-axis=3]' : 'draw'
+    "change .scatter-3d select[data-axis='1']" : 'draw'
+    "change .scatter-3d select[data-axis='2']" : 'draw'
+    "change .scatter-3d select[data-axis='3']" : 'draw'
   
   constructor: ->
     super
-    console.log 'Scatter3D'
     
     @render()
-    @axis1 = $("#hdu-#{@index} .scatter-3d select[data-axis=1]")
-    @axis2 = $("#hdu-#{@index} .scatter-3d select[data-axis=2]")
-    @axis3 = $("#hdu-#{@index} .scatter-3d select[data-axis=3]")
+    @axis1 = $("#hdu-#{@index} .scatter-3d select[data-axis='1']")
+    @axis2 = $("#hdu-#{@index} .scatter-3d select[data-axis='2']")
+    @axis3 = $("#hdu-#{@index} .scatter-3d select[data-axis='3']")
     
     @setup()
     @setupMouseInteractions()
@@ -53,8 +52,8 @@ class Scatter3D extends Graph
   setup: =>
     console.log 'setup'
     
-    width = @el.innerWidth() - parseInt(@el.css('padding-left')) - parseInt(@el.css('padding-right'))
-    height = @el.innerHeight() - parseInt(@el.css('padding-top')) - parseInt(@el.css('padding-bottom'))
+    width = @el.width() - parseInt(@el.css('padding-left')) - parseInt(@el.css('padding-right'))
+    height = @el.height() - parseInt(@el.css('padding-top')) - parseInt(@el.css('padding-bottom'))
     
     # Setup the parent div
     @container = document.querySelector("#hdu-#{@index} .scatter-3d .graph")

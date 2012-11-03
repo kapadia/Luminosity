@@ -1,8 +1,5 @@
 {
   "dependencies": [
-    "es5-shimify",
-    "json2ify", 
-    "jqueryify-all",
     "spine",
     "spine/lib/local",
     "spine/lib/ajax",
@@ -11,6 +8,7 @@
     "fits"
   ],
   "libs": [
+    "./vendor/zepto.js",
     "./vendor/d3.v2.js",
     "./vendor/ThreeWebGL.js",
     "./vendor/ThreeExtras.js",

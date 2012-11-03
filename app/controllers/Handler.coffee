@@ -9,10 +9,11 @@ class Handler extends Spine.Controller
     'click button.hdu'  : 'selectHDU'
   
   elements:
-    '#header'     : 'header'
+    '#header' : 'header'
   
   constructor: ->
     super
+    window.addEventListener('scroll', @scroll, false)
     
   readBuffer: (buffer) ->
     @fits = new FITS.File(buffer)
@@ -21,12 +22,12 @@ class Handler extends Spine.Controller
     @html require('views/hdus')(hdus)
     @root = $('#luminosity')
     
+    @root.on('scroll', @scroll)
+    
     @currentHDU = 0
     section = $('section')
     margin = parseInt(section.css('margin').match(/(\d+)/))
-    @hduHeight = section.outerHeight() + margin
-    
-    @root.scroll((e) => @scroll(e.target.scrollTop))
+    @hduHeight = section.height() + margin
     
     @readData(buffer)
   
@@ -37,14 +38,16 @@ class Handler extends Spine.Controller
     else
       @header.hide()
       @currentHDU = selectedHDU
-      @root.animate({scrollTop: @hduHeight * @currentHDU})
+      @root[0].scrollTop = @hduHeight * @currentHDU
   
   showHeader: (index) =>
     header = @fits.getHDU(index).header
     @header.html require('views/header')({cards: header.cards})
     @header.toggle()
   
-  scroll: (value) => @currentHDU = Math.floor(value / @hduHeight)
+  scroll: (value) =>
+    value = @root.scrollTop()
+    @currentHDU = Math.floor(value / @hduHeight)
   
   readData: (buffer) =>
     for hdu, index in @fits.hdus

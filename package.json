@@ -4,9 +4,6 @@
   "dependencies": { 
     "serveup": "~0.0.4",
     "hem": "git://github.com/kapadia/hem.git",
-    "es5-shimify": "~0.0.1",
-    "json2ify": "~0.0.1",
-    "jqueryify-all": "~1.8.0",
     "spine": "~1.0.8",
     "fits": "git://github.com/astrojs/fitsjs.git"
   }
