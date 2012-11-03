@@ -26,6 +26,11 @@ class Table extends Spine.Controller
   @.permittedKeys.push(37)  # Left arrow
   @.permittedKeys.push(39)  # Right array
   
+  @stringCompare: (a, b) ->
+    a = a.toLowerCase()
+    b = b.toLowerCase()
+    return (if a > b then 1 else (if a is b then 0 else -1))
+  
   constructor: ->
     super
     @rows = @hdu.data.rows
@@ -35,12 +40,21 @@ class Table extends Spine.Controller
     
     # Populate table with first ten rows
     number = if @rows < 10 then @rows else 10
-    table = []
+    data = []
     while number--
-      table.push @hdu.data.getRow()
-    @tbody.html require('views/tbody')({table: table})
+      data.push @hdu.data.getRow()
     
-    # Initialize a plot objects
+    # Create the table header
+    d3.select("#hdu-#{@index} .table-container thead").selectAll('th')
+        .data(@hdu.data.columns)
+      .enter().append('th')
+        .text( (d) -> return d )
+    
+    # Place initial data in table
+    @tbody = d3.select("#hdu-#{@index} .table-container tbody")
+    @renderRows(data)
+    
+    # Initialize a plot controllers
     columns = @getNumericalColumns()
     
     @histogramElem = $("#hdu-#{@index} .histogram")
@@ -54,7 +68,7 @@ class Table extends Spine.Controller
     
   render: =>
     info = {columns: @hdu.data.columns, rows: @hdu.data.rows}
-    @html require('views/bintable')(info)
+    @html require('views/table')(info)
   
   blockLetter: (e) ->
     keyCode = e.keyCode
@@ -79,11 +93,25 @@ class Table extends Spine.Controller
     count = if count < 10 then count else 10
     count -= 1
     
-    table = []
+    data = []
     for i in [rowsRead..rowsRead+count]
-      table.push dataunit.getRow(i)
-    
-    @tbody.html require('views/tbody')({table: table})
+      data.push dataunit.getRow(i)
+    @renderRows(data)
+  
+  renderRows: (data) =>
+    @tbody.selectAll('tr').remove()
+    @tbody.selectAll('tr')
+        .data(data)
+      .enter().append('tr')
+      .selectAll('td')
+        .data( (d) ->
+          row = []
+          for key, value of d
+            row.push value
+          return row
+        )
+      .enter().append('td')
+      .text( (d) -> return d)
   
   checkRow: (number) =>
     return false if number < 0

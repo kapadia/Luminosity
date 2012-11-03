@@ -4,7 +4,6 @@ class Graph extends Spine.Controller
   # Must be initialized with an axes (1, 2, 3)
   constructor: ->
     super
-    console.log 'Graph'
     
     @type = Graph.getType(@axes)
     

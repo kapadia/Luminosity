@@ -1,34 +1,19 @@
-<div class='axes' style='display: none;'>
-  <select class='axis'>
-  <% for column, index in @columns: %>
-    <option value='<%= index %>'><%= column %></option>
-  <% end %>
-  </select>
-  <select class='axis'>
-  <% for column, index in @columns: %>
-    <option value='<%= index %>'><%= column %></option>
-  <% end %>
-  </select>
+<div class='controls'>
+  <input type='text' name='number' size='<%- @rows.toString().length %>'> of <%- @rows - 1 %>
+  <input type='submit' name='prev' value='Previous'>
+  <input type='submit' name='next' value='Next'>
+  <input type='submit' name='histogram' value='Histogram'>
+  <input type='submit' name='scatter-2d' value='Scatter 2D'>
+  <input type='submit' name='scatter-3d' value='Scatter 3D'>
 </div>
 
-<table class='fits-table'>
-  <thead>
-    <tr class='column-names'>
-      <% for column in @columns: %>
-      <th><%= column %></th>
-      <% end %>
-    </tr>
-  </thead>
-  <tbody>
-  <% for row, index in @table: %>
-    <tr>
-      <% for value in row: %>
-        <td><%= value %></td>
-      <% end %>
-    </tr>  
-  <% end %>
-  </tbody>
-</table>
+<div class='plot histogram modal'></div>
+<div class='plot scatter-2d modal'></div>
+<div class='plot scatter-3d modal'></div>
 
-<div class='scatter3d' style='display: none;'></div>
-<div class='plot' style='display: none;'></div>
+<div class='table-container'>
+  <table class='fits-table'>
+    <thead></thead>
+    <tbody></tbody>
+  </table>
+</div>
