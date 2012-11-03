@@ -29,7 +29,7 @@
 <div id='tutorial-modal' class='tutorial modal'>
   <p>This is a tutorial for <b>Luminosity</b>.</p>
   
-  <p>We'll send over a FITS files that contains a beautiful image of M101 and a binary table of bright point sources from the image.</p>
+  <p>We'll send over a FITS files that contains a beautiful image of M101 and a binary table of bright point sources extracted from the image.</p>
   
   <p>Click the arrow to continue.</p>
   <span class='arrow'>&rarr;</span>

@@ -1,7 +1,9 @@
 Spine = require('spine')
+
 Histogram = require('controllers/Histogram')
 Scatter2D = require('controllers/Scatter2D')
 Scatter3D = require('controllers/Scatter3D')
+Cross     = require('controllers/Crossfilter')
 
 class Table extends Spine.Controller
   @binary = /(\d*)([BIJKED])/
@@ -65,6 +67,8 @@ class Table extends Spine.Controller
     
     @scatter3dElem = $("#hdu-#{@index} .scatter-3d")
     @scatter3d = new Scatter3D({el: @scatter3dElem, hdu: @hdu, index: @index, columns: columns})
+    
+    @cross = new Cross({hdu: @hdu, index: @index})
     
   render: =>
     info = {columns: @hdu.data.columns, rows: @hdu.data.rows}

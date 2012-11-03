@@ -35,6 +35,9 @@ class Scatter2D extends Graph
     @data = []
     
     dataunit = @hdu.data
+    
+    # TODO: This is an expensive operation.  Ship off to worker, or find way
+    #       to do it asynchronously.
     rows = dataunit.rows
     for i in [1..rows]
       row = dataunit.getRow(i - 1)
