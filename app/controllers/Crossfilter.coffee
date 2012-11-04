@@ -13,7 +13,12 @@ class Crossfilter extends Spine.Controller
     
     @cross = crossfilter(@data)
     @all = @cross.groupAll()
-    
+  
+  setDimension: (@column1) =>
+    @dimension = @cross.dimension( (d) => d[@column1])
+  setGroup: =>
+    @dimension.group()
+  
   setDimensions: (@column1, @column2) =>
     @dimension1 = @cross.dimension( (d) => d[@column1])
     @dimension2 = @cross.dimension( (d) => d[@column2])
@@ -22,12 +27,14 @@ class Crossfilter extends Spine.Controller
     @dimension1.group()
     @dimension2.group()
   
+  apply1DFilter: (d) =>
+    @dimension.filter d
+    @trigger 'dataFiltered', @dimension.top(10)
+  
   applyFilter: (d) =>
     [x1, y1] = d[0]
     [x2, y2] = d[1]
     
-    console.log [x1, x2]
-    console.log [y1, y2]
     @dimension1.filter [x1, x2]
     @dimension2.filter [y1, y2]
     

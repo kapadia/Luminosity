@@ -21,6 +21,9 @@ class Histogram extends Graph
     # Get label for the axis
     @key1 = xlabel = @axis1.find("option:selected").text()
     
+    # Trigger event with column names
+    @trigger 'onColumnChange', xlabel
+    
     # Get units if they are available
     header = @hdu.header
     unit1Key = "TUNIT#{parseInt(index1) + 1}"
@@ -38,6 +41,7 @@ class Histogram extends Graph
     bins = d3.layout.histogram().bins(numBins)(@data)
     firstBin = bins[0]
     lastBin = bins[bins.length-1]
+    ymax = d3.max(bins, (d) -> d.y)
     
     margin =
       top: 20
@@ -51,11 +55,10 @@ class Histogram extends Graph
     @x = d3.scale.linear()
       .range([0, width])
       .domain([firstBin.x, lastBin.x])
-      # .domain([0, rows])
+      
     @y = d3.scale.linear()
       .range([height, 0])
-      .domain([0, d3.max(bins, (d) -> d.y)])
-      # .domain(d3.extent(@data))
+      .domain([0, ymax])
       
     @xAxis = d3.svg.axis()
       .scale(@x)
@@ -67,7 +70,6 @@ class Histogram extends Graph
     @svg = d3.select("#hdu-#{@index} .histogram .graph").append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
-            .call(d3.behavior.zoom().x(@x).y(@y).scaleExtent([1, 8]).on("zoom", @zoom))
           .append('g')
             .attr('transform', "translate(#{margin.left}, #{margin.top})")     
     @svg.append("g")
@@ -92,11 +94,29 @@ class Histogram extends Graph
               .attr('width', width / numBins)
               .attr('y', (d) => return @y(d.y))
               .attr('height', (d) => return height - @y(d.y))
+    
+    @svg.append('g')
+      .attr('class', 'brush')
+      .attr('width', width)
+      .attr('height', height)
+      .call(d3.svg.brush().x(@x)
+      .on('brushstart', @brushstart)
+      .on('brush', @brushmove)
+      .on('brushend', @brushend))
+      .selectAll('rect')
+      .attr('height', height)
 
-  zoom: =>
-    super
-    @svg.selectAll(".bar")
-      .attr('x', (d) => return @x(d.x))
-      .attr('y', (d) => return @y(d.y))
+  brushstart: =>
+    @svg.classed("selecting", true)
+
+  brushmove: =>
+    e = d3.event.target.extent()
+    @bars.classed 'selected', (d) =>
+      return e[0][0] <= d[@key1] and d[@key1] <= d[1][0]
+
+  brushend: =>
+    e = d3.event.target.extent()
+    @trigger 'brushend', e
+    @svg.classed('selecting', !d3.event.target.empty())
 
 module.exports = Histogram

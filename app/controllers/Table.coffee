@@ -71,7 +71,16 @@ class Table extends Spine.Controller
     setTimeout =>
       @cross = new Cross({hdu: @hdu, index: @index})
       
+      @histogram.bind 'onColumnChange', (col1) =>
+        @cross.setDimension(col1)
+        @cross.setGroup(col1)
+      
+      @histogram.bind 'brushend', (d) =>
+        @cross.apply1DFilter(d)
+      
       @scatter2d.bind 'onColumnChange', (col1, col2) =>
+        @cross.setDimension(col1, col2)
+        
         @cross.setDimensions(col1, col2)
         @cross.setGroups(col1, col2)
         
