@@ -54,7 +54,7 @@ class Histogram extends Graph
       # .domain([0, rows])
     @y = d3.scale.linear()
       .range([height, 0])
-      .domain([firstBin.y, lastBin.y])
+      .domain([0, d3.max(bins, (d) -> d.y)])
       # .domain(d3.extent(@data))
       
     @xAxis = d3.svg.axis()
@@ -92,15 +92,11 @@ class Histogram extends Graph
               .attr('width', width / numBins)
               .attr('y', (d) => return @y(d.y))
               .attr('height', (d) => return height - @y(d.y))
-              # .attr("x", (d, i) => return @x(i))
-              # .attr("width", @x(2) - @x(1))
-              # .attr("y", (d) => return @y(d))
-              # .attr("height", (d) => return height - @y(d))
 
   zoom: =>
     super
     @svg.selectAll(".bar")
-      .attr("x", (d, i) => return @x(i))
-      .attr("y", (d) => return @y(d))
+      .attr('x', (d) => return @x(d.x))
+      .attr('y', (d) => return @y(d.y))
 
 module.exports = Histogram
