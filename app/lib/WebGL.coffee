@@ -183,7 +183,7 @@ WebGL =
     
     # Create a canvas within the container with specified width and height
     canvas = document.createElement('canvas')
-    canvas.setAttribute('id', 'webgl-fits')
+    canvas.setAttribute('class', 'webgl-fits')
     canvas.setAttribute('width', width)
     canvas.setAttribute('height', height)
     
