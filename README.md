@@ -7,6 +7,7 @@ This application is built using the latest web standards, as such it requires a 
 * ASCII Tables
 * Binary Tables
 * Data Cubes (experimental)
+
 This application is a result of the [astrojs](astrojs.org) project.
 
 If you are interested in participating in this open source project, please fork it from the [GitHub repository](https://github.com/kapadia/Luminosity).
