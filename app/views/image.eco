@@ -6,6 +6,7 @@
 </div>
 <div class='scale'></div>
 <div class='histogram'></div>
+<div class='info'></div>
 <select class='stretch'>
   <option value="linear">Linear</option>
   <option value="logarithm">Logarithm</option>

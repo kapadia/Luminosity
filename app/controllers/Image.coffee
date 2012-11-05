@@ -23,6 +23,8 @@ class Image extends Spine.Controller
     @stretch  = document.querySelector("#hdu-#{@index} .stretch")
     @viewer   = document.querySelector("#hdu-#{@index} .fits-viewer")
     
+    @info = $("#hdu-#{@index} .info")
+    
     # NOTE: Turning off stretch function for now.
     @stretch.style.display = 'none'
     
@@ -180,7 +182,7 @@ class Image extends Spine.Controller
       x = ((-1 * (@xOffset + 0.5)) + xDelta) + 1.5 << 0
       y = ((-1 * (@yOffset + 0.5)) + yDelta) + 1.5 << 0
       
-      console.log x, y, @hdu.data.getPixel(x, y)
+      @info.text("#{x}, #{y}, #{@hdu.data.getPixel(x, y)}")
       return unless @drag
       
       xDelta = e.clientX - @xMouseDown
@@ -189,6 +191,7 @@ class Image extends Spine.Controller
       @xOffset = @xOldOffset + (xDelta / @canvas.width / @scale * 2.0)
       @yOffset = @yOldOffset - (yDelta / @canvas.height / @scale * 2.0)
       
+      @info.text('asdf')
       @drawScene()
     
     @canvas.onmouseout = (e) =>
