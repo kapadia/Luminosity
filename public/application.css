@@ -332,6 +332,9 @@ table.fits-table tbody tr td {
 circle.selected {
   fill: #cd3e20;
 }
+rect.selected {
+  fill: #cd3e20;
+}
 html,
 body {
   margin: 0 auto;

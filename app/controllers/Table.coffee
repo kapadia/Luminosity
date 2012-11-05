@@ -76,7 +76,7 @@ class Table extends Spine.Controller
         @cross.setGroup(col1)
       
       @histogram.bind 'brushend', (d) =>
-        @cross.apply1DFilter()
+        @cross.apply1DFilter(d)
       
       @scatter2d.bind 'onColumnChange', (col1, col2) =>
         @cross.setDimension(col1, col2)
