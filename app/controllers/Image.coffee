@@ -197,7 +197,6 @@ class Image extends Spine.Controller
       @xOffset = @xOldOffset + (xDelta / @canvas.width / @scale * 2.0)
       @yOffset = @yOldOffset - (yDelta / @canvas.height / @scale * 2.0)
       
-      @info.text('asdf')
       @drawScene()
     
     @canvas.onmouseout = (e) =>

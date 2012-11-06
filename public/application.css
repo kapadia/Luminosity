@@ -339,6 +339,12 @@ circle.selected {
 rect.selected {
   fill: #cd3e20;
 }
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #505050;
+  stroke-width: 2px;
+}
 html,
 body {
   margin: 0 auto;
