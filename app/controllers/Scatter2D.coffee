@@ -67,9 +67,11 @@ class Scatter2D extends Graph
     
     @xAxis = d3.svg.axis()
       .scale(@x)
+      .ticks(6)
       .orient("bottom")
     @yAxis = d3.svg.axis()
       .scale(@y)
+      .ticks(6)
       .orient("left")
     
     @svg = d3.select("#hdu-#{@index} .scatter-2d .graph").append('svg')

@@ -412,6 +412,7 @@ class Image extends Spine.Controller
     # Create an x axis
     xAxis = d3.svg.axis()
       .scale(x)
+      .ticks(6)
       .orient('bottom')
 
     # Append the x axis to the parent object

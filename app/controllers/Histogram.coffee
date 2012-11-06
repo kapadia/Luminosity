@@ -62,10 +62,12 @@ class Histogram extends Graph
       
     @xAxis = d3.svg.axis()
       .scale(@x)
+      .ticks(6)
       .orient("bottom")
     @yAxis = d3.svg.axis()
       .scale(@y)
       .orient("left")
+      .ticks(6)
     
     @svg = d3.select("#hdu-#{@index} .histogram .graph").append('svg')
             .attr('width', width + margin.left + margin.right)
