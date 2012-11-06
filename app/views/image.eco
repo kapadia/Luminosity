@@ -4,9 +4,27 @@
     <img src="css/images/spinner.gif" />
   </div>
 </div>
-<div class='scale'></div>
-<div class='histogram'></div>
-<div class='info'></div>
+
+<div class='tools'>
+  <div class='info'>
+  <table>
+    <tr>
+      <td>x</td>
+      <td class='x'></td>
+    </tr>
+    <tr>
+      <td>y</td>
+      <td class='y'></td>
+    </tr>
+    <tr>
+      <td>pixel</td>
+      <td class='pixel'></td>
+    </tr>
+  </table>
+  </div>
+  <div class='histogram'></div>
+</div>
+
 <select class='stretch'>
   <option value="linear">Linear</option>
   <option value="logarithm">Logarithm</option>

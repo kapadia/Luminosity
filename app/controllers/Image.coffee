@@ -22,6 +22,9 @@ class Image extends Spine.Controller
     # Grab a few DOM elements
     @stretch  = document.querySelector("#hdu-#{@index} .stretch")
     @viewer   = document.querySelector("#hdu-#{@index} .fits-viewer")
+    @xEl      = $("#hdu-#{@index} .x")
+    @yEl      = $("#hdu-#{@index} .y")
+    @pixelEl  = $("#hdu-#{@index} .pixel")
     
     @info = $("#hdu-#{@index} .info")
     
@@ -182,7 +185,10 @@ class Image extends Spine.Controller
       x = ((-1 * (@xOffset + 0.5)) + xDelta) + 1.5 << 0
       y = ((-1 * (@yOffset + 0.5)) + yDelta) + 1.5 << 0
       
-      @info.text("#{x}, #{y}, #{@hdu.data.getPixel(x, y)}")
+      @xEl.text("#{x}")
+      @yEl.text("#{y}")
+      @pixelEl.text("#{@hdu.data.getPixel(x, y)}")
+      
       return unless @drag
       
       xDelta = e.clientX - @xMouseDown
@@ -330,8 +336,6 @@ class Image extends Spine.Controller
     
     @histogramMax = Math.max.apply Math, @histogram
     @histogramMin = Math.min.apply Math, @histogram
-    # @histogramMin = @mean - 5 * @std
-    # @histogramMax = @mean + 5 * @std
     
     @histogramLowerIndex = Math.floor(((pixel - @histogramMin) / range) * bins)
     @histogramUpperIndex = Math.floor(((pixel - @histogramMax) / range) * bins)
