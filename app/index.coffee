@@ -25,8 +25,9 @@ class Luminosity extends Spine.Controller
     if @browserCheck()
       drop.enable()
     else
-      $('.requirements').show()
-      $('.requirements').animate({opacity: 1}, 1000)
+      reqStyle = document.querySelector('.requirements').style
+      reqStyle.display = 'block'
+      reqStyle.opacity = 1
   
   browserCheck: ->
     # Check for native objects
