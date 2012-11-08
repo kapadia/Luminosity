@@ -1,6 +1,7 @@
 Spine   = require('spine')
 WebGL   = require('lib/WebGL')
 Workers = require('lib/Workers')
+Radix   = require('radixsort/radixsort')
 
 class Image extends Spine.Controller
   @viewportWidth  = 600
@@ -338,7 +339,21 @@ class Image extends Spine.Controller
     
     @histogramLowerIndex = Math.floor(((pixel - @histogramMin) / range) * bins)
     @histogramUpperIndex = Math.floor(((pixel - @histogramMax) / range) * bins)
+  
+  computeHistogram2: =>
+    console.log 'computeHistogram radix'
+    data = @hdu.data
+    pixels = data.data
     
+    min = data.min
+    max = data.max
+    range = max - min
+    
+    sort = radixsort()
+    sorted = new Float32Array(sort(pixels))
+    console.log sorted
+  
+  
   drawHistogram: ->
     console.log 'drawHistogram'
     return null unless @histogram?

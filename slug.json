@@ -5,7 +5,8 @@
     "spine/lib/ajax",
     "spine/lib/route",
     "spine/lib/manager",
-    "fits"
+    "fits",
+    "radixsort"
   ],
   "libs": [
     "./vendor/zepto.js",

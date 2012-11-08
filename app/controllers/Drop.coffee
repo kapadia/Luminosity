@@ -94,7 +94,6 @@ class Drop extends Spine.Controller
     xhr.responseType = 'arraybuffer'
     xhr.onload = =>
       handler = new Handler({el: @el})
-      console.log xhr.response
       handler.readBuffer(xhr.response)
     xhr.send()
   
