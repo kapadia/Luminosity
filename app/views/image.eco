@@ -1,4 +1,3 @@
-<progress class='read-image' value='0' max='100'></progress>
 <div class='fits-viewer'>
   <div class='spinner'>
     <img src="css/images/spinner.gif" />
@@ -23,12 +22,11 @@
   </table>
   </div>
   <div class='histogram'></div>
+  <select class='stretch'>
+    <option value="linear">Linear</option>
+    <option value="logarithm">Logarithm</option>
+    <option value="sqrt">Square Root</option>
+    <option value="arcsinh">Arcsinh</option>
+    <option value="power">Power</option>
+  </select>
 </div>
-
-<select class='stretch'>
-  <option value="linear">Linear</option>
-  <option value="logarithm">Logarithm</option>
-  <option value="sqrt">Square Root</option>
-  <option value="arcsinh">Arcsinh</option>
-  <option value="power">Power</option>
-</select>

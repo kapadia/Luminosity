@@ -8,14 +8,7 @@ class Image extends Spine.Controller
   @numberOfBins   = 500
   
   constructor: ->
-    console.log 'Image'
     super
-    
-    # Check for WebGL
-    return null unless WebGL.check()
-    
-    # For inline workers
-    window.URL = window.URL or window.webkitURL
     
     @html require('views/image')()
     
@@ -25,15 +18,18 @@ class Image extends Spine.Controller
     @xEl      = $("#hdu-#{@index} .x")
     @yEl      = $("#hdu-#{@index} .y")
     @pixelEl  = $("#hdu-#{@index} .pixel")
-    
-    @info = $("#hdu-#{@index} .info")
-    
-    # NOTE: Turning off stretch function for now.
-    @stretch.style.display = 'none'
+    @info     = $("#hdu-#{@index} .info")
     
     # Read the data from the image
     @bind 'dataready', @finishSetup
     @readImageData()
+    
+    @stretch.addEventListener('change', @changeStretch, false)
+  
+  changeStretch: =>
+    @program = @programs[@stretch.value]
+    @gl.useProgram(@program)
+    @drawScene()
   
   finishSetup: ->
     # Setup histogram
@@ -43,13 +39,8 @@ class Image extends Spine.Controller
     # Setup up WebGL and interface
     @setupWebGL()
     @setupWebGLUI()
-    
-    # # Delete reference to array
-    # delete @hdu.data.data
   
-  # TODO: Handle this with inline workers
   readImageData: ->
-    console.log 'readImageData'
     
     dataunit = @hdu.data
     [@width, @height] = [dataunit.width, dataunit.height]
@@ -64,85 +55,16 @@ class Image extends Spine.Controller
     rowsRead = 0
     
     #
-    # This code allows for a progress bar to update
-    # when the data is being interpretted by fitsjs.
-    # It is VERY slow.
-    
-    # readImageRow = (progressFn) =>
-    #   data.getRow()
-    #   rowsRead += 1
-    #   
-    #   progressFn()
-    #   
-    #   if rowsRead < height
-    #     setTimeout ( =>
-    #       readImageRow progressFn
-    #     ), 0
-    #   else
-    #     data.frame += 1
-    #     data.getExtremes()
-    #     
-    #     # Hide the progress bar
-    #     $(".read-image").hide()
-    #     
-    #     @trigger 'dataready'
-    # 
-    # readImageRow ( ->
-    #   progress = document.querySelector(".read-image")
-    #   percent = Math.round(100 * (rowsRead / height))
-    #   progress.value = percent
-    # )
-    
-    #
-    # This code uses an inline worker to offload the task.
-    #
-    
-    # Set up an object to send to inline worker
-    # msg =
-    #   buffer: @buffer
-    #   index: @index
-    #   bins: Image.numberOfBins
-    # 
-    # # Inline worker
-    # blob = new Blob([Workers.Image])
-    # blobUrl = window.URL.createObjectURL(blob)
-    # 
-    # # Hide the progress bar
-    # $(".read-image").hide()
-    # 
-    # worker = new Worker(blobUrl)
-    # worker.addEventListener 'message', ((e) =>
-    #   data = e.data
-    #   console.log data
-    #   
-    #   dataunit.data = data.data
-    #   dataunit.min = data.min
-    #   dataunit.max = data.max
-    #   dataunit.frame = data.frame
-    #   # @histogram = data.stats[0]
-    #   # @mean = data.stats[1]
-    #   # @std = data.stats[2]
-    #   
-    #   @buffer = null
-    #   @trigger 'dataready'
-    #   $("#dataunit-#{@index} .spinner").remove()
-    # ), false
-    # worker.postMessage(msg)
-    
-    #
     # This is brute force code.  It seems most stable but is a terrible
     # user experience locking the browser.
     #
     
-    dataunit.getRow() while height--
+    dataunit.getFrame()
     $(".read-image").hide()
-    dataunit.frame += 1
     dataunit.getExtremes()
     @trigger 'dataready'
   
-  setupWebGL: ->
-    console.log 'setupWebGL'
-    
+  setupWebGL: ->    
     container = document.querySelector("#hdu-#{@index} .fits-viewer")
     @canvas   = WebGL.setupCanvas(container, Image.viewportWidth, Image.viewportHeight)
     
@@ -232,7 +154,6 @@ class Image extends Spine.Controller
     @drawScene()
   
   setupWebGLUI: ->
-    console.log 'setupWebGLUI'
     
     # Store parameters needed for rendering
     stretch = @stretch.value
@@ -302,8 +223,8 @@ class Image extends Spine.Controller
     @setRectangle(0, 0, @width, @height)
     @gl.drawArrays(@gl.TRIANGLES, 0, 6)
   
+  # TODO: Possible optimization using a radix sort
   computeHistogram: ->
-    console.log 'computeHistogram'
     data = @hdu.data
     pixels = data.data
     
@@ -338,9 +259,9 @@ class Image extends Spine.Controller
     
     @histogramLowerIndex = Math.floor(((pixel - @histogramMin) / range) * bins)
     @histogramUpperIndex = Math.floor(((pixel - @histogramMax) / range) * bins)
-    
+  
+  # TODO: Generalize histogram class further to utilize here
   drawHistogram: ->
-    console.log 'drawHistogram'
     return null unless @histogram?
     
     # Define brush events

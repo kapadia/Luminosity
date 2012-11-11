@@ -9,12 +9,12 @@ WebGL =
       "varying vec2 v_textureCoord;",
       
       "void main() {",
-          "vec2 position = a_position + u_offset;",
-          "position = position * u_scale;",
-          "gl_Position = vec4(position, 0.0, 1.0);",
+        "vec2 position = a_position + u_offset;",
+        "position = position * u_scale;",
+        "gl_Position = vec4(position, 0.0, 1.0);",
           
-          # Pass coordinate to fragment shader
-          "v_textureCoord = a_textureCoord;",
+        # Pass coordinate to fragment shader
+        "v_textureCoord = a_textureCoord;",
       "}"
     ].join("\n")
   
@@ -28,155 +28,94 @@ WebGL =
         "varying vec2 v_textureCoord;",
         
         "void main() {",
-            "vec4 pixel_v = texture2D(u_tex, v_textureCoord);",
+          "vec4 pixel_v = texture2D(u_tex, v_textureCoord);",
             
-            "float min = u_extremes[0];",
-            "float max = u_extremes[1];",
-            "float pixel = (pixel_v[0] - min) / (max - min);",
+          "float min = u_extremes[0];",
+          "float max = u_extremes[1];",
+          "float pixel = (pixel_v[0] - min) / (max - min);",
             
-            "gl_FragColor = vec4(pixel, pixel, pixel, 1.0);",
+          "gl_FragColor = vec4(pixel, pixel, pixel, 1.0);",
         "}"
       ].join("\n")
       logarithm: [
-        "precision mediump float;"
+        "precision mediump float;",
         
-        "uniform vec2 u_resolution;"
-        "uniform sampler2D u_tex;"
-        "uniform vec2 u_extremes;"
+        "uniform sampler2D u_tex;",
+        "uniform vec2 u_extremes;",
+        
+        "varying vec2 v_textureCoord;",
 
         "void main() {",
-            "vec2 texCoord = gl_FragCoord.xy / u_resolution;",
-            "vec4 pixel_v = texture2D(u_tex, texCoord);",
+          "vec4 pixel_v = texture2D(u_tex, v_textureCoord);",
 
-            "float min = log(u_extremes[0]);",
-            "float max = log(u_extremes[1]);",
+          "float min = log(u_extremes[0]);",
+          "float max = log(u_extremes[1]);",
+          "float pixel = (log(pixel_v[0]) - min) / (max - min);",
 
-            "float pixel = (log(pixel_v[0]) - min) / (max - min);",
+          "gl_FragColor = vec4(pixel, pixel, pixel, 1.0);",
+        "}"
+      ].join("\n")
+      sqrt: [
+        "precision mediump float;",
+        
+        "uniform sampler2D u_tex;",
+        "uniform vec2 u_extremes;",
+        
+        "varying vec2 v_textureCoord;",
+
+        "void main() {",
+          "vec4 pixel_v = texture2D(u_tex, v_textureCoord);",
+
+          "float min = sqrt(u_extremes[0]);",
+          "float max = sqrt(u_extremes[1]);",
+          "float pixel = (sqrt(pixel_v[0]) - min) / (max - min);",
+
+          "gl_FragColor = vec4(pixel, pixel, pixel, 1.0);",
+        "}"
+      ].join("\n")
+      arcsinh: [
+        "precision mediump float;",
+        
+        "uniform sampler2D u_tex;",
+        "uniform vec2 u_extremes;",
+        
+        "varying vec2 v_textureCoord;",
+        
+        "float arcsinh(float value) {",
+            "return log(value + sqrt(1.0 + value * value));",
+        "}",
+
+        "void main() {",
+            "vec4 pixel_v = texture2D(u_tex, v_textureCoord);",
+
+            "float min = arcsinh(u_extremes[0]);",
+            "float max = arcsinh(u_extremes[1]);",
+            "float value = arcsinh(pixel_v[0]);",
+
+            "float pixel = (value - min) / (max - min);",
 
             "gl_FragColor = vec4(pixel, pixel, pixel, 1.0);",
         "}"
       ].join("\n")
-      sqrt: [
-            "precision mediump float;",
-            "uniform vec2 u_resolution;",
-            "uniform sampler2D u_tex;",
-            "uniform vec2 u_extremes;",
-
-            "void main() {",
-                "vec2 texCoord = gl_FragCoord.xy / u_resolution;",
-                "vec4 pixel_v = texture2D(u_tex, texCoord);",
-
-                "float min = sqrt(u_extremes[0]);",
-                "float max = sqrt(u_extremes[1]);",
-
-                "float pixel = (sqrt(pixel_v[0]) - min) / (max - min);",
-
-                "gl_FragColor = vec4(pixel, pixel, pixel, 1.0);",
-            "}"
-          ].join("\n")
-      arcsinh: [
-            "precision mediump float;",
-            "uniform vec2 u_resolution;",
-            "uniform sampler2D u_tex;",
-            "uniform vec2 u_extremes;",
-
-            "float arcsinh(float value) {",
-                "return log(value + sqrt(1.0 + value * value));",
-            "}",
-
-            "void main() {",
-                "vec2 texCoord = gl_FragCoord.xy / u_resolution;",
-                "vec4 pixel_v = texture2D(u_tex, texCoord);",
-
-                "float min = arcsinh(u_extremes[0]);",
-                "float max = arcsinh(u_extremes[1]);",
-                "float value = arcsinh(pixel_v[0]);",
-
-                "float pixel = (value - min) / (max - min);",
-
-                "gl_FragColor = vec4(pixel, pixel, pixel, 1.0);",
-            "}"
-          ].join("\n")
       power: [
-            "precision mediump float;",
-            "uniform vec2 u_resolution;",
-            "uniform sampler2D u_tex;",
-            "uniform vec2 u_extremes;",
+        "precision mediump float;",
+      
+        "uniform sampler2D u_tex;",
+        "uniform vec2 u_extremes;",
+      
+        "varying vec2 v_textureCoord;",
+      
+        "void main() {",
+          "vec4 pixel_v = texture2D(u_tex, v_textureCoord);",
 
-            "void main() {",
-                "vec2 texCoord = gl_FragCoord.xy / u_resolution;",
-                "vec4 pixel_v = texture2D(u_tex, texCoord);",
+          "float min = pow(u_extremes[0], 2.0);",
+          "float max = pow(u_extremes[1], 2.0);",
 
-                "float min = pow(u_extremes[0], 2.0);",
-                "float max = pow(u_extremes[1], 2.0);",
+          "float pixel = (pow(pixel_v[0], 2.0) - min) / (max - min);",
 
-                "float pixel = (pow(pixel_v[0], 2.0) - min) / (max - min);",
-
-                "gl_FragColor = vec4(pixel, pixel, pixel, 1.0);",
-            "}"
-          ].join("\n")
-      color: [
-            "precision mediump float;",
-            "uniform vec2 u_resolution;",
-
-            "uniform sampler2D u_tex_g;",
-            "uniform sampler2D u_tex_r;",
-            "uniform sampler2D u_tex_i;",
-            "uniform vec2 u_extremes;",
-
-            "float arcsinh(float value) {",
-                "return log(value + sqrt(1.0 + value * value));",
-            "}",
-
-            "float f(float minimum, float maximum, float value) {",
-                "float pixel = clamp(value, minimum, maximum);",
-                "float alpha = 0.02;",
-                "float Q = 8.0;",
-                "return arcsinh(alpha * Q * (pixel - minimum)) / Q;",
-            "}",
-
-            "void main() {",
-                "vec2 texCoord = gl_FragCoord.xy / u_resolution;",
-                "vec4 pixel_v_g = texture2D(u_tex_g, texCoord);",
-                "vec4 pixel_v_r = texture2D(u_tex_r, texCoord);",
-                "vec4 pixel_v_i = texture2D(u_tex_i, texCoord);",
-
-                "float minimum = u_extremes[0];",
-                "float maximum = u_extremes[1];",
-                "float g = pixel_v_g[0];",
-                "float r = pixel_v_r[0];",
-                "float i = pixel_v_i[0];",
-                "float I = (g + r + i) / 3.0;",
-                "float fI = f(minimum, maximum, I);",
-                "float fII = fI / I;",
-
-                "float R = i * fII;",
-                "float G = r * fII;",
-                "float B = g * fII;",
-
-                "float RGBmax = max(max(R, G), B);",
-
-                "if (RGBmax > 1.0) {",
-                  "R = R / RGBmax;",
-                  "G = G / RGBmax;",
-                  "B = B / RGBmax;",
-                "}",
-                "if (I == 0.0) {",
-                  "R = 0.0;",
-                  "G = 0.0;",
-                  "B = 0.0;",
-                "}",
-
-                "gl_FragColor = vec4(R, G, B, 1.0);",
-            "}"
-          ].join("\n")
-
-  # TODO: This function is not working ...
-  check: ->
-    unless window.WebGLRenderingContext
-      alert('Sorry, you need a WebGL enabled browser to use this application')
-      return false
-    return true
+          "gl_FragColor = vec4(pixel, pixel, pixel, 1.0);",
+        "}"
+      ].join("\n")
   
   # WebGL needs a canvas for drawing
   setupCanvas: (container, width, height) ->
