@@ -27,8 +27,15 @@ class Image extends Spine.Controller
     @stretch.addEventListener('change', @changeStretch, false)
   
   changeStretch: =>
+    extremesLocation = @gl.getUniformLocation(@program, 'u_extremes')
+    extremes = @gl.getUniform(@program, extremesLocation)
+    
     @program = @programs[@stretch.value]
     @gl.useProgram(@program)
+    
+    extremesLocation = @gl.getUniformLocation(@program, 'u_extremes')
+    @gl.uniform2fv(extremesLocation, extremes)
+    
     @drawScene()
   
   finishSetup: ->
@@ -133,8 +140,8 @@ class Image extends Spine.Controller
     @canvas.addEventListener('mousewheel', @wheelHandler, false)
     @canvas.addEventListener('DOMMouseScroll', @wheelHandler, false)
     
-    @gl = WebGL.create3DContext(@canvas)
-    @ext = @gl.getExtension('OES_texture_float')
+    @gl   = WebGL.create3DContext(@canvas)
+    @ext  = @gl.getExtension('OES_texture_float')
     
     unless @ext
       alert "No OES_texture_float"
@@ -144,7 +151,6 @@ class Image extends Spine.Controller
   
   wheelHandler: (e) =>
     e.preventDefault()
-    e.stopPropagation()
     factor = if e.shiftKey then 1.01 else 1.1
     @scale *= if (e.detail or e.wheelDelta) < 0 then factor else 1 / factor
     
@@ -181,7 +187,10 @@ class Image extends Spine.Controller
       
       texCoordBuffer = @gl.createBuffer()
       @gl.bindBuffer(@gl.ARRAY_BUFFER, texCoordBuffer)
-      @gl.bufferData(@gl.ARRAY_BUFFER, new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]), @gl.STATIC_DRAW)
+      @gl.bufferData(
+        @gl.ARRAY_BUFFER,
+        new Float32Array([0.0, 0.0, 1.0, 0.0, 0.0, 1.0, 0.0, 1.0, 1.0, 0.0, 1.0, 1.0]),
+        @gl.STATIC_DRAW)
       
       @gl.enableVertexAttribArray(texCoordLocation)
       @gl.vertexAttribPointer(texCoordLocation, 2, @gl.FLOAT, false, 0, 0)
@@ -261,12 +270,12 @@ class Image extends Spine.Controller
     @histogramUpperIndex = Math.floor(((pixel - @histogramMax) / range) * bins)
   
   # TODO: Generalize histogram class further to utilize here
-  drawHistogram: ->
+  drawHistogram: =>
     return null unless @histogram?
     
     # Define brush events
     brushstart = ->
-      chart.classed "selecting", true
+      svg.classed "selecting", true
     brushmove = =>
       s = d3.event.target.extent()
       bars.classed "selected", (d) ->
@@ -276,13 +285,14 @@ class Image extends Spine.Controller
       @gl.uniform2f(extremesLocation, s[0], s[1])
       @gl.drawArrays(@gl.TRIANGLES, 0, 6)
     brushend = ->
-      chart.classed "selecting", not d3.event.target.empty()
+      svg.classed "selecting", not d3.event.target.empty()
     
     margin =
       top: 0
       right: 20
       bottom: 60
       left: 10
+    
     w = 390 - margin.right - margin.left
     h = 260 - margin.top - margin.bottom
     
@@ -291,66 +301,65 @@ class Image extends Spine.Controller
     [min, max] = [data.min, data.max]
     
     # Create scales for both axes
-    x = d3.scale.linear()
+    @x = d3.scale.linear()
       .domain([min, max])
       .range([0, w])
     
-    y = d3.scale.linear()
+    @y = d3.scale.linear()
       .domain([0, d3.max(@histogram)])
       .range([0, h])
     
-    # Create a chart object
-    chart = d3.select("#hdu-#{@index} .histogram").append('svg')
-      .attr('class', 'chart')
+    # Create the SVG
+    svg = d3.select("#hdu-#{@index} .histogram").append('svg')
       .attr('width', w + margin.right + margin.left)
       .attr('height', h + margin.top + margin.bottom)
       .append('g')
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")")
+      .attr('transform', "translate(#{margin.left}, #{margin.top})")
     
-    # Create a parent element for the chart
-    main = chart.append('g')
-      .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+    # Create a parent element for the svg
+    main = svg.append('g')
+      .attr('transform', "translate(#{margin.left}, #{margin.top})")
       .attr('width', w)
       .attr('height', h)
       .attr('class', 'main')
     
-    # Add the data to the chart
-    bars = chart.selectAll('rect')
+    # Add the data
+    bars = svg.selectAll('rect')
       .data(@histogram)
-      .enter().append('rect')
+      .enter().append('rect' )
       .attr('x', ((d, i) ->
         return i * 1.25 + margin.left
       ))
-      .attr('y', ((d) ->
-        return h - y(d) + margin.top - 1.5
+      .attr('y', ((d) =>
+        return h - @y(d) + margin.top - 1.5
       ))
       .attr('width', 1)
-      .attr('height', ((d) ->
-        return y(d)
+      .attr('height', ((d) =>
+        return @y(d)
       ))
     
     # Create an x axis
     xAxis = d3.svg.axis()
-      .scale(x)
+      .scale(@x)
       .ticks(6)
       .orient('bottom')
 
     # Append the x axis to the parent object
     main.append('g')
-      .attr('transform', 'translate(' + -1 * margin.left + ',' + h + ')')
+      .attr('transform', "translate(#{-1 * margin.left}, #{h})")
       .attr('class', 'main axis date')
       .call(xAxis)
     
     # Append the brush
-    chart.append('g')
-      .attr('class', "brush")
+    svg.append('g')
+      .attr('class', 'brush')
       .attr('width', w)
       .attr('height', h)
-      .call(d3.svg.brush().x(x)
-      .on("brushstart", brushstart)
-      .on("brush", brushmove)
-      .on("brushend", brushend))
-      .selectAll("rect")
-      .attr("height", h)
+      .call(d3.svg.brush().x(@x)
+      .on('brushstart', brushstart)
+      .on('brush', brushmove)
+      .on('brushend', brushend))
+      .selectAll('rect')
+      .attr('height', h)
     
 module.exports = Image
