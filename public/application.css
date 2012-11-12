@@ -203,14 +203,6 @@ canvas {
 .histogram {
   float: left;
 }
-.chart rect {
-  stroke: #fff;
-  fill: #cd3e20;
-  opacity: 1;
-}
-.chart rect .selected {
-  fill: #0172e6;
-}
 .brush .extent {
   fill: #0172e6;
   stroke: #fff;
@@ -333,10 +325,10 @@ table.fits-table tbody tr td {
 .plot .graph text.label {
   fill: #0172e6;
 }
-circle.selected {
+.plot circle.selected {
   fill: #cd3e20;
 }
-rect.selected {
+.plot rect.selected {
   fill: #cd3e20;
 }
 .axis path,

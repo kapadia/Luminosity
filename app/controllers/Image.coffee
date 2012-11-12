@@ -1,6 +1,5 @@
 Spine   = require('spine')
 WebGL   = require('lib/WebGL')
-Workers = require('lib/Workers')
 
 class Image extends Spine.Controller
   @viewportWidth  = 600
@@ -301,11 +300,11 @@ class Image extends Spine.Controller
     [min, max] = [data.min, data.max]
     
     # Create scales for both axes
-    @x = d3.scale.linear()
+    x = d3.scale.linear()
       .domain([min, max])
       .range([0, w])
     
-    @y = d3.scale.linear()
+    y = d3.scale.linear()
       .domain([0, d3.max(@histogram)])
       .range([0, h])
     
@@ -330,17 +329,17 @@ class Image extends Spine.Controller
       .attr('x', ((d, i) ->
         return i * 1.25 + margin.left
       ))
-      .attr('y', ((d) =>
-        return h - @y(d) + margin.top - 1.5
+      .attr('y', ((d) ->
+        return h - y(d) + margin.top - 1.5
       ))
       .attr('width', 1)
-      .attr('height', ((d) =>
-        return @y(d)
+      .attr('height', ((d) ->
+        return y(d)
       ))
     
     # Create an x axis
     xAxis = d3.svg.axis()
-      .scale(@x)
+      .scale(x)
       .ticks(6)
       .orient('bottom')
 
@@ -355,7 +354,7 @@ class Image extends Spine.Controller
       .attr('class', 'brush')
       .attr('width', w)
       .attr('height', h)
-      .call(d3.svg.brush().x(@x)
+      .call(d3.svg.brush().x(x)
       .on('brushstart', brushstart)
       .on('brush', brushmove)
       .on('brushend', brushend))
