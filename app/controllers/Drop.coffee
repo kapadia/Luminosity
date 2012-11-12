@@ -4,7 +4,6 @@ class Drop extends Spine.Controller
   
   events:
     'click #help'     : 'showHelp'
-    'click #tutorial' : 'showTutorial'
     'click .arrow'    : 'beginTutorial'
 
   @getExtension: (filename) -> filename.split('.').pop()
@@ -12,7 +11,8 @@ class Drop extends Spine.Controller
   constructor: ->
     super
     
-    @html require('views/drop')({developer: 'amit', domain: 'zooniverse.org'})
+    info = require('lib/info')
+    @html require('views/drop')(info)
     
     @drop = document.getElementById('drop')
     @drop.addEventListener('dragover', @handleDragOver, false)
@@ -22,7 +22,9 @@ class Drop extends Spine.Controller
     
     window.addEventListener('keydown', @shortcuts, false)
   
-  enable: -> @disabled = false
+  enable: ->
+    @disabled = false
+    $('#tutorial').bind 'click', @showTutorial
   
   handleDragOver: (e) ->
     e.stopPropagation()

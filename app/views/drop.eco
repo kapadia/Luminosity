@@ -1,3 +1,7 @@
+<div id='commit'>
+  <a href='https://github.com/kapadia/Luminosity/commit/<%- @ref %>'><%- @ref %> <%- @date %></a>
+</div>
+
 <div id='drop' class='frame'>
   <p class='center'>DROP FITS HERE</p>
 </div>
@@ -40,6 +44,5 @@
 <ul>
   <li>Google Chrome</li>
   <li>Mozilla Firefox (>= 15)</li>
-  <li>Apple Safari (>= 6)</li>
 </ul>
 </div>
