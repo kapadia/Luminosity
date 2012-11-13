@@ -73,21 +73,17 @@ class Table extends Spine.Controller
       @cross = new Cross({index: @index}, @hdu.data)
       
       @histogram.bind 'onColumnChange', (col1) =>
-        @cross.setDimension(col1)
-        @cross.setGroup(col1)
+        @cross.setDimensions(col1)
       
       @histogram.bind 'brushend', (d) =>
-        @cross.apply1DFilter(d)
+        @cross.applyFilters(d)
       
       @scatter2d.bind 'onColumnChange', (col1, col2) =>
-        @cross.setDimension(col1, col2)
-        
         @cross.setDimensions(col1, col2)
-        @cross.setGroups(col1, col2)
-        
+      
       @scatter2d.bind 'brushend', (d) =>
-        @cross.applyFilter(d)
-        
+        @cross.applyFilters(d)
+      
       @cross.bind 'dataFiltered', @renderRows
     , 0
     

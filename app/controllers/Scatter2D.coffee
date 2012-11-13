@@ -150,8 +150,11 @@ class Scatter2D extends Graph
       return e[0][0] <= d[@key1] and d[@key1] <= e[1][0] and e[0][1] <= d[@key2] and d[@key2] <= e[1][1]
     
   brushend: =>
-    e = d3.event.target.extent()
-    @trigger 'brushend', e
+    d = d3.event.target.extent()
+    data = {}
+    data[@key1] = d.map( (x) -> return x[0])
+    data[@key2] = d.map( (x) -> return x[1])
+    @trigger 'brushend', data
     @svg.classed('selecting', !d3.event.target.empty())
   
 module.exports = Scatter2D

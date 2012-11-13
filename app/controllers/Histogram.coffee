@@ -117,8 +117,9 @@ class Histogram extends Graph
       return e[0][0] <= d[@key1] and d[@key1] <= d[1][0]
 
   brushend: =>
-    e = d3.event.target.extent()
-    @trigger 'brushend', e
+    data = {}
+    data[@key1] = d3.event.target.extent()
+    @trigger 'brushend', data
     @svg.classed('selecting', !d3.event.target.empty())
 
 module.exports = Histogram

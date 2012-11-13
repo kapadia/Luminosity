@@ -4,7 +4,6 @@ class Crossfilter extends Spine.Controller
   
   constructor: ->
     super
-
     dataunit = arguments[1]
     
     # Process all data
@@ -13,31 +12,25 @@ class Crossfilter extends Spine.Controller
       data.push dataunit.getRow(i)
     
     @cross = crossfilter(data)
+    @dimensions = {}
   
-  setDimension: (@column1) =>
-    @dimension = @cross.dimension( (d) => d[@column1])
-  setGroup: =>
-    @dimension.group()
+  # Create a crossfilter dimension on the selected column
+  setDimensions: (columns...) =>
+    for column in columns
+      @dimensions[column] = @cross.dimension((d) => d[column])
   
-  setDimensions: (@column1, @column2) =>
-    @dimension1 = @cross.dimension( (d) => d[@column1])
-    @dimension2 = @cross.dimension( (d) => d[@column2])
+  applyFilters: (bounds) =>
     
-  setGroups: (column1, column2) =>
-    @dimension1.group()
-    @dimension2.group()
-  
-  apply1DFilter: (d) =>
-    @dimension.filter d
-    @trigger 'dataFiltered', @dimension.top(10)
-  
-  applyFilter: (d) =>
-    [x1, y1] = d[0]
-    [x2, y2] = d[1]
+    # Clear the existing filters
+    for key, dimension of @dimensions
+      dimension.filterAll()
     
-    @dimension1.filter [x1, x2]
-    @dimension2.filter [y1, y2]
+    # Apply filters based on bounds
+    for key, value of bounds
+      @dimensions[key].filter(value)
     
-    @trigger 'dataFiltered', @dimension1.top(10)
-    
+    key = Object.keys(bounds)[0]
+    @trigger 'dataFiltered', @dimensions[key].top(10)
+
+
 module.exports = Crossfilter
