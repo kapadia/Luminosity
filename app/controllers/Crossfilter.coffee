@@ -4,15 +4,15 @@ class Crossfilter extends Spine.Controller
   
   constructor: ->
     super
+
+    dataunit = arguments[1]
     
     # Process all data
-    dataunit = @hdu.data
-    @data = []
+    data = []
     for i in [0..dataunit.rows-1]
-      @data.push dataunit.getRow(i)
+      data.push dataunit.getRow(i)
     
-    @cross = crossfilter(@data)
-    @all = @cross.groupAll()
+    @cross = crossfilter(data)
   
   setDimension: (@column1) =>
     @dimension = @cross.dimension( (d) => d[@column1])
