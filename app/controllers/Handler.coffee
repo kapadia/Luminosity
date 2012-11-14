@@ -6,7 +6,8 @@ Table = require('controllers/Table')
 
 class Handler extends Spine.Controller
   events:
-    'click button.hdu'  : 'selectHDU'
+    'click button.hdu'    : 'selectHDU'
+    'click #active label' : 'setHDU'
   
   elements:
     '#header' : 'header'
@@ -16,20 +17,54 @@ class Handler extends Spine.Controller
     window.addEventListener('scroll', @scroll, false)
     
   readBuffer: (buffer) ->
-    @fits = new FITS.File(buffer)
     
+    # Initialize FITS object and cache the HDUs
+    @fits = new FITS.File(buffer)
     hdus = @fits.hdus
+    numHDUs = hdus.length
+    
+    # Set some styles dynamically (this is messy)
+    styles = "<style>"
+    for i in [0..numHDUs-1]
+      margin = "#{-1 * 100 * i}%"
+      
+      styles += "#hdu#{i}:checked ~ #slides .inner {margin-left: #{margin};}"
+      styles += "#hdu#{i}:checked ~ #active label:nth-child(#{i+1}) {background: #333; border-color: #333 !important;}"
+      styles += "#hdu#{i}:checked ~ #slides article:nth-child(#{i+1}) {opacity: 1; -webkit-transition: all 1s ease-out 0.6s; -moz-transition: all 1s ease-out 0.6s; transition: all 1s ease-out 0.6s;}"
+    
+    styles += "#slides .inner {width: #{100 * numHDUs}%;}"
+    styles += "#slides article {width: #{100 / numHDUs}%;}"
+    styles += "</style>"
+    $('head').append(styles)
+    
+    # Render the template
     @html require('views/hdus')(hdus)
+    
+    # Set the default HDU
+    # TODO: Default to the first HDU containing a data unit
+    $('#hdu0').attr('checked', 'checked') # TODO: Test Zepto's prop method
+    
+    # Cache the root object
     @root = $('#luminosity')
     
-    @root.on('scroll', @scroll)
+    # Set styles dynamically
+    @root.css('margin', '10px 20px')
+    window.onresize = =>
+      width = $(window).width()
+      $('body').width(width)
+    window.onresize()
     
-    @currentHDU = 0
-    section = $('section')
-    margin = parseInt(section.css('margin').match(/(\d+)/))
-    @hduHeight = section.height() + margin
-    
-    @readData(buffer)
+    # @root.on('scroll', @scroll)
+    # 
+    # @currentHDU = 0
+    # section = $('section')
+    # margin = parseInt(section.css('margin').match(/(\d+)/))
+    # @hduHeight = section.height() + margin
+    # 
+    # @readData(buffer)
+  
+  setHDU: (e) =>
+    console.log e
   
   selectHDU: (e) =>
     selectedHDU = parseInt(e.target.dataset['index'])

@@ -1,0 +1,101 @@
+body
+  margin: 0 auto
+  width: 1000px
+  font: 14px Helvetica, sans-serif
+  color: #333
+  background: #DDD
+
+#luminosity
+  text-align: center
+  -webkit-transform: translateZ(0)
+  -webkit-transition: all 0.5s ease-out
+  -moz-transition: all 0.5s ease-out
+  transition: all 0.5s ease-out
+
+input
+  display: none
+
+#slide1:checked ~ #slides .inner
+  margin-left: 0
+
+#slide2:checked ~ #slides .inner
+  margin-left: -100%
+
+#slide3:checked ~ #slides .inner
+  margin-left: -200%
+
+#slide4:checked ~ #slides .inner
+  margin-left: -300%
+
+#slide5:checked ~ #slides .inner
+  margin-left: -400%
+
+#slides
+  margin: 45px 0 0
+  -webkit-border-radius: 5px
+  -moz-border-radius: 5px
+  border-radius: 5px
+  box-shadow: 1px 1px 4px #666
+  padding: 1%
+  background: #FAFAFA
+
+
+#overflow
+  width: 100%
+  overflow: hidden
+
+article p
+  width: 100%
+
+
+#slides article
+  width: 20%
+  float: left
+
+#active
+  margin: 23% 0 0
+  text-align: center
+
+#active label
+  -webkit-border-radius: 5px
+  -moz-border-radius: 5px
+  border-radius: 5px
+  display: inline-block
+  width: 10px
+  height: 10px
+  background: #bbb
+
+#slide1:checked ~ #active label:nth-child(1),
+#slide2:checked ~ #active label:nth-child(2),
+#slide3:checked ~ #active label:nth-child(3),
+#slide4:checked ~ #active label:nth-child(4),
+#slide5:checked ~ #active label:nth-child(5)
+  background: #333
+  border-color: #333 !important
+
+#slides .inner
+  width: 500%
+  -webkit-transform: translateZ(0)
+  -webkit-transition: all 800ms cubic-bezier(0.770, 0.000, 0.175, 1.000)
+  -moz-transition: all 800ms cubic-bezier(0.770, 0.000, 0.175, 1.000)
+  transition: all 800ms cubic-bezier(0.770, 0.000, 0.175, 1.000)
+  -webkit-transition-timing-function: cubic-bezier(0.770, 0.000, 0.175, 1.000)
+  -moz-transition-timing-function: cubic-bezier(0.770, 0.000, 0.175, 1.000)
+  transition-timing-function: cubic-bezier(0.770, 0.000, 0.175, 1.000)
+
+#slide1:checked ~ #slides article:nth-child(1),
+#slide2:checked ~ #slides article:nth-child(2),
+#slide3:checked ~ #slides article:nth-child(3),
+#slide4:checked ~ #slides article:nth-child(4),
+#slide5:checked ~ #slides article:nth-child(5)
+  opacity: 1
+  -webkit-transition: all 1s ease-out 0.6s
+  -moz-transition: all 1s ease-out 0.6s
+  transition: all 1s ease-out 0.6s
+
+#slides, #active, #active label
+  -webkit-transform: translateZ(0)
+  -webkit-transition: all 0.5s ease-out
+  -moz-transition: all 0.5s ease-out
+  transition: all 0.5s ease-out
+

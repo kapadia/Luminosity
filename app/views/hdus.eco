@@ -1,19 +1,24 @@
-<div id='hdus'>
-  <% for hdu, index in @: %>
-  <% type = if hdu.header.extensionType? then hdu.header.extensionType.toLowerCase() else 'primary' %>
-  <button id='hdu-button-<%- index %>' class='hdu <%- type %>' data-type='<%- type %>' data-index='<%- index %>'>HDU <%- index %> (<%- type.toUpperCase() %>)</button>
-  <% end %>
-</div>
-
 <div id='header' class='modal'></div>
 <div id='info'></div>
 
 <% for hdu, index in @: %>
-<section id='hdu-<%= index %>' class='hdu'>
-  <article class='dataunit'></article>
-</section>
+<input type='radio' name='hdu' id='hdu<%- index %>'>
 <% end %>
 
-<div id="toolbar">
-  <p>Toolbar Goes Here ...</p>
+<div id="slides">
+  <div id="overflow">
+    <div class="inner">
+      <% for hdu, index in @: %>
+        <article>
+          <p>DataUnit <%- index %></p>
+        </article>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div id="active">
+<% for hdu, index in @: %>
+  <label for='hdu<%- index %>'></label>
+<% end %>
 </div>

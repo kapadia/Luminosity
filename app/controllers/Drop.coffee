@@ -88,7 +88,6 @@ class Drop extends Spine.Controller
     $('#tutorial-modal').toggle()
   
   beginTutorial: =>
-    console.log 'beginTutorial'
     xhr = new XMLHttpRequest()
     xhr.open('GET', 'tutorial/demo.fits')
     xhr.responseType = 'arraybuffer'
