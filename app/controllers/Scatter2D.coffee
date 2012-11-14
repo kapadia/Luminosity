@@ -74,7 +74,7 @@ class Scatter2D extends Graph
       .ticks(6)
       .orient("left")
     
-    @svg = d3.select("#hdu-#{@index} .scatter-2d .graph").append('svg')
+    @svg = d3.select("#dataunit#{@index} .scatter-2d .graph").append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
             .call(d3.behavior.zoom().x(@x).y(@y).scaleExtent([1, 8]).on("zoom", @zoom))

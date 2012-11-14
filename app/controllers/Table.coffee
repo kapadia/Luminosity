@@ -53,19 +53,19 @@ class Table extends Spine.Controller
         .text( (d) -> return d )
     
     # Place initial data in table
-    @tbody = d3.select("#hdu-#{@index} .table-container tbody")
+    @tbody = d3.select("#dataunit#{@index} .table-container tbody")
     @renderRows(data)
     
     # Initialize a plot controllers
     columns = @getNumericalColumns()
     
-    @histogramElem = $("#hdu-#{@index} .histogram")
+    @histogramElem = $("#dataunit#{@index} .histogram")
     @histogram = new Histogram({el: @histogramElem, hdu: @hdu, index: @index, columns: columns})
     
-    @scatter2dElem = $("#hdu-#{@index} .scatter-2d")
+    @scatter2dElem = $("#dataunit#{@index} .scatter-2d")
     @scatter2d = new Scatter2D({el: @scatter2dElem, hdu: @hdu, index: @index, columns: columns})
     
-    @scatter3dElem = $("#hdu-#{@index} .scatter-3d")
+    @scatter3dElem = $("#dataunit#{@index} .scatter-3d")
     @scatter3d = new Scatter3D({el: @scatter3dElem, hdu: @hdu, index: @index, columns: columns})
     
     # Setup crossfilter object and hook up events

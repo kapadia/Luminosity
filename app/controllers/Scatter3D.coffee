@@ -13,10 +13,9 @@ class Scatter3D extends Graph
   constructor: ->
     super
     
-    @render()
-    @axis1 = $("#hdu-#{@index} .scatter-3d select[data-axis='1']")
-    @axis2 = $("#hdu-#{@index} .scatter-3d select[data-axis='2']")
-    @axis3 = $("#hdu-#{@index} .scatter-3d select[data-axis='3']")
+    @axis1 = $("#dataunit#{@index} .scatter-3d select[data-axis='1']")
+    @axis2 = $("#dataunit#{@index} .scatter-3d select[data-axis='2']")
+    @axis3 = $("#dataunit#{@index} .scatter-3d select[data-axis='3']")
     
     @setup()
     @setupMouseInteractions()
@@ -56,7 +55,7 @@ class Scatter3D extends Graph
     height = @el.height() - parseInt(@el.css('padding-top')) - parseInt(@el.css('padding-bottom'))
     
     # Setup the parent div
-    @container = document.querySelector("#hdu-#{@index} .scatter-3d .graph")
+    @container = document.querySelector("#dataunit#{@index} .scatter-3d .graph")
     @container.width = width
     @container.height = height
     

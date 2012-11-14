@@ -6,10 +6,9 @@ class Graph extends Spine.Controller
     super
     
     @type = Graph.getType(@axes)
-    
     @render()
     
-    @root = $("#hdu-#{@index} .#{@type}")
+    @root = $("#dataunit#{@index} .#{@type}")
     @plot = @root.find('.graph')
     @info = $('#info')
     
