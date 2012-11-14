@@ -17,6 +17,7 @@ class Crossfilter extends Spine.Controller
   # Create a crossfilter dimension on the selected column
   setDimensions: (columns...) =>
     for column in columns
+      continue if @dimensions.hasOwnProperty(column)
       @dimensions[column] = @cross.dimension((d) => d[column])
   
   applyFilters: (bounds) =>
