@@ -13,12 +13,13 @@ class Image extends Spine.Controller
     @html require('views/image')()
     
     # Grab a few DOM elements
-    @stretch  = document.querySelector("#hdu-#{@index} .stretch")
-    @viewer   = document.querySelector("#hdu-#{@index} .fits-viewer")
-    @xEl      = $("#hdu-#{@index} .x")
-    @yEl      = $("#hdu-#{@index} .y")
-    @pixelEl  = $("#hdu-#{@index} .pixel")
-    @info     = $("#hdu-#{@index} .info")
+    @stretch  = document.querySelector("#dataunit#{@index} .stretch")
+    @viewer   = document.querySelector("#dataunit#{@index} .fits-viewer")
+    
+    @xEl      = @el.find('.x')
+    @yEl      = @el.find('.y')
+    @pixelEl  = @el.find('.pixel')
+    @info     = @el.find('.info')
     
     # Read the data from the image
     @bind 'dataready', @finishSetup
@@ -72,8 +73,7 @@ class Image extends Spine.Controller
     @trigger 'dataready'
   
   setupWebGL: ->    
-    container = document.querySelector("#hdu-#{@index} .fits-viewer")
-    @canvas   = WebGL.setupCanvas(container, Image.viewportWidth, Image.viewportHeight)
+    @canvas   = WebGL.setupCanvas(@viewer, Image.viewportWidth, Image.viewportHeight)
     
     # Set up variables for panning and zooming
     @xOffset = -@width / 2
@@ -323,7 +323,7 @@ class Image extends Spine.Controller
       .range([0, h])
     
     # Create the SVG
-    svg = d3.select("#hdu-#{@index} .histogram").append('svg')
+    svg = d3.select("#dataunit#{@index} .histogram").append('svg')
       .attr('width', w + margin.right + margin.left)
       .attr('height', h + margin.top + margin.bottom)
       .append('g')

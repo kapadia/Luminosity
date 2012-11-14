@@ -6,7 +6,6 @@ Table = require('controllers/Table')
 
 class Handler extends Spine.Controller
   events:
-    'click button.hdu'    : 'selectHDU'
     'click #active label' : 'setHDU'
   
   elements:
@@ -28,12 +27,12 @@ class Handler extends Spine.Controller
     for i in [0..numHDUs-1]
       margin = "#{-1 * 100 * i}%"
       
-      styles += "#hdu#{i}:checked ~ #slides .inner {margin-left: #{margin};}"
+      styles += "#hdu#{i}:checked ~ #dataunits .inner {margin-left: #{margin};}"
       styles += "#hdu#{i}:checked ~ #active label:nth-child(#{i+1}) {background: #333; border-color: #333 !important;}"
-      styles += "#hdu#{i}:checked ~ #slides article:nth-child(#{i+1}) {opacity: 1; -webkit-transition: all 1s ease-out 0.6s; -moz-transition: all 1s ease-out 0.6s; transition: all 1s ease-out 0.6s;}"
+      styles += "#hdu#{i}:checked ~ #dataunits article:nth-child(#{i+1}) {opacity: 1; -webkit-transition: all 1s ease-out 0.6s; -moz-transition: all 1s ease-out 0.6s; transition: all 1s ease-out 0.6s;}"
     
-    styles += "#slides .inner {width: #{100 * numHDUs}%;}"
-    styles += "#slides article {width: #{100 / numHDUs}%;}"
+    styles += "#dataunits .inner {width: #{100 * numHDUs}%;}"
+    styles += "#dataunits article {width: #{100 / numHDUs}%;}"
     styles += "</style>"
     $('head').append(styles)
     
@@ -41,8 +40,11 @@ class Handler extends Spine.Controller
     @html require('views/hdus')(hdus)
     
     # Set the default HDU
-    # TODO: Default to the first HDU containing a data unit
-    $('#hdu0').attr('checked', 'checked') # TODO: Test Zepto's prop method
+    for hdu, index in hdus
+      if hdu.hasData()
+        $("#hdu#{index}").attr('checked', 'checked')
+        @currentHDU = index
+        break
     
     # Cache the root object
     @root = $('#luminosity')
@@ -54,42 +56,22 @@ class Handler extends Spine.Controller
       $('body').width(width)
     window.onresize()
     
-    # @root.on('scroll', @scroll)
-    # 
-    # @currentHDU = 0
-    # section = $('section')
-    # margin = parseInt(section.css('margin').match(/(\d+)/))
-    # @hduHeight = section.height() + margin
-    # 
-    # @readData(buffer)
+    # Begin reading the dataunits
+    @readData(buffer)
   
-  setHDU: (e) =>
-    console.log e
-  
-  selectHDU: (e) =>
-    selectedHDU = parseInt(e.target.dataset['index'])
-    if selectedHDU is @currentHDU
-      @showHeader(@currentHDU)
-    else
-      @header.hide()
-      @currentHDU = selectedHDU
-      @root[0].scrollTop = @hduHeight * @currentHDU
+  setHDU: (e) => @currentHDU = parseInt(e.target.dataset.unit)
   
   showHeader: (index) =>
     header = @fits.getHDU(index).header
     @header.html require('views/header')({cards: header.cards})
     @header.toggle()
   
-  scroll: (value) =>
-    value = @root.scrollTop()
-    @currentHDU = Math.floor(value / @hduHeight)
-  
   readData: (buffer) =>
     for hdu, index in @fits.hdus
       header  = hdu.header
       data    = hdu.data
       
-      elem = $("#hdu-#{index} .dataunit")
+      elem = $("#dataunit#{index}")
       args = {el: elem, hdu: hdu, index: index, buffer: buffer}
       
       # Initialize the appropriate handler for the HDU

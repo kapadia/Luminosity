@@ -12,7 +12,6 @@ $black  = #505050
 @import './mixin'
 @import './modal'
 @import './drop'
-@import './hdu'
 @import './header'
 @import './image'
 @import './table'
@@ -36,9 +35,9 @@ body
     input[type='radio']
       display: none
     
-    #slides
+    #dataunits
       margin 45px 0 0
-      box-shadow 1px 1px 4px #666
+      box-shadow 1px 1px 2px #666
       padding 1%
       background-color #FAFAFA
       
@@ -57,9 +56,10 @@ body
         
           article
             float left
+            color $black
           
     #active
-      margin 23% 0 0
+      margin 0
       text-align center
       
       label
@@ -72,7 +72,7 @@ body
         background #BBB
         cursor pointer
 
-#slides, #active, #active label
+#dataunits, #active, #active label
   -webkit-transform translateZ(0)
   -webkit-transition all 0.5s ease-out
   -moz-transition all 0.5s ease-out

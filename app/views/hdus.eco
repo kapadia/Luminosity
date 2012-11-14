@@ -5,20 +5,18 @@
 <input type='radio' name='hdu' id='hdu<%- index %>'>
 <% end %>
 
-<div id="slides">
+<div id="active">
+<% for hdu, index in @: %>
+  <label for='hdu<%- index %>' data-unit='<%- index %>'></label>
+<% end %>
+</div>
+
+<div id="dataunits">
   <div id="overflow">
     <div class="inner">
       <% for hdu, index in @: %>
-        <article>
-          <p>DataUnit <%- index %></p>
-        </article>
+        <article id='dataunit<%- index %>'></article>
       <% end %>
     </div>
   </div>
-</div>
-
-<div id="active">
-<% for hdu, index in @: %>
-  <label for='hdu<%- index %>'></label>
-<% end %>
 </div>
