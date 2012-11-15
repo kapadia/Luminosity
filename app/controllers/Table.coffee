@@ -47,7 +47,7 @@ class Table extends Spine.Controller
       data.push @hdu.data.getRow()
     
     # Create the table header
-    d3.select("#hdu-#{@index} .table-container thead").selectAll('th')
+    d3.select("#dataunit#{@index} .table-container thead").selectAll('th')
         .data(@hdu.data.columns)
       .enter().append('th')
         .text( (d) -> return d )

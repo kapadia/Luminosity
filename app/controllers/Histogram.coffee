@@ -6,7 +6,7 @@ class Histogram extends Graph
   
   events:
     "change .histogram select[data-axis='1']" : 'draw'
-    "click .histogram button[name='save']"    : 'savePlot'
+    "click  .histogram button[name='save']"   : 'savePlot'
   
   draw: =>
     index1 = @axis1.val()
@@ -76,7 +76,7 @@ class Histogram extends Graph
             .attr('transform', "translate(#{margin.left}, #{margin.top})")     
     @svg.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0, #{height})")
         .call(@xAxis)
       .append("text")
         .attr("class", "label")

@@ -15,7 +15,8 @@
   <div id="overflow">
     <div class="inner">
       <% for hdu, index in @: %>
-        <article id='dataunit<%- index %>'></article>
+        <% type = if hdu.header.extensionType? then hdu.header.extensionType.toLowerCase() else 'primary' %>
+        <article id='dataunit<%- index %>' class='<%- type %>'></article>
       <% end %>
     </div>
   </div>

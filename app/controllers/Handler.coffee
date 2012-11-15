@@ -46,11 +46,8 @@ class Handler extends Spine.Controller
         @currentHDU = index
         break
     
-    # Cache the root object
-    @root = $('#luminosity')
-    
     # Set styles dynamically
-    @root.css('margin', '10px 20px')
+    $('#luminosity').css('margin', '10px 20px')
     window.onresize = =>
       width = $(window).width()
       $('body').width(width)
