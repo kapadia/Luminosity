@@ -31,7 +31,7 @@ class Handler extends Spine.Controller
     styles += "#dataunits article {width: #{100 / numHDUs}%;}"
     styles += "</style>"
     $('head').append(styles)
-    $('#luminosity').css('margin', '10px 20px')
+    @el.css('margin', '10px 20px')
     
     # Render the template
     @html require('views/hdus')(hdus)
@@ -50,6 +50,9 @@ class Handler extends Spine.Controller
     
     # Begin reading the dataunits
     @readData(buffer)
+    
+    # Setup keyboard shortcuts
+    window.addEventListener('keydown', @shortcuts, false)
   
   setHDU: (e) => @currentHDU = parseInt(e.target.dataset.unit)
   
@@ -83,5 +86,14 @@ class Handler extends Spine.Controller
             new Table args
         else if header.extensionType is 'IMAGE'
           new Image args
+    
+  shortcuts: (e) =>
+    keyCode = e.keyCode
+    switch keyCode
+      when 37
+        @currentHDU -= 1 unless @currentHDU is 0
+      when 39
+        @currentHDU += 1 unless @currentHDU is @fits.hdus.length - 1
+    @el.find("label[for='hdu#{@currentHDU}']").click()
   
 module.exports = Handler
