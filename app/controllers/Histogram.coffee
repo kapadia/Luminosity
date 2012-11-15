@@ -88,38 +88,28 @@ class Histogram extends Graph
           .attr("class", "y axis")
           .call(@yAxis)
     
-    @bars = @svg.selectAll('.bar')
-              .data(bins)
-            .enter().append('rect')
-              .attr('class', 'bar')
-              .attr('x', (d) => return @x(d.x))
-              .attr('width', width / numBins)
-              .attr('y', (d) => return @y(d.y))
-              .attr('height', (d) => return height - @y(d.y))
+    @svg.selectAll('.bar')
+        .data(bins)
+      .enter().append('rect')
+        .attr('class', 'bar')
+        .attr('x', (d) => return @x(d.x))
+        .attr('width', width / numBins)
+        .attr('y', (d) => return @y(d.y))
+        .attr('height', (d) => return height - @y(d.y))
     
+    # Create the brush
     @svg.append('g')
       .attr('class', 'brush')
       .attr('width', width)
       .attr('height', height)
       .call(d3.svg.brush().x(@x)
-      .on('brushstart', @brushstart)
-      .on('brush', @brushmove)
       .on('brushend', @brushend))
       .selectAll('rect')
       .attr('height', height)
-
-  brushstart: =>
-    @svg.classed("selecting", true)
-
-  brushmove: =>
-    e = d3.event.target.extent()
-    @bars.classed 'selected', (d) =>
-      return e[0][0] <= d[@key1] and d[@key1] <= d[1][0]
 
   brushend: =>
     data = {}
     data[@key1] = d3.event.target.extent()
     @trigger 'brushend', data
-    @svg.classed('selecting', !d3.event.target.empty())
 
 module.exports = Histogram
