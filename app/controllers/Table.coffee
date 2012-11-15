@@ -56,6 +56,9 @@ class Table extends Spine.Controller
     @tbody = d3.select("#dataunit#{@index} .table-container tbody")
     @renderRows(data)
     
+    # Set height  TODO: Do this in pure css
+    @el.find('.table-container').height(@el.parent().height() - @el.find('.controls').height())
+    
     # Initialize a plot controllers
     columns = @getNumericalColumns()
     

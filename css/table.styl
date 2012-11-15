@@ -1,11 +1,36 @@
 article.bintable, article.table
   font-size 11px
   
+  .controls
+    padding-bottom 16px
+    
+    input[type=submit]
+      padding 2px 8px
+      background $gray1
+      color $black
+      -webkit-border-radius 4px
+         -moz-border-radius 4px
+      border-radius 4px
+      border solid 1px $gray2
+      text-shadow 0 -1px 0 rgba(0, 0, 0, 0.4)
+      -webkit-box-shadow inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2)
+         -moz-box-shadow inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2)
+              box-shadow inset 0 1px 0 rgba(255, 255, 255, 0.4), 0 1px 1px rgba(0, 0, 0, 0.2)
+      &:hover, &:focus
+        background $gray2
+        text-decoration none
+        cursor pointer
+        -webkit-transition-duration 0.2s
+           -moz-transition-duration 0.2s
+                transition-duration 0.2s
+        
   .table-container
     overflow hidden
+    height 100%
 
     table.fits-table
       width 100%
+      height 100%
       text-align left
       border-spacing 0
       border-collapse collapse
