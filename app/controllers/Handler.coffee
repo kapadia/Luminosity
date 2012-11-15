@@ -10,10 +10,6 @@ class Handler extends Spine.Controller
   
   elements:
     '#header' : 'header'
-  
-  constructor: ->
-    super
-    window.addEventListener('scroll', @scroll, false)
     
   readBuffer: (buffer) ->
     
@@ -22,7 +18,7 @@ class Handler extends Spine.Controller
     hdus = @fits.hdus
     numHDUs = hdus.length
     
-    # Set some styles dynamically (this is messy)
+    # Set some styles dynamically (sadly, this is messy)
     styles = "<style>"
     for i in [0..numHDUs-1]
       margin = "#{-1 * 100 * i}%"
@@ -31,10 +27,11 @@ class Handler extends Spine.Controller
       styles += "#hdu#{i}:checked ~ #active label:nth-child(#{i+1}) {background: #333; border-color: #333 !important;}"
       styles += "#hdu#{i}:checked ~ #dataunits article:nth-child(#{i+1}) {opacity: 1; -webkit-transition: all 1s ease-out 0.6s; -moz-transition: all 1s ease-out 0.6s; transition: all 1s ease-out 0.6s;}"
     
-    styles += "#dataunits .inner {width: #{100 * numHDUs}%;}"
+    styles += "#dataunits .inner {width: #{100 * numHDUs}%; height: 100%}"
     styles += "#dataunits article {width: #{100 / numHDUs}%;}"
     styles += "</style>"
     $('head').append(styles)
+    $('#luminosity').css('margin', '10px 20px')
     
     # Render the template
     @html require('views/hdus')(hdus)
@@ -46,8 +43,6 @@ class Handler extends Spine.Controller
         @currentHDU = index
         break
     
-    # Set styles dynamically
-    $('#luminosity').css('margin', '10px 20px')
     window.onresize = =>
       width = $(window).width()
       $('body').width(width)
