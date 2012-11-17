@@ -1,4 +1,29 @@
 .plot
+
+  // Resize handles
+  .resize
+    position absolute
+    width 10px
+    height 10px
+    background $red
+    z-index 2
+  
+  .resize[data-corner='tl']
+    cursor nw-resize
+    top 0
+    left 0
+  .resize[data-corner='tr']
+    cursor ne-resize
+    top 0
+    right 0
+  .resize[data-corner='bl']
+    cursor sw-resize
+    bottom 0
+    left 0
+  .resize[data-corner='br']
+    cursor se-resize
+    bottom 0
+    right 0
   
   .heading
     border-bottom 1px solid $black

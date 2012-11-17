@@ -8,19 +8,67 @@ class Graph extends Spine.Controller
     @type = Graph.getType(@axes)
     @render()
     
-    @root = $("#dataunit#{@index} .#{@type}")
-    @plot = @root.find('.graph')
+    @drag = false
+    @resize = @el.find('.resize')
+    @resize.on('mousedown', @mousedown)
+    @resize.on('mouseup', @mouseup)
+    @resize.on('mousemove', @mousemove)
+    @resize.on('mousemove', @mouseout)
+    
+    @plot = @el.find('.graph')
     @info = $('#info')
     
     for axis in [1..@axes]
-      @["axis#{axis}"] = @root.find("select[data-axis='#{axis}']")
+      @["axis#{axis}"] = @el.find("select[data-axis='#{axis}']")
 
-    @saveButton = @root.find('button[name=save]')
+    @saveButton = @el.find('button[name=save]')
     @saveButton.prop('disabled', true)
   
   render: =>
     attrs = {columns: @columns, name: @name, axes: @axes}
     @html require('views/plot')(attrs)
+    
+  mousedown: (e) =>
+    @drag = true
+    @down = [e.offsetX, e.offsetY]
+  mouseup: =>
+    @drag = false
+  mouseout: => @mouseup()
+  mousemove: (e) =>
+    return unless @drag
+    
+    corner = e.target.dataset.corner
+    offset = @el.offset()
+    
+    width   = offset.width
+    height  = offset.height
+    top     = offset.top
+    bottom  = Math.abs(offset.top - height)
+    left    = offset.left
+    right   = Math.abs(offset.left - width)
+    
+    dx = @drag[0] - e.offsetX
+    dy = @drag[1] - e.offsetY
+    
+    switch corner
+      when 'tl'
+        @el.css('left', left + dx)
+        @el.css('top', top + dy)
+      # when 'tr'
+      # when 'bl'
+      # when 'br'
+    
+    
+    @el.width(width + dx)
+    @el.height(height + dy)
+    
+    
+    
+    
+    
+    
+    
+  
   
   zoom: =>
     @svg.select(".x.axis").call(@xAxis)
