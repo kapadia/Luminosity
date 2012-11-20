@@ -5,7 +5,6 @@
     "serveup": "~0.0.4",
     "hem": "git://github.com/maccman/hem.git",
     "spine": "~1.0.8",
-    "fits": "git://github.com/astrojs/fitsjs.git",
     "radixsort": "git://github.com/jasondavies/radixsort.js.git"
   }
 }

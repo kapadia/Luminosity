@@ -1,5 +1,3 @@
-FITS = require('fits')
-
 Image = require('controllers/Image')
 Cube  = require('controllers/Cube')
 Table = require('controllers/Table')
@@ -14,7 +12,7 @@ class Handler extends Spine.Controller
   readBuffer: (buffer) ->
     
     # Initialize FITS object and cache the HDUs
-    @fits = new FITS.File(buffer)
+    @fits = new astro.FITS.File(buffer)
     hdus = @fits.hdus
     numHDUs = hdus.length
     

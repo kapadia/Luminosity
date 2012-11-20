@@ -5,10 +5,10 @@
     "spine/lib/ajax",
     "spine/lib/route",
     "spine/lib/manager",
-    "fits",
     "radixsort"
   ],
   "libs": [
+    "./vendor/fits.js",
     "./vendor/zepto.js",
     "./vendor/d3.v2.js",
     "./vendor/ThreeWebGL.js",
