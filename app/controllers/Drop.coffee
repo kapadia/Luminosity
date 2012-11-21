@@ -3,8 +3,7 @@ Handler = require('controllers/Handler')
 class Drop extends Spine.Controller
   
   events:
-    'click #help'     : 'showHelp'
-    'click .arrow'    : 'beginTutorial'
+    'click .arrow'  : 'beginTutorial'
 
   @getExtension: (filename) -> filename.split('.').pop()
 
@@ -22,9 +21,7 @@ class Drop extends Spine.Controller
     
     window.addEventListener('keydown', @shortcuts, false)
   
-  enable: ->
-    @disabled = false
-    $('#tutorial').bind 'click', @showTutorial
+  enable: -> @disabled = false
   
   handleDragOver: (e) ->
     e.stopPropagation()
@@ -76,16 +73,6 @@ class Drop extends Spine.Controller
         
     $("#loading").show()
     reader.readAsArrayBuffer(file)
-
-  showHelp: =>
-    $('.requirements').hide()
-    $('#tutorial-modal').hide()
-    $('#help-modal').toggle()
-  
-  showTutorial: =>
-    $('.requirements').hide()
-    $('#help-modal').hide()
-    $('#tutorial-modal').toggle()
   
   beginTutorial: =>
     xhr = new XMLHttpRequest()
@@ -101,6 +88,7 @@ class Drop extends Spine.Controller
 
     # Escape
     if keyCode is 27
-      $('.modal').hide()
+      console.log 'here'
+      $('#clear').attr('checked', 'checked')
     
 module.exports = Drop

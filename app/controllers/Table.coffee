@@ -47,13 +47,13 @@ class Table extends Spine.Controller
       data.push @hdu.data.getRow()
     
     # Create the table header
-    d3.select("#dataunit#{@index} .table-container thead").selectAll('th')
+    d3.select("article:nth-child(#{@index + 1}) .table-container thead").selectAll('th')
         .data(@hdu.data.columns)
       .enter().append('th')
         .text( (d) -> return d )
     
     # Place initial data in table
-    @tbody = d3.select("#dataunit#{@index} .table-container tbody")
+    @tbody = d3.select("article:nth-child(#{@index + 1}) .table-container tbody")
     @renderRows(data)
     
     # Set height  TODO: Do this in pure css
@@ -62,13 +62,13 @@ class Table extends Spine.Controller
     # Initialize a plot controllers
     columns = @getNumericalColumns()
     
-    @histogramElem = $("#dataunit#{@index} .histogram")
+    @histogramElem = $("article:nth-child(#{@index + 1}) .histogram")
     @histogram = new Histogram({el: @histogramElem, hdu: @hdu, index: @index, columns: columns})
     
-    @scatter2dElem = $("#dataunit#{@index} .scatter-2d")
+    @scatter2dElem = $("article:nth-child(#{@index + 1}) .scatter-2d")
     @scatter2d = new Scatter2D({el: @scatter2dElem, hdu: @hdu, index: @index, columns: columns})
     
-    @scatter3dElem = $("#dataunit#{@index} .scatter-3d")
+    @scatter3dElem = $("article:nth-child(#{@index + 1}) .scatter-3d")
     @scatter3d = new Scatter3D({el: @scatter3dElem, hdu: @hdu, index: @index, columns: columns})
     
     # Setup crossfilter object and hook up events

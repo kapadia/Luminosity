@@ -1,7 +1,3 @@
-<div id='commit'>
-  <a href='https://github.com/kapadia/Luminosity/commit/<%- @ref %>'><%- @ref %> <%- @date %></a>
-</div>
-
 <div id='drop' class='frame'>
   <p class='center'>DROP FITS HERE</p>
 </div>
@@ -10,18 +6,25 @@
   <progress class='center' value='0' max='100'></progress>
 </div>
 
-<div id='help' class='help-button'>?</div>
-<div id='tutorial' class='help-button'>></div>
+<input type='radio' name='dialog' id='clear' />
 
-<div id='help-modal' class='help modal'>
-  <p><b>Luminosity</b> is a web application for visualizing astronomical data.</p>
+<input type='radio' name='dialog' id='help' />
+<label class='circle' for='help'>?</label>
+
+<input type='radio' name='dialog' id='tutorial' />
+<label class='circle' for='tutorial'>></label>
+
+<input type='checkbox' id='requirements' />
+
+<div class='modal help'>
+  <p><b>Luminosity</b> is an experimental web application for visualizing astronomical data.</p>
   <p>This application is built using the latest web standards, as such it requires a modern browser.  The application strives to support all variations of FITS files.  The following extensions are supported:</p>
   <ul>
   <li>Images</li>
   <li>Compressed Images (using the Rice algorithm)</li>
   <li>ASCII Tables</li>
   <li>Binary Tables</li>
-  <li>Data Cubes (experimental)</li>
+  <li>Data Cubes (very experimental)</li>
   </ul>
 
   <p>This application is a result of the <a class='bold' href='http://www.astrojs.org'>astrojs</a> project.</p>
@@ -30,7 +33,7 @@
   <p>For bugs, complaints, praises, words of encouragement, feature requests, or any other feedback, please email <%- @developer %>&#64;<%- @domain %> or submit a <a href='https://github.com/kapadia/Luminosity/issues/new'>GitHub issue</a>.</p>
 </div>
 
-<div id='tutorial-modal' class='tutorial modal'>
+<div class='modal tutorial'>
   <p>This is a tutorial for <b>Luminosity</b>.</p>
   
   <p>We'll send over a FITS files that contains a beautiful image of M101 and a binary table of bright point sources extracted from the image.</p>
@@ -39,10 +42,14 @@
   <span class='arrow'>&rarr;</span>
 </div>
 
-<div class='requirements modal'>
-<p><b>Luminosity</b> is built using the latest web standards, and requires a modern browser.  Sadly, your browser is not supported.  If you would like to use this web application, we suggest one of the following:
-<ul>
-  <li>Google Chrome</li>
-  <li>Mozilla Firefox (>= 15)</li>
-</ul>
+<div class='modal requirements'>
+  <p><b>Luminosity</b> is built using the latest web standards, and requires a modern browser.  Sadly, your browser is not supported.  If you would like to use this web application, we suggest one of the following:</p>
+  <ul>
+    <li>Google Chrome (>= 9)</li>
+    <li>Mozilla Firefox (>= 15)</li>
+  </ul>
+</div>
+
+<div id='commit'>
+  <a href='https://github.com/kapadia/Luminosity/commit/<%- @ref %>'><%- @ref %> <%- @date %></a>
 </div>

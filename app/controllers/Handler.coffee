@@ -4,7 +4,7 @@ Table = require('controllers/Table')
 
 class Handler extends Spine.Controller
   events:
-    'click #active label' : 'setHDU'
+    'click #controls label' : 'setHDU'
   
   elements:
     '#header' : 'header'
@@ -16,21 +16,6 @@ class Handler extends Spine.Controller
     hdus = @fits.hdus
     numHDUs = hdus.length
     
-    # Set some styles dynamically (sadly, this is messy)
-    styles = "<style>"
-    for i in [0..numHDUs-1]
-      margin = "#{-1 * 100 * i}%"
-      
-      styles += "#hdu#{i}:checked ~ #dataunits .inner {margin-left: #{margin};}"
-      styles += "#hdu#{i}:checked ~ #active label:nth-child(#{i+1}) {background: #333; border-color: #333 !important;}"
-      styles += "#hdu#{i}:checked ~ #dataunits article:nth-child(#{i+1}) {opacity: 1; -webkit-transition: all 1s ease-out 0.6s; -moz-transition: all 1s ease-out 0.6s; transition: all 1s ease-out 0.6s;}"
-    
-    styles += "#dataunits .inner {width: #{100 * numHDUs}%; height: 100%}"
-    styles += "#dataunits article {width: #{100 / numHDUs}%;}"
-    styles += "</style>"
-    $('head').append(styles)
-    @el.css('margin', '10px 20px')
-    
     # Render the template
     @html require('views/hdus')(hdus)
     
@@ -38,13 +23,9 @@ class Handler extends Spine.Controller
     for hdu, index in hdus
       if hdu.hasData()
         $("#hdu#{index}").attr('checked', 'checked')
+        $($("#dataunits article").get(index)).addClass('current')
         @currentHDU = index
         break
-    
-    window.onresize = =>
-      width = $(window).width()
-      $('body').width(width)
-    window.onresize()
     
     # Begin reading the dataunits
     @readData(buffer)
@@ -52,7 +33,10 @@ class Handler extends Spine.Controller
     # Setup keyboard shortcuts
     window.addEventListener('keydown', @shortcuts, false)
   
-  setHDU: (e) => @currentHDU = parseInt(e.target.dataset.unit)
+  setHDU: (e) =>
+    @currentHDU = parseInt(e.target.dataset.order)
+    $('#dataunits article.current').removeClass('current')
+    $("#dataunits article:nth-child(#{@currentHDU + 1})").addClass('current')
   
   showHeader: (index) =>
     header = @fits.getHDU(index).header
@@ -60,12 +44,16 @@ class Handler extends Spine.Controller
     @header.toggle()
   
   readData: (buffer) =>
+    articles = $("#dataunits article")
+    
     for hdu, index in @fits.hdus
       header  = hdu.header
       data    = hdu.data
       
-      elem = $("#dataunit#{index}")
-      args = {el: elem, hdu: hdu, index: index, buffer: buffer}
+      # Select the parent DOM element for the dataunit
+      # TODO: Remove reference to buffer
+      elem = $(articles.get(index))
+      args = {el: elem, hdu: hdu, index: index}
       
       # Initialize the appropriate handler for the HDU
       if header.isPrimary()

@@ -5,8 +5,8 @@ class Histogram extends Graph
   axes: 1
   
   events:
-    "change .histogram select[data-axis='1']" : 'draw'
-    "click  .histogram button[name='save']"   : 'savePlot'
+    "change select[data-axis='1']" : 'draw'
+    "click  button[name='save']"   : 'savePlot'
   
   draw: =>
     index1 = @axis1.val()
@@ -69,7 +69,7 @@ class Histogram extends Graph
       .orient("left")
       .ticks(6)
     
-    @svg = d3.select("#dataunit#{@index} .histogram .graph").append('svg')
+    @svg = d3.select("article:nth-child(#{@index + 1}) .histogram .graph").append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
           .append('g')

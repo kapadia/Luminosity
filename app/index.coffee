@@ -13,15 +13,11 @@ class Luminosity extends Spine.Controller
     # Include the DOM from main
     @html require('views/main')()
     
-    # Set some styles dynamically
-    $("body").css('height', window.innerHeight)
-    # window.onresize = ->  
-    #   $(".hdu").css('height', window.innerHeight)
-    
     # Initialize controllers
     drop = new Drop({el: @luminosity})
     
     # Check for compatibility
+    # TODO: Implement using css checked attribute (keeps styles outside of JS)
     if @browserCheck()
       drop.enable()
     else

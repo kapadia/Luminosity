@@ -13,8 +13,8 @@ class Image extends Spine.Controller
     @html require('views/image')()
     
     # Grab a few DOM elements
-    @stretch  = document.querySelector("#dataunit#{@index} .stretch")
-    @viewer   = document.querySelector("#dataunit#{@index} .fits-viewer")
+    @stretch  = @el[0].querySelector('.stretch')
+    @viewer   = @el[0].querySelector('.fits-viewer')
     
     @xEl      = @el.find('.x')
     @yEl      = @el.find('.y')
@@ -269,18 +269,18 @@ class Image extends Spine.Controller
     @histogramLowerIndex = Math.floor(((pixel - @histogramMin) / range) * bins)
     @histogramUpperIndex = Math.floor(((pixel - @histogramMax) / range) * bins)
   
-  computeHistogram2: =>
-    console.log 'computeHistogram radix'
-    data = @hdu.data
-    pixels = data.data
-    
-    min = data.min
-    max = data.max
-    range = max - min
-    
-    sort = radixsort()
-    sorted = new Float32Array(sort(pixels))
-    console.log sorted
+  # computeHistogram2: =>
+  #   console.log 'computeHistogram radix'
+  #   data = @hdu.data
+  #   pixels = data.data
+  #   
+  #   min = data.min
+  #   max = data.max
+  #   range = max - min
+  #   
+  #   sort = radixsort()
+  #   sorted = new Float32Array(sort(pixels))
+  #   console.log sorted
   
   # TODO: Generalize histogram class further to utilize here
   drawHistogram: ->
@@ -323,7 +323,8 @@ class Image extends Spine.Controller
       .range([0, h])
     
     # Create the SVG
-    svg = d3.select("#dataunit#{@index} .histogram").append('svg')
+    # TODO: Find way to set a selection root with D3
+    svg = d3.select("article:nth-child(#{@index + 1}) .histogram").append('svg')
       .attr('width', w + margin.right + margin.left)
       .attr('height', h + margin.top + margin.bottom)
       .append('g')

@@ -6,9 +6,9 @@ class Scatter2D extends Graph
   formatter: d3.format(".3f")
   
   events:
-    "change .scatter-2d select[data-axis='1']"  : 'draw'
-    "change .scatter-2d select[data-axis='2']"  : 'draw'
-    "click .scatter-2d button[name='save']"     : 'savePlot'
+    "change select[data-axis='1']"  : 'draw'
+    "change select[data-axis='2']"  : 'draw'
+    "click  button[name='save']"    : 'savePlot'
   
   draw: =>
     index1 = @axis1.val()
@@ -74,7 +74,7 @@ class Scatter2D extends Graph
       .ticks(6)
       .orient("left")
     
-    @svg = d3.select("#dataunit#{@index} .scatter-2d .graph").append('svg')
+    @svg = d3.select("article:nth-child(#{@index + 1}) .scatter-2d .graph").append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
             .call(d3.behavior.zoom().x(@x).y(@y).scaleExtent([1, 8]).on("zoom", @zoom))
