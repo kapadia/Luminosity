@@ -88,7 +88,6 @@ class Drop extends Spine.Controller
 
     # Escape
     if keyCode is 27
-      console.log 'here'
-      $('#clear').attr('checked', 'checked')
+      document.querySelector('#clear').checked = true
     
 module.exports = Drop

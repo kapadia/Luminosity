@@ -14,7 +14,7 @@
 <input type='radio' name='dialog' id='tutorial' />
 <label class='circle' for='tutorial'>></label>
 
-<input type='checkbox' id='requirements' />
+<input type='checkbox' name='dialog' id='requirements' />
 
 <div class='modal help'>
   <p><b>Luminosity</b> is an experimental web application for visualizing astronomical data.</p>
