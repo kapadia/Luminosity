@@ -23,7 +23,7 @@ class Handler extends Spine.Controller
     for hdu, index in hdus
       if hdu.hasData()
         $("#hdu#{index}").attr('checked', 'checked')
-        $($("#dataunits article").get(index)).addClass('current')
+        $("#dataunits article:nth-child(#{index + 1})").addClass('current')
         @currentHDU = index
         break
     
@@ -44,7 +44,6 @@ class Handler extends Spine.Controller
     @header.toggle()
   
   readData: (buffer) =>
-    articles = $("#dataunits article")
     
     for hdu, index in @fits.hdus
       header  = hdu.header
@@ -52,7 +51,7 @@ class Handler extends Spine.Controller
       
       # Select the parent DOM element for the dataunit
       # TODO: Remove reference to buffer
-      elem = $(articles.get(index))
+      elem = $("#dataunits article:nth-child(#{index + 1}) div.container")
       args = {el: elem, hdu: hdu, index: index}
       
       # Initialize the appropriate handler for the HDU

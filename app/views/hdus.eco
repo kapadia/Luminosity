@@ -12,7 +12,9 @@
   <div id='dataunits'>
     <% for hdu, index in @: %>
     <% type = if hdu.header.extensionType? then hdu.header.extensionType.toLowerCase() else 'primary' %>
-    <article class='<%- type %>'></article>
+    <article class='<%- type %>'>
+      <div class='container'></div>
+    </article>
     <% end %>
   </div>
 </div>
