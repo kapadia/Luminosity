@@ -68,6 +68,7 @@ class Drop extends Spine.Controller
     reader.onloadend = (e) =>
       if e.target.readyState is FileReader.DONE
         buffer = e.target.result
+        window.removeEventListener('keydown', @shortcuts, false)
         handler = new Handler({el: @el})
         handler.readBuffer(buffer)
         
@@ -79,6 +80,7 @@ class Drop extends Spine.Controller
     xhr.open('GET', 'tutorial/demo.fits')
     xhr.responseType = 'arraybuffer'
     xhr.onload = =>
+      window.removeEventListener('keydown', @shortcuts, false)
       handler = new Handler({el: @el})
       handler.readBuffer(xhr.response)
     xhr.send()
