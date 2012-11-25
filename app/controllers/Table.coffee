@@ -20,6 +20,7 @@ class Table extends Spine.Controller
     'click input[name=histogram]'   : 'toggleHistogram'
     'click input[name=scatter-2d]'  : 'toggleScatter2D'
     'click input[name=scatter-3d]'  : 'toggleScatter3D'
+    'click .fits-table th'          : 'sortByColumn'
   
   @permittedKeys: [48..57]
   @.permittedKeys.push(8)   # Delete
@@ -90,8 +91,6 @@ class Table extends Spine.Controller
       @cross.bind 'dataFiltered', @renderRows
     , 0
     
-    
-    
   render: =>
     info = {columns: @hdu.data.columns, rows: @hdu.data.rows}
     @html require('views/table')(info)
@@ -160,6 +159,11 @@ class Table extends Spine.Controller
         columns[header[type]] = i - 1
     return columns
   
+  sortByColumn: (e) ->
+    column = e.target.__data__  # When creating tables, D3 sets this property
+    @cross.sortByColumn(column)
+    
+  # TODO: Remove these methods, handle this with CSS
   toggleHistogram: => @histogramElem.toggle()
   toggleScatter2D: => @scatter2dElem.toggle()
   toggleScatter3D: => @scatter3dElem.toggle()
