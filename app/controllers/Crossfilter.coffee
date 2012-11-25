@@ -14,7 +14,7 @@ class Crossfilter extends Spine.Controller
     
     @cross = crossfilter(data)
     @dimensions = {}
-    @bisects = {}
+    @sortOrder = {}
   
   # Create a crossfilter dimension on the selected column
   setDimensions: (columns...) =>
@@ -40,11 +40,17 @@ class Crossfilter extends Spine.Controller
     console.log 'sortByColumn', column
     unless column of @dimensions
       @dimensions[column] = @cross.dimension((d) -> d[column])
+    unless column of @sortOrder
+      @sortOrder[column] = true # Represents ascending order
     
-    dimension = @dimensions[column]
-    
-    top = dimension.top(Infinity)
-    @trigger 'dataFiltered', dimension.top(10)
+    unless @sortOrder[column]
+      rows = @dimensions[column].top(10)
+      @sortOrder[column] = true
+    else
+      rows = @dimensions[column].bottom(10)
+      @sortOrder[column] = false
+      
+    @trigger 'dataFiltered', rows
     
     
 
