@@ -90,6 +90,6 @@ class Drop extends Spine.Controller
 
     # Escape
     if keyCode is 27
-      document.querySelector('#clear').checked = true
+      @el[0].querySelector('#clear').checked = true
     
 module.exports = Drop

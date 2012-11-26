@@ -13,33 +13,16 @@ class Table extends Spine.Controller
     'input[name=number]'  : 'rowNumber'
   
   events:
-    'keydown input[name=number]'    : 'blockLetter'
-    'keyup input[name=number]'      : 'updateRows'
-    'click input[name=next]'        : 'updateRows'
-    'click input[name=prev]'        : 'updateRows'
-    'click input[name=histogram]'   : 'toggleHistogram'
-    'click input[name=scatter-2d]'  : 'toggleScatter2D'
-    'click input[name=scatter-3d]'  : 'toggleScatter3D'
-    'click .fits-table th'          : 'sortByColumn'
-  
-  @permittedKeys: [48..57]
-  @.permittedKeys.push(8)   # Delete
-  @.permittedKeys.push(91)  # Shift
-  @.permittedKeys.push(16)  # Command
-  @.permittedKeys.push(37)  # Left arrow
-  @.permittedKeys.push(39)  # Right array
-  
-  @stringCompare: (a, b) ->
-    a = a.toLowerCase()
-    b = b.toLowerCase()
-    return (if a > b then 1 else (if a is b then 0 else -1))
+    'click .fits-table th' : 'sortByColumn'
   
   constructor: ->
     super
     @rows = @hdu.data.rows
     
     @render()
-    @tbody = @el.find('tbody')
+    
+    tableContainer = @el[0].querySelector('.table-container')
+    tableContainer.addEventListener('scroll', @scroll, false)
     
     # Populate table with first ten rows
     number = if @rows < 10 then @rows else 10
@@ -57,19 +40,19 @@ class Table extends Spine.Controller
     @tbody = d3.select("article:nth-child(#{@index + 1}) .table-container tbody")
     @renderRows(data)
     
-    # Set height  TODO: Do this in pure css
-    @el.find('.table-container').height(@el.parent().height() - @el.find('.controls').height())
+    window.addEventListener('keydown', @shortcuts, false)
     
     # Initialize a plot controllers
     columns = @getNumericalColumns()
     
-    @histogramElem = $("article:nth-child(#{@index + 1}) .histogram")
+    index = @index + 1
+    @histogramElem = $("article:nth-child(#{index}) .one")
     @histogram = new Histogram({el: @histogramElem, hdu: @hdu, index: @index, columns: columns})
     
-    @scatter2dElem = $("article:nth-child(#{@index + 1}) .scatter-2d")
+    @scatter2dElem = $("article:nth-child(#{index}) .two")
     @scatter2d = new Scatter2D({el: @scatter2dElem, hdu: @hdu, index: @index, columns: columns})
     
-    @scatter3dElem = $("article:nth-child(#{@index + 1}) .scatter-3d")
+    @scatter3dElem = $("article:nth-child(#{index}) .three")
     @scatter3d = new Scatter3D({el: @scatter3dElem, hdu: @hdu, index: @index, columns: columns})
     
     # Setup crossfilter object and hook up events
@@ -92,36 +75,8 @@ class Table extends Spine.Controller
     , 0
     
   render: =>
-    info = {columns: @hdu.data.columns, rows: @hdu.data.rows}
+    info = {index: @index}
     @html require('views/table')(info)
-  
-  blockLetter: (e) ->
-    keyCode = e.keyCode
-    unless keyCode in Table.permittedKeys
-      e.preventDefault()
-  
-  updateRows: (e) =>
-    dataunit = @hdu.data
-    
-    switch e.target.name
-      when 'next'
-        rowsRead = dataunit.rowsRead
-      when 'prev'
-        rowsRead = Math.max(dataunit.rowsRead - 2 * 10, 0)
-      when 'number'
-        @rowNumber.val(0) if @rowNumber.val() is ''
-        rowsRead = parseInt(@rowNumber.val())
-    
-    return null unless @checkRow(rowsRead)
-    
-    count = dataunit.rows - rowsRead
-    count = if count < 10 then count else 10
-    count -= 1
-    
-    data = []
-    for i in [rowsRead..rowsRead+count]
-      data.push dataunit.getRow(i)
-    @renderRows(data)
   
   renderRows: (data) =>
     @tbody.selectAll('tr').remove()
@@ -163,9 +118,19 @@ class Table extends Spine.Controller
     column = e.target.__data__  # When creating tables, D3 sets this property
     @cross.sortByColumn(column)
     
-  # TODO: Remove these methods, handle this with CSS
-  toggleHistogram: => @histogramElem.toggle()
-  toggleScatter2D: => @scatter2dElem.toggle()
-  toggleScatter3D: => @scatter3dElem.toggle()
+  scroll: (e) =>
+    clientHeight  = e.target.clientHeight
+    scrollHeight  = e.target.scrollHeight
+    scrollTop     = e.target.scrollTop
     
+    state = clientHeight is scrollHeight - scrollTop
+    @cross.onScroll() if state
+  
+  shortcuts: (e) =>
+    keyCode = e.keyCode
+
+    # Escape
+    if keyCode is 27
+      @el[0].querySelector("#clear-#{@index}").checked = true
+  
 module.exports = Table

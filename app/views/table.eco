@@ -1,15 +1,21 @@
 <div class='controls'>
-  <input type='text' name='number' size='<%- @rows.toString().length %>'> of <%- @rows - 1 %>
-  <input type='submit' name='prev' value='Previous'>
-  <input type='submit' name='next' value='Next'>
-  <input type='submit' name='histogram' value='Histogram'>
-  <input type='submit' name='scatter-2d' value='Scatter 2D'>
-  <input type='submit' name='scatter-3d' value='Scatter 3D'>
+  
+  <input type='radio' name='plots-<%- @index %>' id='clear-<%- @index %>' />
+  
+  <input type='radio' name='plots-<%- @index %>' id='1d-<%- @index %>' data-plot='one'/>
+  <label for='1d-<%- @index %>'>1D</label>
+  
+  <input type='radio' name='plots-<%- @index %>' id='2d-<%- @index %>' data-plot='two'/>
+  <label for='2d-<%- @index %>'>2D</label>
+  
+  <input type='radio' name='plots-<%- @index %>' id='3d-<%- @index %>' data-plot='three'/>
+  <label for='3d-<%- @index %>'>3D</label>
+  
+  <div class='plot one modal'></div>
+  <div class='plot two modal'></div>
+  <div class='plot three modal'></div>
+  
 </div>
-
-<div class='plot histogram modal'></div>
-<div class='plot scatter-2d modal'></div>
-<div class='plot scatter-3d modal'></div>
 
 <div class='table-container'>
   <table class='fits-table'>

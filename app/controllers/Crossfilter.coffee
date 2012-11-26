@@ -2,6 +2,7 @@ Spine = require('spine')
 
 class Crossfilter extends Spine.Controller
   maxDimensions: 16
+  rowsToAppend: 100
   
   constructor: ->
     super
@@ -12,15 +13,17 @@ class Crossfilter extends Spine.Controller
     for i in [0..dataunit.rows-1]
       data.push dataunit.getRow(i)
     
-    @cross = crossfilter(data)
+    @cross      = crossfilter(data)
     @dimensions = {}
-    @sortOrder = {}
+    @sortOrder  = {}
+    @currentRow = 0
   
   # Create a crossfilter dimension on the selected column
   setDimensions: (columns...) =>
     for column in columns
       continue if @dimensions.hasOwnProperty(column)
       @dimensions[column] = @cross.dimension((d) -> d[column])
+      @sortOrder[column]  = true # represents ascending order
   
   # Apply a filter on active dimension(s) based on brushing from plot
   applyFilters: (bounds) =>
@@ -34,24 +37,29 @@ class Crossfilter extends Spine.Controller
       @dimensions[key].filter(value)
     
     key = Object.keys(bounds)[0]
-    @trigger 'dataFiltered', @dimensions[key].top(10)
+    @data = @dimensions[key].top(Infinity)
+    
+    @currentRow += 10
+    @trigger 'dataFiltered', @data.slice(0, 10)
   
   sortByColumn: (column) =>
-    console.log 'sortByColumn', column
-    unless column of @dimensions
-      @dimensions[column] = @cross.dimension((d) -> d[column])
-    unless column of @sortOrder
-      @sortOrder[column] = true # Represents ascending order
+    @setDimensions(column)
     
     unless @sortOrder[column]
-      rows = @dimensions[column].top(10)
+      @data = @dimensions[column].top(Infinity)
       @sortOrder[column] = true
     else
-      rows = @dimensions[column].bottom(10)
+      @data = @dimensions[column].bottom(Infinity)
       @sortOrder[column] = false
-      
-    @trigger 'dataFiltered', rows
     
+    @currentRow += 10
+    @trigger 'dataFiltered', @data.slice(0, 10)
+    
+  onScroll: =>
+    currentRow = @currentRow
+    @currentRow += @rowsToAppend
+    
+    @trigger 'dataFiltered', @data.slice(currentRow, @currentRow)
     
 
 
