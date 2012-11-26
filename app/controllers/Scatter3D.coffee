@@ -6,9 +6,9 @@ class Scatter3D extends Graph
   axes: 3
   
   events:
-    "change .scatter-3d select[data-axis='1']" : 'draw'
-    "change .scatter-3d select[data-axis='2']" : 'draw'
-    "change .scatter-3d select[data-axis='3']" : 'draw'
+    "change select[data-axis='1']" : 'draw'
+    "change select[data-axis='2']" : 'draw'
+    "change select[data-axis='3']" : 'draw'
   
   constructor: ->
     super

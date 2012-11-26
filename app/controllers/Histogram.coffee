@@ -69,7 +69,7 @@ class Histogram extends Graph
       .orient("left")
       .ticks(6)
     
-    @svg = d3.select("article:nth-child(#{@index + 1}) .histogram .graph").append('svg')
+    @svg = d3.select("article:nth-child(#{@index + 1}) .one .graph").append('svg')
             .attr('width', width + margin.left + margin.right)
             .attr('height', height + margin.top + margin.bottom)
           .append('g')
