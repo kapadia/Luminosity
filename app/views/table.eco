@@ -3,13 +3,13 @@
   <input type='radio' name='plots-<%- @index %>' id='clear-<%- @index %>' />
   
   <input type='radio' name='plots-<%- @index %>' id='1d-<%- @index %>' data-plot='one'/>
-  <label for='1d-<%- @index %>'>1D</label>
+  <label for='1d-<%- @index %>'>1D Plot</label>
   
   <input type='radio' name='plots-<%- @index %>' id='2d-<%- @index %>' data-plot='two'/>
-  <label for='2d-<%- @index %>'>2D</label>
+  <label for='2d-<%- @index %>'>2D Plot</label>
   
   <input type='radio' name='plots-<%- @index %>' id='3d-<%- @index %>' data-plot='three'/>
-  <label for='3d-<%- @index %>'>3D</label>
+  <label for='3d-<%- @index %>'>3D Plot</label>
   
   <div class='plot one modal'></div>
   <div class='plot two modal'></div>

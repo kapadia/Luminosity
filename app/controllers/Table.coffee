@@ -30,11 +30,27 @@ class Table extends Spine.Controller
     while number--
       data.push @hdu.data.getRow()
     
-    # Create the table header
-    d3.select("article:nth-child(#{@index + 1}) .table-container thead").selectAll('th')
-        .data(@hdu.data.columns)
-      .enter().append('th')
-        .text( (d) -> return d )
+    # Create table header using document fragments
+    thead = document.querySelector("article:nth-child(#{@index + 1}) .table-container thead")
+    fragment = document.createDocumentFragment()
+    for column, index in @hdu.data.columns
+      th = document.createElement('th')
+      
+      id = "th-#{@index}-#{index}"
+      
+      input = document.createElement('input')
+      input.setAttribute('id', id)
+      input.setAttribute('type', 'checkbox')
+      
+      label = document.createElement('label')
+      label.setAttribute('for', id)
+      
+      th.appendChild(document.createTextNode(column))
+      th.appendChild(input)
+      th.appendChild(label)
+      
+      fragment.appendChild(th)
+    thead.appendChild(fragment)
     
     # Place initial data in table
     @tbody = d3.select("article:nth-child(#{@index + 1}) .table-container tbody")

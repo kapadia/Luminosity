@@ -59,6 +59,23 @@ article.bintable, article.table
           background-color: $blue
           text-align center
           cursor pointer
+          
+          input
+            display none
+
+            &:checked + label
+              background red
+              border-color #333 !important
+              
+          label
+            border-radius 3px
+            display inline-block
+            width 6px
+            height 6px
+            background #BBB
+            cursor pointer
+            margin 3px
+            transition all 0.8s ease-out
     
         th:not(:last-child)
           border-right 1px solid $gray1
