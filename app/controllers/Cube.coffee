@@ -79,36 +79,6 @@ class Cube extends Spine.Controller
     
     @animate()
     
-    return
-    
-    for frameIndex in [1..nFrames]
-      frame = data.getFrame()
-      
-      [@min, @max] = data.getExtremes()
-      @minimums.push @min
-      @maximums.push @max
-      
-      for pixel, index in frame
-        frame[index] = @toUint8(pixel)
-      
-      # Create the texture
-      texture = @createTexture(@width, @height, frame)
-      
-      # Add to the mesh
-      mesh = new THREE.Mesh(
-        @geometry, new THREE.MeshBasicMaterial( { map: texture, opacity: 0.5, transparent: true, depthTest: false, blending: THREE.AdditiveBlending })
-      )
-      mesh.position.y = 300 - 0.5 * frameIndex
-      mesh.rotation.x = 90 * Math.PI / 180
-      mesh.doubleSided = true
-      @object3d.add(mesh)
-    
-    @scene.add(@object3d)
-    @container.appendChild(@renderer.domElement)
-    @addControls()
-    
-    @animate()
-    
   createTexture: (arr) ->
     texture = new THREE.Texture()
     texture.needsUpdate = false
