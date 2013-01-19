@@ -11,8 +11,8 @@
     "./vendor/fits.js",
     "./vendor/zepto.js",
     "./vendor/d3.v2.js",
-    "./vendor/ThreeWebGL.js",
-    "./vendor/ThreeExtras.js",
+    "./vendor/three.js",
+    "./vendor/TrackballControls.js",
     "./vendor/RequestAnimationFrame.js",
     "./vendor/crossfilter.js"
   ]

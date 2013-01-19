@@ -53,12 +53,18 @@ article.bintable, article.table
         display table-header-group
     
         th
+          padding 2px 8px
+          background -webkit-linear-gradient(top, #00264C 90%, $gray5)
+          background -moz-linear-gradient(top, #00264C 90%, $gray5)
+          color $gray1
           padding: 6px 12px
-          color: $gray1
-          text-shadow: 1px 1px 1px $blue2
-          background-color: $blue
           text-align center
-          cursor pointer
+          
+          // color: $gray1
+          // text-shadow: 1px 1px 1px $blue2
+          // background-color: $blue
+          // text-align center
+          // cursor pointer
           
           input
             display none
@@ -93,9 +99,11 @@ article.bintable, article.table
     
           &:hover
             background $gray2
+            
+          &:not(:first-child)
+            border-top 1px solid $black
     
           td
             padding 2px 4px
-            border-top 1px solid @blue
             text-align center
   
