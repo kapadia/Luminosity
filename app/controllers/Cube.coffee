@@ -1,5 +1,6 @@
-Spine = require('spine')
-WebGL = require('lib/WebGL')
+Spine   = require('spine')
+WebGL   = require('lib/WebGL')
+Shaders = require('lib/Shaders')
 
 class Cube extends Spine.Controller
   viewportWidth: 600
@@ -15,18 +16,10 @@ class Cube extends Spine.Controller
     @html require('views/cube')()
     @container = @el[0].querySelector(".cube-viewer")
     
-    # TEMP variables for scaling data
-    @min = -0.78050774
-    @max = 4.0023365
-    # @min = -0.38050774
-    # @max = 3.9023365
-    # @min = -12.537979
-    # @max = 177.71017
-    
     dataunit  = @hdu.data
     @width    = dataunit.width
     @height   = dataunit.height
-    nFrames   = dataunit.naxis[2]
+    nFrames   = i = dataunit.naxis[2]
     nPixels   = @width * @height
     @minimums = []
     @maximums = []
@@ -47,13 +40,20 @@ class Cube extends Spine.Controller
     # Get the extent of the data
     extents = []
     frames = []
-    while nFrames--
+    while i--
       frame = new Float32Array(dataunit.getFrame())
       [min, max] = @getExtent(frame)
       extents.push min
       extents.push max
       frames.push frame
     [@gMin, @gMax] = @getExtent(extents)
+    
+    # Set uniforms and attributes for custom shaders
+    attributes  = {}
+    uniforms    =
+      u_extent:
+        type: 'v2'
+        value: new THREE.Vector2(@gMin, @gMax)
     
     for frame, index in frames
       # Scale the pixels
@@ -64,9 +64,17 @@ class Cube extends Spine.Controller
       
       # Add texture to new mesh
       mesh = new THREE.Mesh(
-        @geometry, new THREE.MeshBasicMaterial( { map: texture, opacity: 0.5, transparent: true, depthTest: false, blending: THREE.AdditiveBlending })
+        @geometry, new THREE.MeshBasicMaterial
+          # uniforms: uniforms
+          # attributes: attributes
+          # vertexShader: Shaders.vertex
+          # fragmentShader: Shaders.fragment
+          map: texture
+          opacity: 0.5
+          transparent: false
+          depthTest: false
       )
-      mesh.position.y = 300 - 0.5 * frameIndex
+      mesh.position.y = -nFrames / 2 + index
       mesh.rotation.x = 90 * Math.PI / 180
       mesh.doubleSided = true
       
@@ -108,8 +116,8 @@ class Cube extends Spine.Controller
     i = arr.length
     pixels = new Float32Array(i)
     
-    min = @scaledArcsinh(min)
-    max = @scaledArcsinh(max)
+    # min = @scaledArcsinh(min)
+    # max = @scaledArcsinh(max)
     range = max - min
     
     while i--
@@ -117,7 +125,8 @@ class Cube extends Spine.Controller
       if isNaN(value)
         pixels[i] = 0
         continue
-      pixels[i] = (@scaledArcsinh(value) - min) / range
+      pixels[i] = (value - min) / range
+      # pixels[i] = (@scaledArcsinh(value) - min) / range
     return pixels
   
   toUint8: (value) ->
