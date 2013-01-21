@@ -16,6 +16,70 @@ class Cube extends Spine.Controller
     @html require('views/cube')()
     @container = @el[0].querySelector(".cube-viewer")
     
+    @initWebGL()
+  
+  # Voxels baby!
+  initWebGL2: =>
+    dataunit  = @hdu.data
+    @width    = dataunit.width
+    @height   = dataunit.height
+    nFrames   = i = dataunit.naxis[2]
+    nPixels   = @width * @height
+    @minimums = []
+    @maximums = []
+    
+    # Create a renderer and get the GL context
+    @renderer = new THREE.WebGLRenderer({antialias: false})
+    @gl = @renderer.context
+    @renderer.setSize(@viewportWidth, @viewportHeight)
+    
+    # Set up the camera, scene, and plane
+    @camera   = new THREE.PerspectiveCamera(45, @viewportWidth / @viewportHeight, 1, 10000)
+    @scene    = new THREE.Scene()
+    @object3d = new THREE.Object3D()
+    @geometry = new THREE.PlaneGeometry(@width / 4, @height / 4)
+    
+    @camera.position.z = 240
+    
+    # Get the extent of the data
+    extents = []
+    frames = []
+    while i--
+      frame = new Float32Array(dataunit.getFrame())
+      [min, max] = @getExtent(frame)
+      extents.push min
+      extents.push max
+      frames.push frame
+    [@gMin, @gMax] = @getExtent(extents)
+    
+    # Create geometry and material
+    cubeGeo = new THREE.CubeGeometry(5, 5, 2)
+    cubeMaterial = new THREE.MeshLambertMaterial({
+      color: 0x00ff80,
+      ambient: 0x00ff80,
+      shading: THREE.FlatShading
+    })
+    
+    for frame, index in frames
+      pixels = @scale(frame, @gMin, @gMax)
+      
+      for pixel, i in pixels
+        cubeMaterial.color.setRGB(pixel, pixel, pixel)
+        voxel = new THREE.Mesh(cubeGeo, cubeMaterial)
+        voxel.position.x = i * 5
+        voxel.position.y = 5 * Math.floor(i / @width)
+        voxel.position.z = index
+        @scene.add(voxel)
+      break
+      
+    @container.appendChild(@renderer.domElement)
+    @addControls()
+
+    @animate()
+  
+  
+  initWebGL: =>
+    
     dataunit  = @hdu.data
     @width    = dataunit.width
     @height   = dataunit.height
@@ -33,7 +97,7 @@ class Cube extends Spine.Controller
     @camera   = new THREE.PerspectiveCamera(45, @viewportWidth / @viewportHeight, 1, 10000)
     @scene    = new THREE.Scene()
     @object3d = new THREE.Object3D()
-    @geometry = new THREE.PlaneGeometry(@width / 4, @height / 4)
+    @geometry = new THREE.CubeGeometry(@width / 4, @height / 4, 2)
     
     @camera.position.z = 240
     
@@ -74,7 +138,7 @@ class Cube extends Spine.Controller
           transparent: false
           depthTest: false
       )
-      mesh.position.y = -nFrames / 2 + index
+      mesh.position.y = -nFrames / 2 + 2 * index
       mesh.rotation.x = 90 * Math.PI / 180
       mesh.doubleSided = true
       

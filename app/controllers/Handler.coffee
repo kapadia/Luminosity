@@ -58,7 +58,6 @@ class Handler extends Spine.Controller
       if header.isPrimary()
         if header.hasDataUnit()
           if data.isDataCube()
-            console.log args
             new Cube args
           else
             new Image args
