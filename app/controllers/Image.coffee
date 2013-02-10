@@ -1,11 +1,15 @@
-Spine   = require('spine')
-WebGL   = require('lib/WebGL')
-Radix   = require('radixsort/radixsort')
 
-class Image extends Spine.Controller
-  @viewportWidth  = 600
-  @viewportHeight = 600
-  @numberOfBins   = 500
+{Controller}  = require('spine')
+
+WebGL = require('lib/WebGL')
+Radix = require('radixsort/radixsort')
+
+
+class Image extends Controller
+  viewportWidth: 600
+  viewportHeight: 600
+  nBins: 500
+  
   
   constructor: ->
     super
@@ -39,41 +43,30 @@ class Image extends Spine.Controller
     
     @drawScene()
   
-  finishSetup: ->
+  finishSetup: (arr) ->
     # Setup histogram
-    @computeHistogram()
+    @computeHistogram(arr)
     @drawHistogram()
 
     # Setup up WebGL and interface
     @setupWebGL()
-    @setupWebGLUI()
+    @setupWebGLUI(arr)
   
   readImageData: ->
     
     dataunit = @hdu.data
     [@width, @height] = [dataunit.width, dataunit.height]
     
-    # Initialize a Float32Array for WebGL
-    dataunit.data = new Float32Array(@width * @height)
-    
-    dataunit.totalRowsRead = dataunit.width * dataunit.frame
-    dataunit.rowsRead = 0
-    
     height = dataunit.height
-    rowsRead = 0
     
-    #
-    # This is brute force code.  It seems most stable but is a terrible
-    # user experience locking the browser.
-    #
-    
-    dataunit.getFrame()
-    $(".read-image").hide()
-    dataunit.getExtremes()
-    @trigger 'dataready'
+    dataunit.getFrameAsync(null, (arr) =>
+      $(".read-image").hide()
+      dataunit.getExtent(arr)
+      @trigger 'dataready', arr
+    )
   
   setupWebGL: ->    
-    @canvas   = WebGL.setupCanvas(@viewer, Image.viewportWidth, Image.viewportHeight)
+    @canvas   = WebGL.setupCanvas(@viewer, @viewportWidth, @viewportHeight)
     
     # Set up variables for panning and zooming
     @xOffset = -@width / 2
@@ -81,7 +74,7 @@ class Image extends Spine.Controller
     @xOldOffset = @xOffset
     @yOldOffset = @yOffset
     @scale = 2 / @width
-    @minScale = 1 / (Image.viewportWidth * Image.viewportWidth)
+    @minScale = 1 / (@viewportWidth * @viewportWidth)
     @maxScale = 2
     @drag = false
 
@@ -159,12 +152,13 @@ class Image extends Spine.Controller
     @scale = if @scale < @minScale then @minScale else @scale
     @drawScene()
   
-  setupWebGLUI: ->
+  setupWebGLUI: (arr) ->
+    dataunit = @hdu.data
     
     # Store parameters needed for rendering
     stretch = @stretch.value
-    minimum = @hdu.data.min
-    maximum = @hdu.data.max
+    minimum = dataunit.min
+    maximum = dataunit.max
     
     unless @programs?
       @programs = {}
@@ -216,7 +210,7 @@ class Image extends Spine.Controller
       @gl.drawArrays(@gl.TRIANGLES, 0, 6)
       
     # Update texture
-    @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.LUMINANCE, @width, @height, 0, @gl.LUMINANCE, @gl.FLOAT, @hdu.data.data)
+    @gl.texImage2D(@gl.TEXTURE_2D, 0, @gl.LUMINANCE, @width, @height, 0, @gl.LUMINANCE, @gl.FLOAT, new Float32Array(arr))
     @gl.drawArrays(@gl.TRIANGLES, 0, 6)
   
   setRectangle: (x, y, width, height) ->
@@ -233,24 +227,23 @@ class Image extends Spine.Controller
     @gl.drawArrays(@gl.TRIANGLES, 0, 6)
   
   # TODO: Possible optimization using a radix sort
-  computeHistogram: ->
-    data = @hdu.data
-    pixels = data.data
+  computeHistogram: (arr) ->
+    dataunit = @hdu.data
     
-    min   = data.min
-    max   = data.max
+    min   = dataunit.min
+    max   = dataunit.max
     range = max - min
     
     sum = 0
-    bins = Image.numberOfBins
+    bins = @nBins
     binSize = range / bins
-    length = pixels.length
+    length = arr.length
     
     @histogram = new Uint32Array(bins + 1)
-    for pixel in pixels
-      sum += pixel
+    for value in arr
+      sum += value
       
-      index = Math.floor(((pixel - min) / range) * bins)
+      index = Math.floor(((value - min) / range) * bins)
       @histogram[index] += 1
       
     @mean = sum / length
@@ -266,8 +259,8 @@ class Image extends Spine.Controller
     @histogramMax = Math.max.apply Math, @histogram
     @histogramMin = Math.min.apply Math, @histogram
     
-    @histogramLowerIndex = Math.floor(((pixel - @histogramMin) / range) * bins)
-    @histogramUpperIndex = Math.floor(((pixel - @histogramMax) / range) * bins)
+    @histogramLowerIndex = Math.floor(((value - @histogramMin) / range) * bins)
+    @histogramUpperIndex = Math.floor(((value - @histogramMax) / range) * bins)
   
   # computeHistogram2: =>
   #   console.log 'computeHistogram radix'
