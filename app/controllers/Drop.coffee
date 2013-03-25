@@ -2,8 +2,9 @@ Handler = require('controllers/Handler')
 
 class Drop extends Spine.Controller
   
+  
   events:
-    'click .arrow'  : 'beginTutorial'
+    'click .arrow'    : 'beginTutorial'
 
   @getExtension: (filename) -> filename.split('.').pop()
 
@@ -20,6 +21,9 @@ class Drop extends Spine.Controller
     @disabled = true
     
     window.addEventListener('keydown', @shortcuts, false)
+    
+    # Socket handler
+    @el.find('.sockets-experiment').on('click', @startSocket)
   
   enable: -> @disabled = false
   
@@ -46,6 +50,7 @@ class Drop extends Spine.Controller
       return null
     
     file = files[0]
+    window.f = file
     
     # Check the extension
     ext = Drop.getExtension(file.name)
@@ -84,6 +89,29 @@ class Drop extends Spine.Controller
       handler = new Handler({el: @el})
       handler.readBuffer(xhr.response)
     xhr.send()
+  
+  startSocket: (e) =>
+    e.preventDefault()
+    
+    unless @socket?
+      if location.hostname is '0.0.0.0'
+        @socket = io.connect('0.0.0.0', {port: 5000})
+      else
+        @socket = io.connect('weakforce.herokuapp.com', {port: 80})
+        
+    
+    @socket.on('status', (data) =>
+      
+      # Test with tutorial image
+      xhr = new XMLHttpRequest()
+      xhr.open('GET', 'tutorial/demo.fits')
+      xhr.responseType = 'arraybuffer'
+      xhr.onload = =>
+        window.removeEventListener('keydown', @shortcuts, false)
+        handler = new Handler({el: @el, socket: @socket})
+        handler.readBuffer(xhr.response)
+      xhr.send()
+    )
   
   shortcuts: (e) =>
     keyCode = e.keyCode

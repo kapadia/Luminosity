@@ -1,9 +1,10 @@
 require('lib/setup')
 
-Spine = require('spine')
+{Controller} = require('spine')
 Drop  = require('controllers/Drop')
 
-class Luminosity extends Spine.Controller
+
+class Luminosity extends Controller
   elements:
     '#luminosity' : 'luminosity'
   
@@ -41,5 +42,6 @@ class Luminosity extends Spine.Controller
     checkWebGL = context?
     
     return checkFile and checkFileReader and checkFileList and checkDataView and checkBlob and checkWebWorker and checkWebGL
-    
+
+
 module.exports = Luminosity

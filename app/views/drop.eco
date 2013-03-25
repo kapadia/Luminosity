@@ -50,6 +50,8 @@
   </ul>
 </div>
 
-<div id='commit'>
+<div class='links'>
   <a href='https://github.com/kapadia/Luminosity/commit/<%- @ref %>'><%- @ref %> <%- @date %></a>
+  &nbsp;
+  <a class='sockets-experiment' href=''>sockets experiment</a>
 </div>

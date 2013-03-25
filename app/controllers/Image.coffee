@@ -16,7 +16,7 @@ class Image extends Controller
     
     @html require('views/image')()
     
-    # Grab a few DOM elements
+    # Get DOM elements
     @stretch  = @el[0].querySelector('.stretch')
     @viewer   = @el[0].querySelector('.fits-viewer')
     
@@ -30,6 +30,19 @@ class Image extends Controller
     @readImageData()
     
     @stretch.addEventListener('change', @changeStretch, false)
+    
+    # Setup sockets if there is a socket instance
+    @setupSockets() if @socket?
+  
+  setupSockets: ->
+    console.log 'setupSockets', @socket
+    
+    @socket.on('zoom', (data) =>
+      unless @socket.socket.sessionid is data.id
+        @scale = data.zoom
+        @drawScene()
+    )
+    
   
   changeStretch: =>
     extremesLocation = @gl.getUniformLocation(@program, 'u_extremes')
@@ -151,6 +164,10 @@ class Image extends Controller
     @scale = if @scale > @maxScale then @maxScale else @scale
     @scale = if @scale < @minScale then @minScale else @scale
     @drawScene()
+    
+    # Handle socket
+    if @socket?
+      @socket.emit('zoom', @scale, @socket.socket.sessionid)
   
   setupWebGLUI: (arr) ->
     dataunit = @hdu.data

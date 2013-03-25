@@ -13,7 +13,7 @@
 
   FITS = {};
 
-  FITS.version = '0.3.0';
+  FITS.version = '0.3.9';
 
   this.astro.FITS = FITS;
 
@@ -81,7 +81,7 @@
 
     __extends(DataUnit, _super);
 
-    DataUnit.prototype.swapEndian = {
+    DataUnit.swapEndian = {
       B: function(value) {
         return value;
       },
@@ -93,11 +93,11 @@
       }
     };
 
-    DataUnit.prototype.swapEndian[8] = DataUnit.prototype.swapEndian['B'];
+    DataUnit.swapEndian[8] = DataUnit.swapEndian['B'];
 
-    DataUnit.prototype.swapEndian[16] = DataUnit.prototype.swapEndian['I'];
+    DataUnit.swapEndian[16] = DataUnit.swapEndian['I'];
 
-    DataUnit.prototype.swapEndian[32] = DataUnit.prototype.swapEndian['J'];
+    DataUnit.swapEndian[32] = DataUnit.swapEndian['J'];
 
     function DataUnit(header, view, offset) {
       this.view = view;
@@ -351,8 +351,6 @@
     Header.prototype.maxLines = 600;
 
     function Header(block) {
-      this.readBlock = __bind(this.readBlock, this);
-
       var method, name, _ref;
       this.primary = false;
       this.extension = false;
@@ -533,130 +531,121 @@
       this.frame = 0;
     }
 
-    Image.prototype.getFrameAsync = function(frame, callback) {
-      var URL, blob, blobUrl, data, fn, nPixels, onmessage, start, worker;
-      this.frame = frame != null ? frame : this.frame;
-      onmessage = function(e) {
-        var arr, bitpix, bscale, bzero, chunk, data, height, i, nPixels, swapEndian, value, width;
-        data = e.data;
-        bitpix = data.bitpix;
-        width = data.width;
-        height = data.height;
-        bzero = data.bzero;
-        bscale = data.bscale;
-        chunk = data.chunk;
-        nPixels = i = width * height;
-        switch (Math.abs(bitpix)) {
+    Image._getFrame = function(buffer, width, height, offset, frame, bytes, bitpix, bzero, bscale) {
+      var arr, chunk, dataType, i, nPixels, start, swapEndian, value;
+      nPixels = i = width * height;
+      start = offset + (frame * nPixels * bytes);
+      chunk = buffer.slice(start, start + nPixels * bytes);
+      dataType = Math.abs(bitpix);
+      if (bitpix > 0) {
+        switch (bitpix) {
+          case 8:
+            arr = new Uint8Array(chunk);
+            arr = new Uint16Array(arr);
+            swapEndian = function(value) {
+              return value;
+            };
+            break;
           case 16:
+            arr = new Uint16Array(chunk);
             swapEndian = function(value) {
               return (value << 8) | (value >> 8);
             };
             break;
           case 32:
+            arr = new Int32Array(chunk);
             swapEndian = function(value) {
               return ((value & 0xFF) << 24) | ((value & 0xFF00) << 8) | ((value >> 8) & 0xFF00) | ((value >> 24) & 0xFF);
             };
-            break;
-          default:
-            swapEndian = function(value) {
-              return value;
-            };
         }
-        if (bitpix > 0) {
-          switch (bitpix) {
-            case 8:
-              arr = new Uint8Array(chunk);
-              arr = new Uint16Array(arr);
-              break;
-            case 16:
-              arr = new Uint16Array(chunk);
-              break;
-            case 32:
-              arr = new Int32Array(chunk);
-          }
-          while (nPixels--) {
-            value = arr[nPixels];
-            value = swapEndian(value);
-            arr[nPixels] = bzero + bscale * value + 0.5;
-          }
-        } else {
-          arr = new Uint32Array(chunk);
-          while (i--) {
-            value = arr[i];
-            arr[i] = swapEndian(value);
-          }
-          arr = new Float32Array(chunk);
-          while (nPixels--) {
-            arr[nPixels] = bzero + bscale * arr[nPixels];
-          }
+        while (nPixels--) {
+          value = arr[nPixels];
+          value = swapEndian(value);
+          arr[nPixels] = bzero + bscale * value + 0.5;
         }
+      } else {
+        arr = new Uint32Array(chunk);
+        swapEndian = function(value) {
+          return ((value & 0xFF) << 24) | ((value & 0xFF00) << 8) | ((value >> 8) & 0xFF00) | ((value >> 24) & 0xFF);
+        };
+        while (i--) {
+          value = arr[i];
+          arr[i] = swapEndian(value);
+        }
+        arr = new Float32Array(chunk);
+        while (nPixels--) {
+          arr[nPixels] = bzero + bscale * arr[nPixels];
+        }
+      }
+      return arr;
+    };
+
+    Image.prototype.getFrameAsync = function(frame, callback, opts) {
+      var URL, blobGetFrame, blobOnMessage, fn1, fn2, mime, msg, onmessage, urlGetFrame, urlOnMessage, worker;
+      this.frame = frame != null ? frame : this.frame;
+      if (opts == null) {
+        opts = void 0;
+      }
+      onmessage = function(e) {
+        var arr, bitpix, bscale, buffer, bytes, bzero, data, height, offset, url, width;
+        data = e.data;
+        buffer = data.buffer;
+        width = data.width;
+        height = data.height;
+        offset = data.offset;
+        frame = data.frame;
+        bytes = data.bytes;
+        bitpix = data.bitpix;
+        bzero = data.bzero;
+        bscale = data.bscale;
+        url = data.url;
+        importScripts(url);
+        arr = _getFrame(buffer, width, height, offset, frame, bytes, bitpix, bzero, bscale);
         return postMessage(arr);
       };
-      fn = onmessage.toString().split('').reverse().join('').replace(' nruter', '');
-      fn = fn.split('').reverse().join('');
-      fn = "onmessage = " + fn;
-      blob = new Blob([fn], {
-        type: "application/javascript"
+      fn1 = onmessage.toString().replace('return postMessage(data);', 'postMessage(data);');
+      fn1 = "onmessage = " + fn1;
+      fn2 = Image._getFrame.toString();
+      fn2 = fn2.replace('function', 'function _getFrame');
+      mime = "application/javascript";
+      blobOnMessage = new Blob([fn1], {
+        type: mime
       });
-      URL = URL || webkitURL;
-      blobUrl = URL.createObjectURL(blob);
-      worker = new Worker(blobUrl);
+      blobGetFrame = new Blob([fn2], {
+        type: mime
+      });
+      URL = window.URL || window.webkitURL || window.MozURLProperty;
+      urlOnMessage = URL.createObjectURL(blobOnMessage);
+      urlGetFrame = URL.createObjectURL(blobGetFrame);
+      worker = new Worker(urlOnMessage);
       worker.onmessage = function(e) {
         var arr;
         arr = e.data;
         if (callback != null) {
-          callback.call(this, arr);
+          callback.call(this, arr, opts);
         }
-        return URL.revokeObjectURL(blobUrl);
+        URL.revokeObjectURL(urlOnMessage);
+        URL.revokeObjectURL(urlGetFrame);
+        return worker.terminate();
       };
-      nPixels = this.width * this.height;
-      start = this.offset + (this.frame * nPixels * this.bytes);
-      data = {};
-      data.bitpix = this.bitpix;
-      data.width = this.width;
-      data.height = this.height;
-      data.bzero = this.bzero;
-      data.bscale = this.bscale;
-      data.chunk = this.view.buffer.slice(start, start + nPixels * this.bytes);
-      return worker.postMessage(data);
+      msg = {};
+      msg.buffer = this.view.buffer;
+      msg.width = this.width;
+      msg.height = this.height;
+      msg.offset = this.offset;
+      msg.frame = this.frame;
+      msg.bytes = this.bytes;
+      msg.bitpix = this.bitpix;
+      msg.bzero = this.bzero;
+      msg.bscale = this.bscale;
+      msg.url = urlGetFrame;
+      return worker.postMessage(msg);
     };
 
     Image.prototype.getFrame = function(frame) {
-      var arr, bitpix, buffer, chunk, i, nPixels, start, value;
+      var arr;
       this.frame = frame != null ? frame : this.frame;
-      buffer = this.view.buffer;
-      nPixels = i = this.width * this.height;
-      start = this.offset + (this.frame * nPixels * this.bytes);
-      chunk = buffer.slice(start, start + nPixels * this.bytes);
-      bitpix = Math.abs(this.bitpix);
-      if (this.bitpix > 0) {
-        switch (this.bitpix) {
-          case 8:
-            arr = new Uint8Array(chunk);
-            arr = new Uint16Array(arr);
-            break;
-          case 16:
-            arr = new Uint16Array(chunk);
-            break;
-          case 32:
-            arr = new Int32Array(chunk);
-        }
-        while (nPixels--) {
-          value = arr[nPixels];
-          value = this.swapEndian[bitpix](value);
-          arr[nPixels] = this.bzero + this.bscale * value + 0.5;
-        }
-      } else {
-        arr = new Uint32Array(chunk);
-        while (i--) {
-          value = arr[i];
-          arr[i] = this.swapEndian[bitpix](value);
-        }
-        arr = new Float32Array(chunk);
-        while (nPixels--) {
-          arr[nPixels] = this.bzero + this.bscale * arr[nPixels];
-        }
-      }
+      arr = Image._getFrame(this.view.buffer, this.width, this.height, this.offset, this.frame, this.bytes, this.bitpix, this.bzero, this.bscale);
       if (this.isDataCube()) {
         this.frame += 1;
       }
@@ -678,7 +667,6 @@
   this.astro.FITS.Image = Image;
 
   Tabular = (function(_super) {
-    var _this = this;
 
     __extends(Tabular, _super);
 
@@ -771,7 +759,6 @@
     };
 
     function Tabular(header, view, offset) {
-      this.getRow = __bind(this.getRow, this);
       Tabular.__super__.constructor.apply(this, arguments);
       this.rowByteSize = header.get("NAXIS1");
       this.rows = header.get("NAXIS2");
@@ -780,6 +767,7 @@
       this.rowsRead = 0;
       this.columns = this.getColumnNames(header);
       this.accessors = [];
+      this.header = header;
     }
 
     Tabular.prototype.getRow = function(row) {
@@ -816,7 +804,7 @@
 
     return Tabular;
 
-  }).call(this, DataUnit);
+  })(DataUnit);
 
   this.astro.FITS.Tabular = Tabular;
 
@@ -900,11 +888,27 @@
     __extends(BinaryTable, _super);
 
     function BinaryTable(header, view, offset) {
+      var tblCols;
       BinaryTable.__super__.constructor.apply(this, arguments);
       this.tableLength = this.length;
       this.columnNames = {};
-      this.setAccessors(header);
+      tblCols = this.getTableColumns(header);
+      this.setAccessors(tblCols, view);
     }
+
+    BinaryTable.prototype.getTableColumns = function(header) {
+      var form, i, obj, parameters, type, _i, _ref;
+      parameters = [];
+      for (i = _i = 1, _ref = this.cols; 1 <= _ref ? _i <= _ref : _i >= _ref; i = 1 <= _ref ? ++_i : --_i) {
+        obj = {};
+        form = header.get("TFORM" + i);
+        type = header.get("TTYPE" + i);
+        obj[form] = type;
+        parameters.push(obj);
+        this.columnNames[type] = i - 1;
+      }
+      return parameters;
+    };
 
     BinaryTable.prototype.toBits = function(byte) {
       var arr, i;
@@ -928,24 +932,24 @@
       arr = new this.typedArray[descriptor](chunk);
       i = arr.length;
       while (i--) {
-        arr[i] = this.swapEndian[descriptor](arr[i]);
+        arr[i] = this.constructor.swapEndian[descriptor](arr[i]);
       }
       return arr;
     };
 
-    BinaryTable.prototype.setAccessors = function(header) {
-      var count, descriptor, form, i, isArray, match, pattern, type, _i, _ref, _results,
+    BinaryTable.prototype.setAccessors = function(tblCols, view) {
+      var column, count, descriptor, form, i, isArray, match, pattern, type, _i, _len, _results,
         _this = this;
       pattern = /(\d*)([P|Q]*)([L|X|B|I|J|K|A|E|D|C|M]{1})/;
       _results = [];
-      for (i = _i = 1, _ref = this.cols; 1 <= _ref ? _i <= _ref : _i >= _ref; i = 1 <= _ref ? ++_i : --_i) {
-        form = header.get("TFORM" + i);
-        type = header.get("TTYPE" + i);
+      for (i = _i = 0, _len = tblCols.length; _i < _len; i = ++_i) {
+        column = tblCols[i];
+        form = Object.keys(column)[0];
+        type = column[form];
         match = pattern.exec(form);
         count = parseInt(match[1]) || 1;
         isArray = match[2];
         descriptor = match[3];
-        this.columnNames[type] = i - 1;
         if (isArray) {
           switch (type) {
             case "COMPRESSED_DATA":
@@ -955,7 +959,7 @@
                   var arr, pixels;
                   arr = _this.getFromHeap(descriptor);
                   pixels = new _this.typedArray[_this.params["BYTEPIX"]](_this.ztile[0]);
-                  _this.constructor.Rice(arr, _this.params["BLOCKSIZE"], _this.params["BYTEPIX"], pixels, _this.ztile[0]);
+                  Decompress.Rice(arr, _this.params["BLOCKSIZE"], _this.params["BYTEPIX"], pixels, _this.ztile[0], Decompress.RiceSetup);
                   return pixels;
                 };
                 return _this.accessors.push(accessor);
@@ -973,7 +977,7 @@
                   }
                   return arr;
                 };
-                return _this.accessors.push('accessor');
+                return _this.accessors.push(accessor);
               })(descriptor, count));
               break;
             default:
@@ -982,7 +986,7 @@
                 accessor = function() {
                   return _this.getFromHeap(descriptor);
                 };
-                return _this.accessors.push('accessor');
+                return _this.accessors.push(accessor);
               })(descriptor, count));
           }
         } else {
@@ -990,8 +994,8 @@
             _results.push((function(descriptor, count) {
               var accessor;
               accessor = function() {
-                var value, _ref1;
-                _ref1 = _this.dataAccessors[descriptor](_this.view, _this.offset), value = _ref1[0], _this.offset = _ref1[1];
+                var value, _ref;
+                _ref = _this.dataAccessors[descriptor](view, _this.offset), value = _ref[0], _this.offset = _ref[1];
                 return value;
               };
               return _this.accessors.push(accessor);
@@ -1002,11 +1006,11 @@
                 var accessor, nBytes;
                 nBytes = Math.log(count) / Math.log(2);
                 accessor = function() {
-                  var arr, bits, byte, bytes, chunk, _j, _len;
-                  chunk = _this.view.buffer.slice(_this.offset, _this.offset + nBytes);
+                  var arr, bits, byte, bytes, chunk, _j, _len1;
+                  chunk = view.buffer.slice(_this.offset, _this.offset + nBytes);
                   bytes = new Uint8Array(chunk);
                   bits = [];
-                  for (_j = 0, _len = bytes.length; _j < _len; _j++) {
+                  for (_j = 0, _len1 = bytes.length; _j < _len1; _j++) {
                     byte = bytes[_j];
                     arr = _this.toBits(byte);
                     bits = bits.concat(arr);
@@ -1021,7 +1025,7 @@
                 var accessor;
                 accessor = function() {
                   var str;
-                  str = _this.view.getString(_this.offset, count);
+                  str = view.getString(_this.offset, count);
                   _this.offset += count;
                   return str.trim();
                 };
@@ -1031,10 +1035,10 @@
               _results.push((function(descriptor, count) {
                 var accessor;
                 accessor = function() {
-                  var data, value, _ref1;
+                  var data, value, _ref;
                   data = [];
                   while (count--) {
-                    _ref1 = _this.dataAccessors[descriptor](_this.view, _this.offset), value = _ref1[0], _this.offset = _ref1[1];
+                    _ref = _this.dataAccessors[descriptor](view, _this.offset), value = _ref[0], _this.offset = _ref[1];
                     data.push(value);
                   }
                   return data;
@@ -1055,10 +1059,55 @@
   this.astro.FITS.BinaryTable = BinaryTable;
 
   Decompress = {
-    Rice: function(array, blocksize, bytepix, pixels, nx) {
+    RiceSetup: {
+      1: function(array) {
+        var fsbits, fsmax, lastpix, pointer;
+        pointer = 0;
+        fsbits = 3;
+        fsmax = 6;
+        lastpix = array[pointer];
+        pointer += 1;
+        return [fsbits, fsmax, lastpix, pointer];
+      },
+      2: function(array) {
+        var bytevalue, fsbits, fsmax, lastpix, pointer;
+        pointer = 0;
+        fsbits = 4;
+        fsmax = 14;
+        lastpix = 0;
+        bytevalue = array[pointer];
+        pointer += 1;
+        lastpix = lastpix | (bytevalue << 8);
+        bytevalue = array[pointer];
+        pointer += 1;
+        lastpix = lastpix | bytevalue;
+        return [fsbits, fsmax, lastpix, pointer];
+      },
+      4: function(array) {
+        var bytevalue, fsbits, fsmax, lastpix, pointer;
+        pointer = 0;
+        fsbits = 5;
+        fsmax = 25;
+        lastpix = 0;
+        bytevalue = array[pointer];
+        pointer += 1;
+        lastpix = lastpix | (bytevalue << 24);
+        bytevalue = array[pointer];
+        pointer += 1;
+        lastpix = lastpix | (bytevalue << 16);
+        bytevalue = array[pointer];
+        pointer += 1;
+        lastpix = lastpix | (bytevalue << 8);
+        bytevalue = array[pointer];
+        pointer += 1;
+        lastpix = lastpix | bytevalue;
+        return [fsbits, fsmax, lastpix, pointer];
+      }
+    },
+    Rice: function(array, blocksize, bytepix, pixels, nx, setup) {
       var b, bbits, diff, fs, fsbits, fsmax, i, imax, k, lastpix, nbits, nonzeroCount, nzero, pointer, _ref, _ref1;
       bbits = 1 << fsbits;
-      _ref = this.RiceSetup[bytepix](array), fsbits = _ref[0], fsmax = _ref[1], lastpix = _ref[2], pointer = _ref[3];
+      _ref = setup[bytepix](array), fsbits = _ref[0], fsmax = _ref[1], lastpix = _ref[2], pointer = _ref[3];
       nonzeroCount = new Uint8Array(256);
       nzero = 8;
       _ref1 = [128, 255], k = _ref1[0], i = _ref1[1];
@@ -1151,60 +1200,6 @@
         }
       }
       return pixels;
-    },
-    RiceSetup: {
-      1: function(array) {
-        var fsbits, fsmax, lastpix, pointer;
-        pointer = 0;
-        fsbits = 3;
-        fsmax = 6;
-        lastpix = array[pointer];
-        pointer += 1;
-        return [fsbits, fsmax, lastpix, pointer];
-      },
-      2: function(array) {
-        var bytevalue, fsbits, fsmax, lastpix, pointer;
-        pointer = 0;
-        fsbits = 4;
-        fsmax = 14;
-        lastpix = 0;
-        bytevalue = array[pointer];
-        pointer += 1;
-        lastpix = lastpix | (bytevalue << 8);
-        bytevalue = array[pointer];
-        pointer += 1;
-        lastpix = lastpix | bytevalue;
-        return [fsbits, fsmax, lastpix, pointer];
-      },
-      4: function(array) {
-        var bytevalue, fsbits, fsmax, lastpix, pointer;
-        pointer = 0;
-        fsbits = 5;
-        fsmax = 25;
-        lastpix = 0;
-        bytevalue = array[pointer];
-        pointer += 1;
-        lastpix = lastpix | (bytevalue << 24);
-        bytevalue = array[pointer];
-        pointer += 1;
-        lastpix = lastpix | (bytevalue << 16);
-        bytevalue = array[pointer];
-        pointer += 1;
-        lastpix = lastpix | (bytevalue << 8);
-        bytevalue = array[pointer];
-        pointer += 1;
-        lastpix = lastpix | bytevalue;
-        return [fsbits, fsmax, lastpix, pointer];
-      }
-    },
-    gzip: function(array) {
-      throw "Not yet implemented";
-    },
-    plio: function(array, length) {
-      throw "Not yet implemented";
-    },
-    hcompress: function(array, length) {
-      throw "Not yet implemented";
     }
   };
 
@@ -1252,7 +1247,8 @@
       this.zquantiz = this.getValue(header, "ZQUANTIZ", "LINEAR_SCALING");
       this.bzero = this.getValue(header, "BZERO", 0);
       this.bscale = this.getValue(header, "BSCALE", 1);
-      this.setAccessors(header);
+      this.tableColumns = this.getTableColumns(header);
+      this.setAccessors(this.tableColumns, view);
       this.defGetRow();
     }
 
@@ -1336,6 +1332,419 @@
 
   this.astro.FITS.CompressedImage = CompressedImage;
 
+  CompressedImage = this.astro.FITS.CompressedImage;
+
+  CompressedImage.prototype.getFrameAsync = function(frame, callback, opts) {
+    var URL, blobOnMessage, blobRice, data, fn1, fn2, mime, onmessage, urlOnMessage, urlRice, worker;
+    this.frame = frame != null ? frame : this.frame;
+    if (opts == null) {
+      opts = void 0;
+    }
+    onmessage = function(e) {
+      var RiceSetup, accessors, arr, bitpix, blank, bscale, buffer, bzero, columnNames, data, dataAccessors, defGetRow, getFrame, getFromHeap, getRow, getRowHasBlanks, getRowNoBlanks, getTableRow, height, offset, params, rowByteSize, rowsRead, setAccessors, swapEndian, tableColumns, tableLength, typedArray, urlRice, view, width, zblank, ztile;
+      data = e.data;
+      tableLength = data.tableLength;
+      tableColumns = data.tableColumns;
+      columnNames = data.columnNames;
+      params = data.params;
+      ztile = data.ztile;
+      rowByteSize = data.rowByteSize;
+      zblank = data.zblank;
+      bscale = data.bscale;
+      bzero = data.bzero;
+      width = data.width;
+      height = data.height;
+      blank = data.blank;
+      bitpix = data.bitpix;
+      buffer = data.buffer;
+      urlRice = data.urlRice;
+      dataAccessors = {
+        L: function(view, offset) {
+          var val, x;
+          x = view.getInt8(offset);
+          offset += 1;
+          val = x === 84 ? true : false;
+          return [val, offset];
+        },
+        B: function(view, offset) {
+          var val;
+          val = view.getUint8(offset);
+          offset += 1;
+          return [val, offset];
+        },
+        I: function(view, offset) {
+          var val;
+          val = view.getInt16(offset);
+          offset += 2;
+          return [val, offset];
+        },
+        J: function(view, offset) {
+          var val;
+          val = view.getInt32(offset);
+          offset += 4;
+          return [val, offset];
+        },
+        K: function(view, offset) {
+          var factor, highByte, lowByte, mod, val;
+          highByte = Math.abs(view.getInt32(offset));
+          offset += 4;
+          lowByte = Math.abs(view.getInt32(offset));
+          offset += 4;
+          mod = highByte % 10;
+          factor = mod ? -1 : 1;
+          highByte -= mod;
+          console.warn("Precision for 64 bit integers may be incorrect.");
+          val = factor * ((highByte << 32) | lowByte);
+          return [val, offset];
+        },
+        A: function(view, offset) {
+          var val;
+          val = view.getChar(offset);
+          offset += 1;
+          return [val, offset];
+        },
+        E: function(view, offset) {
+          var val;
+          val = view.getFloat32(offset);
+          offset += 4;
+          return [val, offset];
+        },
+        D: function(view, offset) {
+          var val;
+          val = view.getFloat64(offset);
+          offset += 8;
+          return [val, offset];
+        },
+        C: function(view, offset) {
+          var val, val1, val2;
+          val1 = view.getFloat32(offset);
+          offset += 4;
+          val2 = view.getFloat32(offset);
+          offset += 4;
+          val = [val1, val2];
+          return [val, offset];
+        },
+        M: function(view, offset) {
+          var val, val1, val2;
+          val1 = view.getFloat64(offset);
+          offset += 8;
+          val2 = view.getFloat64(offset);
+          offset += 8;
+          val = [val1, val2];
+          return [val, offset];
+        }
+      };
+      RiceSetup = {
+        1: function(array) {
+          var fsbits, fsmax, lastpix, pointer;
+          pointer = 0;
+          fsbits = 3;
+          fsmax = 6;
+          lastpix = array[pointer];
+          pointer += 1;
+          return [fsbits, fsmax, lastpix, pointer];
+        },
+        2: function(array) {
+          var bytevalue, fsbits, fsmax, lastpix, pointer;
+          pointer = 0;
+          fsbits = 4;
+          fsmax = 14;
+          lastpix = 0;
+          bytevalue = array[pointer];
+          pointer += 1;
+          lastpix = lastpix | (bytevalue << 8);
+          bytevalue = array[pointer];
+          pointer += 1;
+          lastpix = lastpix | bytevalue;
+          return [fsbits, fsmax, lastpix, pointer];
+        },
+        4: function(array) {
+          var bytevalue, fsbits, fsmax, lastpix, pointer;
+          pointer = 0;
+          fsbits = 5;
+          fsmax = 25;
+          lastpix = 0;
+          bytevalue = array[pointer];
+          pointer += 1;
+          lastpix = lastpix | (bytevalue << 24);
+          bytevalue = array[pointer];
+          pointer += 1;
+          lastpix = lastpix | (bytevalue << 16);
+          bytevalue = array[pointer];
+          pointer += 1;
+          lastpix = lastpix | (bytevalue << 8);
+          bytevalue = array[pointer];
+          pointer += 1;
+          lastpix = lastpix | bytevalue;
+          return [fsbits, fsmax, lastpix, pointer];
+        }
+      };
+      importScripts(urlRice);
+      typedArray = {
+        B: Uint8Array,
+        I: Uint16Array,
+        J: Int32Array,
+        E: Float32Array,
+        D: Float64Array,
+        1: Uint8Array,
+        2: Uint16Array,
+        4: Int32Array
+      };
+      offset = 0;
+      rowsRead = 0;
+      accessors = [];
+      view = new DataView(buffer);
+      switch (Math.abs(bitpix)) {
+        case 16:
+          swapEndian = function(value) {
+            return (value << 8) | (value >> 8);
+          };
+          break;
+        case 32:
+          swapEndian = function(value) {
+            return ((value & 0xFF) << 24) | ((value & 0xFF00) << 8) | ((value >> 8) & 0xFF00) | ((value >> 24) & 0xFF);
+          };
+          break;
+        default:
+          swapEndian = function(value) {
+            return value;
+          };
+      }
+      getFromHeap = function(descriptor) {
+        var arr, chunk, chunkOffset, heapOffset, i, length;
+        length = view.getInt32(offset);
+        offset += 4;
+        heapOffset = view.getInt32(offset);
+        offset += 4;
+        chunkOffset = tableLength + heapOffset;
+        chunk = view.buffer.slice(chunkOffset, chunkOffset + length);
+        arr = new typedArray[descriptor](chunk);
+        i = arr.length;
+        while (i--) {
+          arr[i] = swapEndian(arr[i]);
+        }
+        return arr;
+      };
+      setAccessors = function() {
+        var column, count, descriptor, form, i, isArray, match, pattern, type, _i, _len, _results,
+          _this = this;
+        pattern = /(\d*)([P|Q]*)([L|X|B|I|J|K|A|E|D|C|M]{1})/;
+        _results = [];
+        for (i = _i = 0, _len = tableColumns.length; _i < _len; i = ++_i) {
+          column = tableColumns[i];
+          form = Object.keys(column)[0];
+          type = column[form];
+          match = pattern.exec(form);
+          count = parseInt(match[1]) || 1;
+          isArray = match[2];
+          descriptor = match[3];
+          if (isArray) {
+            switch (type) {
+              case "COMPRESSED_DATA":
+                _results.push((function(descriptor, count) {
+                  var accessor;
+                  accessor = function() {
+                    var arr, pixels;
+                    arr = getFromHeap(descriptor);
+                    pixels = new typedArray[params["BYTEPIX"]](ztile[0]);
+                    Rice(arr, params["BLOCKSIZE"], params["BYTEPIX"], pixels, ztile[0], RiceSetup);
+                    return pixels;
+                  };
+                  return accessors.push(accessor);
+                })(descriptor, count));
+                break;
+              case "GZIP_COMPRESSED_DATA":
+                _results.push((function(descriptor, count) {
+                  var accessor;
+                  accessor = function() {
+                    var arr;
+                    arr = new Float32Array(width);
+                    i = arr.length;
+                    while (i--) {
+                      arr[i] = NaN;
+                    }
+                    return arr;
+                  };
+                  return accessors.push(accessor);
+                })(descriptor, count));
+                break;
+              default:
+                _results.push((function(descriptor, count) {
+                  var accessor;
+                  accessor = function() {
+                    return getFromHeap(descriptor);
+                  };
+                  return accessors.push(accessor);
+                })(descriptor, count));
+            }
+          } else {
+            if (count === 1) {
+              _results.push((function(descriptor, count) {
+                var accessor;
+                accessor = function() {
+                  var value, _ref;
+                  _ref = dataAccessors[descriptor](view, offset), value = _ref[0], offset = _ref[1];
+                  return value;
+                };
+                return accessors.push(accessor);
+              })(descriptor, count));
+            } else {
+              if (descriptor === 'X') {
+                _results.push((function(descriptor, count) {
+                  var accessor, nBytes;
+                  nBytes = Math.log(count) / Math.log(2);
+                  accessor = function() {
+                    var arr, bits, byte, bytes, chunk, _j, _len1;
+                    chunk = view.buffer.slice(offset, offset + nBytes);
+                    bytes = new Uint8Array(chunk);
+                    bits = [];
+                    for (_j = 0, _len1 = bytes.length; _j < _len1; _j++) {
+                      byte = bytes[_j];
+                      arr = _this.toBits(byte);
+                      bits = bits.concat(arr);
+                    }
+                    offset += nBytes;
+                    return bits.slice(0, +(count - 1) + 1 || 9e9);
+                  };
+                  return accessors.push(accessor);
+                })(descriptor, count));
+              } else if (descriptor === 'A') {
+                _results.push((function(descriptor, count) {
+                  var accessor;
+                  accessor = function() {
+                    var str;
+                    str = view.getString(offset, count);
+                    _this.offset += count;
+                    return str.trim();
+                  };
+                  return accessors.push(accessor);
+                })(descriptor, count));
+              } else {
+                _results.push((function(descriptor, count) {
+                  var accessor;
+                  accessor = function() {
+                    var value, _ref;
+                    data = [];
+                    while (count--) {
+                      _ref = dataAccessors[descriptor](view, offset), value = _ref[0], offset = _ref[1];
+                      data.push(value);
+                    }
+                    return data;
+                  };
+                  return accessors.push(accessor);
+                })(descriptor, count));
+              }
+            }
+          }
+        }
+        return _results;
+      };
+      getTableRow = function() {
+        var accessor, row, scale, zero, _i, _len;
+        offset = rowsRead * rowByteSize;
+        row = [];
+        for (_i = 0, _len = accessors.length; _i < _len; _i++) {
+          accessor = accessors[_i];
+          row.push(accessor());
+        }
+        data = row[columnNames["COMPRESSED_DATA"]] || row[columnNames["UNCOMPRESSED_DATA"]] || row[columnNames["GZIP_COMPRESSED_DATA"]];
+        blank = row[columnNames["ZBLANK"]] || zblank;
+        scale = row[columnNames["ZSCALE"]] || bscale;
+        zero = row[columnNames["ZZERO"]] || bzero;
+        return [data, blank, scale, zero];
+      };
+      getRowHasBlanks = function(arr) {
+        var i, index, scale, value, zero, _i, _len, _ref;
+        _ref = getTableRow(), data = _ref[0], blank = _ref[1], scale = _ref[2], zero = _ref[3];
+        offset = rowsRead * width;
+        for (index = _i = 0, _len = data.length; _i < _len; index = ++_i) {
+          value = data[index];
+          i = offset + index;
+          arr[i] = value === blank ? NaN : zero + scale * value;
+        }
+        return rowsRead += 1;
+      };
+      getRowNoBlanks = function(arr) {
+        var i, index, scale, value, zero, _i, _len, _ref;
+        _ref = getTableRow(), data = _ref[0], blank = _ref[1], scale = _ref[2], zero = _ref[3];
+        offset = rowsRead * width;
+        for (index = _i = 0, _len = data.length; _i < _len; index = ++_i) {
+          value = data[index];
+          i = offset + index;
+          arr[i] = zero + scale * value;
+        }
+        return rowsRead += 1;
+      };
+      defGetRow = function() {
+        var hasBlanks;
+        hasBlanks = (zblank != null) || (blank != null) || columnNames.hasOwnProperty("ZBLANK");
+        if (hasBlanks) {
+          return getRowHasBlanks;
+        } else {
+          return getRowNoBlanks;
+        }
+      };
+      getFrame = function() {
+        var arr;
+        arr = new Float32Array(width * height);
+        rowsRead = 0;
+        while (height--) {
+          getRow(arr);
+        }
+        return arr;
+      };
+      setAccessors(tableColumns, view);
+      getRow = defGetRow();
+      arr = getFrame();
+      data = {
+        offset: offset,
+        arr: arr
+      };
+      return postMessage(data);
+    };
+    fn1 = onmessage.toString().replace('return postMessage(data);', 'postMessage(data);');
+    fn1 = "onmessage = " + fn1;
+    fn2 = this.constructor.Rice.toString();
+    fn2 = fn2.replace('function', 'function Rice');
+    mime = "application/javascript";
+    blobOnMessage = new Blob([fn1], {
+      type: mime
+    });
+    blobRice = new Blob([fn2], {
+      type: mime
+    });
+    URL = window.URL || window.webkitURL || window.MozURLProperty;
+    urlOnMessage = URL.createObjectURL(blobOnMessage);
+    urlRice = URL.createObjectURL(blobRice);
+    worker = new Worker(urlOnMessage);
+    worker.onmessage = function(e) {
+      var arr;
+      arr = e.data.arr;
+      if (callback != null) {
+        callback.call(this, arr, opts);
+      }
+      URL.revokeObjectURL(urlOnMessage);
+      return worker.terminate();
+    };
+    data = {
+      buffer: this.view.buffer.slice(this.begin, this.begin + this.length),
+      tableLength: this.tableLength,
+      tableColumns: this.tableColumns,
+      columnNames: this.columnNames,
+      params: this.params,
+      ztile: this.ztile,
+      rowByteSize: this.rowByteSize,
+      zblank: this.zblank,
+      bscale: this.bscale,
+      bzero: this.bzero,
+      width: this.width,
+      height: this.height,
+      blank: this.blank,
+      urlRice: urlRice
+    };
+    return worker.postMessage(data);
+  };
+
   HDU = (function() {
 
     function HDU(header, data) {
@@ -1367,13 +1776,12 @@
 
     File.prototype.BLOCKLENGTH = 2880;
 
-    function File(arg, callback) {
-      this.isEOF = __bind(this.isEOF, this);
-
-      this.excessBytes = __bind(this.excessBytes, this);
-
+    function File(arg, callback, opts) {
       var xhr,
         _this = this;
+      if (opts == null) {
+        opts = void 0;
+      }
       this.constructor.extendDataView(this.view);
       this.hdus = [];
       this.offset = 0;
@@ -1382,7 +1790,7 @@
         xhr.open('GET', arg);
         xhr.responseType = 'arraybuffer';
         xhr.onload = function() {
-          return _this.initBuffer(xhr.response, callback);
+          return _this.initBuffer(xhr.response, callback, opts);
         };
         xhr.send();
       } else {
@@ -1390,7 +1798,7 @@
       }
     }
 
-    File.prototype.initBuffer = function(buffer, callback) {
+    File.prototype.initBuffer = function(buffer, callback, opts) {
       var data, hdu, header;
       this.length = buffer.byteLength;
       this.view = new DataView(buffer);
@@ -1404,7 +1812,7 @@
         }
       }
       if (callback != null) {
-        return callback.call(this);
+        return callback.call(this, this, opts);
       }
     };
 

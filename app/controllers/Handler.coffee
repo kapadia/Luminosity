@@ -60,6 +60,8 @@ class Handler extends Spine.Controller
           if data.isDataCube()
             new Cube args
           else
+            # Testing sockets with Image class only
+            args.socket = @socket if @socket
             new Image args
       else if header.isExtension()
         if header['XTENSION'] is 'TABLE'
