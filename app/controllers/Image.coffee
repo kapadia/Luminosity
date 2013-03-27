@@ -35,7 +35,6 @@ class Image extends Controller
     @setupSockets() if @socket?
   
   setupSockets: ->
-    console.log 'setupSockets', @socket
     
     @socket.on('zoom', (data) =>
       unless @socket.socket.sessionid is data.id
@@ -43,6 +42,12 @@ class Image extends Controller
         @drawScene()
     )
     
+    @socket.on('translation', (data) =>
+      unless @socket.socket.sessionid is data.id
+        @xOffset = data.xOffset
+        @yOffset = data.yOffset
+        @drawScene()
+    )
   
   changeStretch: =>
     extremesLocation = @gl.getUniformLocation(@program, 'u_extremes')
@@ -131,6 +136,9 @@ class Image extends Controller
       
       @xOffset = @xOldOffset + (xDelta / @canvas.width / @scale * 2.0)
       @yOffset = @yOldOffset - (yDelta / @canvas.height / @scale * 2.0)
+      
+      if @socket?
+        @socket.emit('translation', @xOffset, @yOffset, @socket.socket.sessionid)
       
       @drawScene()
     
