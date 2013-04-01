@@ -50,6 +50,7 @@ class Drop extends Spine.Controller
       return null
     
     file = files[0]
+    console.log file instanceof File
     window.f = file
     
     # Check the extension
