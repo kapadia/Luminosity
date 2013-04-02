@@ -50,8 +50,6 @@ class Drop extends Spine.Controller
       return null
     
     file = files[0]
-    console.log file instanceof File
-    window.f = file
     
     # Check the extension
     ext = Drop.getExtension(file.name)
@@ -59,27 +57,30 @@ class Drop extends Spine.Controller
       alert 'This does not seem to be a FITS file'
       return null
     
-    # Read the file
-    reader = new FileReader()
+    # Initialize FITS File object using native File instance
+    handler = new Handler({el: @el}, file)
     
-    reader.onprogress = (e) =>
-      if e.lengthComputable
-        progress = document.querySelector("#loading progress")
-        loaded = e.loaded
-        total = e.total
-        percent = Math.round(100 * (loaded / total))
-        if percent < 100
-          progress.value = percent
-    
-    reader.onloadend = (e) =>
-      if e.target.readyState is FileReader.DONE
-        buffer = e.target.result
-        window.removeEventListener('keydown', @shortcuts, false)
-        handler = new Handler({el: @el})
-        handler.readBuffer(buffer)
-        
-    $("#loading").show()
-    reader.readAsArrayBuffer(file)
+    # # Read the file
+    # reader = new FileReader()
+    # 
+    # reader.onprogress = (e) =>
+    #   if e.lengthComputable
+    #     progress = document.querySelector("#loading progress")
+    #     loaded = e.loaded
+    #     total = e.total
+    #     percent = Math.round(100 * (loaded / total))
+    #     if percent < 100
+    #       progress.value = percent
+    # 
+    # reader.onloadend = (e) =>
+    #   if e.target.readyState is FileReader.DONE
+    #     buffer = e.target.result
+    #     window.removeEventListener('keydown', @shortcuts, false)
+    #     handler = new Handler({el: @el})
+    #     handler.readBuffer(buffer)
+    #     
+    # reader.readAsArrayBuffer(file)
+    # $("#loading").show()
   
   beginTutorial: =>
     xhr = new XMLHttpRequest()

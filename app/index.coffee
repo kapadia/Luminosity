@@ -5,8 +5,10 @@ Drop  = require('controllers/Drop')
 
 
 class Luminosity extends Controller
+  
   elements:
     '#luminosity' : 'luminosity'
+  
   
   constructor: ->
     super
