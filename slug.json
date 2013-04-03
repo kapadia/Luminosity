@@ -9,6 +9,7 @@
   ],
   "libs": [
     "./vendor/fits.js",
+    "./vendor/webfits.js",
     "./vendor/zepto.js",
     "./vendor/d3.v2.js",
     "./vendor/three.js",

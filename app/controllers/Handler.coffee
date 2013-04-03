@@ -1,8 +1,19 @@
-Image = require('controllers/Image')
-Cube  = require('controllers/Cube')
-Table = require('controllers/Table')
+
+Image           = require('controllers/Image')
+Cube            = require('controllers/Cube')
+Table           = require('controllers/Table')
+CompressedImage = require('controllers/CompressedImage')
 
 class Handler extends Spine.Controller
+  
+  handlerConstructor:
+    Image: Image
+    Table: Table
+    BinaryTable: Table
+    CompressedImage: CompressedImage
+  
+  # Storage for HDUs
+  hdus: []
   
   events:
     'click #controls label' : 'setHDU'
@@ -15,8 +26,7 @@ class Handler extends Spine.Controller
     super
     
     # Initialize a FITS File object with a callback and it context
-    opts =
-      context: @
+    opts = {context: @}
     @fits = new astro.FITS.File(arguments[1], @render, opts)
   
   render: ->
@@ -26,6 +36,20 @@ class Handler extends Spine.Controller
     # Render DOM
     @html require('views/hdus')(hdus)
     
+    # Initialize the appropriate handler
+    for hdu, index in hdus
+      
+      # Get type from header
+      type = hdu.header.getDataType()
+      
+      if type?
+        # Get the host element and setup arguments
+        elem = $("#dataunits article:nth-child(#{index + 1}) div.container")
+        args = {el: elem, hdu: hdu, index: index}
+        
+        handler = new @handlerConstructor[type](args)
+        @hdus.push handler
+    
     # Default to the first HDU with a dataunit
     for hdu, index in hdus
       if hdu.hasData()
@@ -34,7 +58,7 @@ class Handler extends Spine.Controller
         @currentHDU = index
         
         # Read only the current data unit
-        @getBuffer(index)
+        @hdus[@currentHDU].readIntoMemory()
         break
     
     # Setup keyboard shortcuts
@@ -42,7 +66,6 @@ class Handler extends Spine.Controller
   
   # Read the bytes of only the dataunit specified by index
   getBuffer: (index) ->
-    console.log 'getBufferAndRead'
     
     # Get dataunit from file
     dataunit = @fits.getDataUnit(index)
