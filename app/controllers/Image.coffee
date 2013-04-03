@@ -3,9 +3,8 @@
 
 
 class Image extends Controller
-  viewportWidth: 600
-  viewportHeight: 600
-  nBins: 500
+  nBins: 5000
+  inMemory: false
   
   elements:
     '.fits-viewer'  : 'viewport'
@@ -14,6 +13,8 @@ class Image extends Controller
     '.pixel'        : 'pixelEl'
     '.info'         : 'info'
   
+  events:
+    'change .stretch' : 'onStretch'
   
   constructor: ->
     super
@@ -22,22 +23,24 @@ class Image extends Controller
     
     # Get DOM elements
     @stretch  = @el[0].querySelector('.stretch')
-    @viewer   = @el[0].querySelector('.fits-viewer')
     
     @bind 'dataready', @finishSetup
-    @stretch.addEventListener('change', @changeStretch, false)
     
     # Setup sockets if there is a socket instance
     @setupSockets() if @socket?
   
   # Function should be explicitly called only once.
   readIntoMemory: ->
+    return if @inMemory
+    
     dataunit = @hdu.data
     dataunit.start(@getFrame, @, dataunit)
     @width = dataunit.width
     @height = dataunit.height
   
   getFrame: (dataunit) ->
+    @inMemory = true
+    
     dataunit.getFrameAsync(0, (arr) =>
       $(".read-image").hide()
       dataunit.getExtent(arr)
@@ -59,11 +62,10 @@ class Image extends Controller
         @drawScene()
     )
   
-  changeStretch: =>
-    @wfits.setStretch(@stretch.value)
+  onStretch: (e) =>
+    @wfits.setStretch(e.target.value)
   
   finishSetup: (arr) ->
-    console.log 'finishSetup'
     
     # Setup histogram
     @computeHistogram(arr)
@@ -124,7 +126,6 @@ class Image extends Controller
       bars.classed "selected", (d) ->
         s[0] <= d and d <= s[1]
       
-      console.log s[0], s[1]
       @wfits.setExtent(s[0], s[1])
     brushend = ->
       svg.classed "selecting", not d3.event.target.empty()

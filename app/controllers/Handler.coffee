@@ -64,48 +64,11 @@ class Handler extends Spine.Controller
     # Setup keyboard shortcuts
     window.addEventListener('keydown', @shortcuts, false)
   
-  # Read the bytes of only the dataunit specified by index
-  getBuffer: (index) ->
-    
-    # Get dataunit from file
-    dataunit = @fits.getDataUnit(index)
-    
-    # Copy data chunk into memory.  Passing callback, context, and argument
-    dataunit.start(@getFrame, @, dataunit)
-  
-  getFrame: (dataunit) ->
-    opts =
-      context: @
-    dataunit.getFrameAsync(null, @draw, opts)
-  
-  draw: (arr, opts) ->
-    console.log 'draw', arr, opts
-  
-  readBuffer: (buffer) ->
-    
-    # Initialize FITS object and cache the HDUs
-    @fits = new astro.FITS.File(buffer)
-    hdus = @fits.hdus
-    
-    # Render the template
-    @html require('views/hdus')(hdus)
-    
-    # Set the default HDU
-    for hdu, index in hdus
-      if hdu.hasData()
-        $("#hdu#{index}").attr('checked', 'checked')
-        $("#dataunits article:nth-child(#{index + 1})").addClass('current')
-        @currentHDU = index
-        break
-    
-    # Begin reading the dataunits
-    @readData(buffer)
-    
-    # Setup keyboard shortcuts
-    window.addEventListener('keydown', @shortcuts, false)
-  
   setHDU: (e) =>
     @currentHDU = parseInt(e.target.dataset.order)
+    
+    # Read into memory now that user has requested these data
+    @hdus[@currentHDU].readIntoMemory()
     $('#dataunits article.current').removeClass('current')
     $("#dataunits article:nth-child(#{@currentHDU + 1})").addClass('current')
   
