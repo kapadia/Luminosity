@@ -1,10 +1,13 @@
 
+{Controller}    = require('spine')
+
 Image           = require('controllers/Image')
 Cube            = require('controllers/Cube')
 Table           = require('controllers/Table')
 CompressedImage = require('controllers/CompressedImage')
 
-class Handler extends Spine.Controller
+class Handler extends Controller
+  el: '#luminosity'
   
   handlerConstructor:
     Image: Image
@@ -22,33 +25,39 @@ class Handler extends Spine.Controller
     '#header' : 'header'
   
   
-  constructor: ->
+  constructor: (args, source)->
     super
     
-    # Initialize a FITS File object with a callback and it context
+    # Set up options for callback
     opts = {context: @}
-    @fits = new astro.FITS.File(arguments[1], @render, opts)
+    
+    # Initialize FITS object with data source and render callback
+    @fits = new astro.FITS(source, @render, opts)
   
   render: ->
+    
     # Get HDU instances
     hdus = @fits.hdus
     
     # Render DOM
     @html require('views/hdus')(hdus)
     
-    # Initialize the appropriate handler
+    # Initialize the appropriate data handler
     for hdu, index in hdus
       
       # Get type from header
       type = hdu.header.getDataType()
       
       if type?
-        # Get the host element and setup arguments
+        
+        # Get DOM element and setup arguments
         elem = $("#dataunits article:nth-child(#{index + 1}) div.container")
         args = {el: elem, hdu: hdu, index: index}
         
         handler = new @handlerConstructor[type](args)
         @hdus.push handler
+      else
+        @hdus.push null
     
     # Default to the first HDU with a dataunit
     for hdu, index in hdus
@@ -58,7 +67,7 @@ class Handler extends Spine.Controller
         @currentHDU = index
         
         # Read only the current data unit
-        @hdus[@currentHDU].readIntoMemory()
+        @hdus[@currentHDU].getData()
         break
     
     # Setup keyboard shortcuts
@@ -68,7 +77,7 @@ class Handler extends Spine.Controller
     @currentHDU = parseInt(e.target.dataset.order)
     
     # Read into memory now that user has requested these data
-    @hdus[@currentHDU].readIntoMemory()
+    @hdus[@currentHDU].getData()
     $('#dataunits article.current').removeClass('current')
     $("#dataunits article:nth-child(#{@currentHDU + 1})").addClass('current')
   
@@ -77,37 +86,6 @@ class Handler extends Spine.Controller
     @header.html require('views/header')({cards: header.cards})
     @header.toggle()
   
-  readData: (buffer) =>
-    
-    for hdu, index in @fits.hdus
-      header  = hdu.header
-      data    = hdu.data
-      
-      # Select the parent DOM element for the dataunit
-      # TODO: Remove reference to buffer
-      elem = $("#dataunits article:nth-child(#{index + 1}) div.container")
-      args = {el: elem, hdu: hdu, index: index}
-      
-      # Initialize the appropriate handler for the HDU
-      if header.isPrimary()
-        if header.hasDataUnit()
-          if data.isDataCube()
-            new Cube args
-          else
-            # Testing sockets with Image class only
-            args.socket = @socket if @socket
-            new Image args
-      else if header.isExtension()
-        if header['XTENSION'] is 'TABLE'
-          new Table args
-        else if header['XTENSION'] is 'BINTABLE'
-          if header.contains('ZIMAGE')
-            new Image args
-          else
-            new Table args
-        else if header.extensionType is 'IMAGE'
-          new Image args
-    
   shortcuts: (e) =>
     keyCode = e.keyCode
     switch keyCode
@@ -116,5 +94,6 @@ class Handler extends Spine.Controller
       when 39
         @currentHDU += 1 unless @currentHDU is @fits.hdus.length - 1
     @el.find("label[for='hdu#{@currentHDU}']").click()
-  
+
+
 module.exports = Handler

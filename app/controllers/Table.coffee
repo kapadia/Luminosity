@@ -1,34 +1,34 @@
-Spine = require('spine')
+{Controller} = require('spine')
 
 Cross     = require('controllers/Crossfilter')
 Histogram = require('controllers/Histogram')
 Scatter2D = require('controllers/Scatter2D')
 Scatter3D = require('controllers/Scatter3D')
 
-class Table extends Spine.Controller
+class Table extends Controller
   @binary = /(\d*)([BIJKED])/
   @ascii = /([IFED])(\d+)\.*(\d+)*/
+  inMemory: false
   
   elements:
     'input[name=number]'  : 'rowNumber'
   
-  events:
-    'click .fits-table th' : 'sortByColumn'
+  # events:
+  #   'click .fits-table th' : 'sortByColumn'
   
   constructor: ->
     super
-    @rows = @hdu.data.rows
     
+    # Get number of rows in data
+    @rows = @hdu.data.rows
     @render()
+  
+  getData: ->
+    return if @inMemory
+    @inMemory = true
     
     tableContainer = @el[0].querySelector('.table-container')
     tableContainer.addEventListener('scroll', @scroll, false)
-    
-    # Populate table with first ten rows
-    number = if @rows < 10 then @rows else 10
-    data = []
-    while number--
-      data.push @hdu.data.getRow()
     
     # Create table header using document fragments
     thead = document.querySelector("article:nth-child(#{@index + 1}) .table-container thead")
@@ -52,10 +52,16 @@ class Table extends Spine.Controller
       fragment.appendChild(th)
     thead.appendChild(fragment)
     
-    # Place initial data in table
-    @tbody = d3.select("article:nth-child(#{@index + 1}) .table-container tbody")
-    @renderRows(data)
+    # Populate table with first ten rows
+    rows = if @rows < 10 then @rows else 10
     
+    # Place initial data in table
+    dataunit = @hdu.data
+    dataunit.getRows(0, rows, (data) =>
+      @renderRows(data)
+    )
+    
+    @tbody = d3.select("article:nth-child(#{@index + 1}) .table-container tbody")
     window.addEventListener('keydown', @shortcuts, false)
     
     # Initialize a plot controllers
@@ -70,6 +76,8 @@ class Table extends Spine.Controller
     
     @scatter3dElem = $("article:nth-child(#{index}) .three")
     @scatter3d = new Scatter3D({el: @scatter3dElem, hdu: @hdu, index: @index, columns: columns})
+    
+    return
     
     # Setup crossfilter object and hook up events
     setTimeout =>
@@ -89,8 +97,8 @@ class Table extends Spine.Controller
       
       @cross.bind 'dataFiltered', @renderRows
     , 0
-    
-  render: =>
+  
+  render: ->
     info = {index: @index}
     @html require('views/table')(info)
   
@@ -120,14 +128,14 @@ class Table extends Spine.Controller
     dataunit = @hdu.data
     cols = dataunit.cols
     
-    pattern = if header['XTENSION'] is 'TABLE' then Table.ascii else Table.binary
+    pattern = if header.get('XTENSION') is 'TABLE' then Table.ascii else Table.binary
     
     for i in [1..cols]
       form = "TFORM#{i}"
       type = "TTYPE#{i}"
-      match = header[form].match(pattern)
+      match = header.get(form).match(pattern)
       if match?
-        columns[header[type]] = i - 1
+        columns[header.get(type)] = i - 1
     return columns
   
   sortByColumn: (e) ->
@@ -140,7 +148,7 @@ class Table extends Spine.Controller
     scrollTop     = e.target.scrollTop
     
     state = clientHeight is scrollHeight - scrollTop
-    @cross.onScroll() if state
+    # @cross.onScroll() if state
   
   shortcuts: (e) =>
     keyCode = e.keyCode

@@ -2,14 +2,23 @@ Handler = require('controllers/Handler')
 
 class Drop extends Spine.Controller
   
+  validExtensions: ['fits', 'fit', 'fz']
+  tutorialPath: 'tutorial/demo.fits'
   
   events:
     'click .arrow'    : 'beginTutorial'
-
-  @getExtension: (filename) -> filename.split('.').pop()
-
+  
+  
   constructor: ->
     super
+    
+    # Determine hostname and port for sockets
+    if location.hostname is '0.0.0.0'
+      @hostname = '0.0.0.0'
+      @port = 5000
+    else
+      @hostname = 'weakforce.herokuapp.com'
+      @port = 80
     
     info = require('lib/info')
     @html require('views/drop')(info)
@@ -27,21 +36,26 @@ class Drop extends Spine.Controller
   
   enable: -> @disabled = false
   
-  handleDragOver: (e) ->
+  blockEvent: (e) ->
     e.stopPropagation()
     e.preventDefault()
+  
+  getExtension: (filename) ->
+    filename.split('.').pop()
+  
+  handleDragOver: (e) =>
+    @blockEvent(e)
     $("#drop").addClass('over')
   
   handleDragLeave: (e) ->
-    e.stopPropagation()
-    e.preventDefault()
+    @blockEvent(e)
     $("#drop").removeClass('over')
   
   handleDrop: (e) =>
-    e.stopPropagation()
-    e.preventDefault()
+    @blockEvent(e)
     return null if @disabled
     
+    # Get the file list
     files = e.dataTransfer.files
     
     # Check that only one file is being imported
@@ -49,70 +63,31 @@ class Drop extends Spine.Controller
       alert 'Please load only one file.'
       return null
     
+    # Get the file from the list
     file = files[0]
     
     # Check the extension
-    ext = Drop.getExtension(file.name)
-    unless ext.toLowerCase() in ['fits', 'fit', 'fz']
+    ext = @getExtension(file.name)
+    unless ext.toLowerCase() in @validExtensions
       alert 'This does not seem to be a FITS file'
       return null
     
     # Initialize FITS File object using native File instance
-    handler = new Handler({el: @el}, file)
-    
-    # # Read the file
-    # reader = new FileReader()
-    # 
-    # reader.onprogress = (e) =>
-    #   if e.lengthComputable
-    #     progress = document.querySelector("#loading progress")
-    #     loaded = e.loaded
-    #     total = e.total
-    #     percent = Math.round(100 * (loaded / total))
-    #     if percent < 100
-    #       progress.value = percent
-    # 
-    # reader.onloadend = (e) =>
-    #   if e.target.readyState is FileReader.DONE
-    #     buffer = e.target.result
-    #     window.removeEventListener('keydown', @shortcuts, false)
-    #     handler = new Handler({el: @el})
-    #     handler.readBuffer(buffer)
-    #     
-    # reader.readAsArrayBuffer(file)
-    # $("#loading").show()
+    handler = new Handler(null, file)
+    window.removeEventListener('keydown', @shortcuts, false)
   
   beginTutorial: =>
-    xhr = new XMLHttpRequest()
-    xhr.open('GET', 'tutorial/demo.fits')
-    xhr.responseType = 'arraybuffer'
-    xhr.onload = =>
-      window.removeEventListener('keydown', @shortcuts, false)
-      handler = new Handler({el: @el})
-      handler.readBuffer(xhr.response)
-    xhr.send()
+    handler = new Handler(null, @tutorialPath)
   
   startSocket: (e) =>
-    e.preventDefault()
+    @blockEvent(e)
     
     unless @socket?
-      if location.hostname is '0.0.0.0'
-        @socket = io.connect('0.0.0.0', {port: 5000})
-      else
-        @socket = io.connect('weakforce.herokuapp.com', {port: 80})
-        
+      @socket = io.connect(@hostname, {port: @port})
     
     @socket.on('status', (data) =>
-      
-      # Test with tutorial image
-      xhr = new XMLHttpRequest()
-      xhr.open('GET', 'tutorial/demo.fits')
-      xhr.responseType = 'arraybuffer'
-      xhr.onload = =>
-        window.removeEventListener('keydown', @shortcuts, false)
-        handler = new Handler({el: @el, socket: @socket})
-        handler.readBuffer(xhr.response)
-      xhr.send()
+      window.removeEventListener('keydown', @shortcuts, false)
+      handler = new Handler({socket: @socket}, @tutorialPath)
     )
   
   shortcuts: (e) =>

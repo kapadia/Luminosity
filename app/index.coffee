@@ -28,7 +28,9 @@ class Luminosity extends Controller
       reqStyle.display = 'block'
       reqStyle.opacity = 1
   
+  # TODO: Double check all the native APIs that are used.
   browserCheck: ->
+    
     # Check for native objects
     checkFile = File?
     checkFileReader = FileReader?

@@ -16,35 +16,32 @@ class Image extends Controller
   events:
     'change .stretch' : 'onStretch'
   
+  
   constructor: ->
     super
+    
+    # Get common parameters describing data
+    @width = @hdu.header.get('NAXIS1')
+    @height = @hdu.header.get('NAXIS2')
     
     @html require('views/image')()
     
     # Get DOM elements
     @stretch  = @el[0].querySelector('.stretch')
     
-    @bind 'dataready', @finishSetup
+    @bind 'data-ready', @draw
     
     # Setup sockets if there is a socket instance
     @setupSockets() if @socket?
   
-  # Function should be explicitly called only once.
-  readIntoMemory: ->
-    return if @inMemory
-    
+  getData: ->
     dataunit = @hdu.data
-    dataunit.start(@getFrame, @, dataunit)
-    @width = dataunit.width
-    @height = dataunit.height
-  
-  getFrame: (dataunit) ->
-    @inMemory = true
     
-    dataunit.getFrameAsync(0, (arr) =>
+    dataunit.getFrame(0, (arr) =>
+      
       $(".read-image").hide()
       dataunit.getExtent(arr)
-      @trigger 'dataready', arr
+      @trigger 'data-ready', arr
     )
   
   setupSockets: ->
@@ -65,7 +62,7 @@ class Image extends Controller
   onStretch: (e) =>
     @wfits.setStretch(e.target.value)
   
-  finishSetup: (arr) ->
+  draw: (arr) ->
     
     # Setup histogram
     @computeHistogram(arr)
