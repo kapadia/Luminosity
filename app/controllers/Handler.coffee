@@ -28,11 +28,8 @@ class Handler extends Controller
   constructor: (args, source)->
     super
     
-    # Set up options for callback
-    opts = {context: @}
-    
     # Initialize FITS object with data source and render callback
-    @fits = new astro.FITS(source, @render, opts)
+    @fits = new astro.FITS(source, @render, {context: @})
   
   render: ->
     

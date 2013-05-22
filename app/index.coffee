@@ -6,18 +6,13 @@ Drop  = require('controllers/Drop')
 
 class Luminosity extends Controller
   
-  elements:
-    '#luminosity' : 'luminosity'
-  
   
   constructor: ->
     super
     
-    # Include the DOM from main
-    @html require('views/main')()
-    
     # Initialize controllers
-    drop = new Drop({el: @luminosity})
+    @el = $('#luminosity')
+    drop = new Drop({el: @el})
     
     # Check for compatibility
     # TODO: Implement using css checked attribute (keeps styles outside of JS)

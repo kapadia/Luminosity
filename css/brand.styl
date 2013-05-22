@@ -1,0 +1,47 @@
+
+header, .select-hdu
+  position fixed
+  color $white
+
+header
+  width 88%
+  background-color $black
+  z-index 1
+  height 20px
+  padding 10px 6%
+  
+  .small
+    font-size 11px
+    padding-left 10px
+  
+  a
+    color $white
+    text-decoration none
+    
+    &:visited
+      color $white
+    
+    &:hover
+      color $blue
+
+.select-hdu
+  z-index 2
+  right 0
+  overflow hidden
+  cursor pointer
+  overflow hidden
+  height 20px
+  
+  padding 10px 6% 10px 0
+  transition all 200 linear
+  
+  &:hover
+    color red
+    height 300px
+  
+  .options
+    padding-top 20px
+    font-size 11px
+    
+    li
+      line-height 20px

@@ -1,8 +1,8 @@
-Spine   = require('spine')
-WebGL   = require('lib/WebGL')
-Shaders = require('lib/Shaders')
 
-class Cube extends Spine.Controller
+{Controller} = require('spine')
+
+
+class Cube extends Controller
   viewportWidth: 600
   viewportHeight: 800
   radius: 14

@@ -1,8 +1,4 @@
-<div class='fits-viewer'>
-  <div class='spinner'>
-    <img src="css/images/spinner.gif" />
-  </div>
-</div>
+<div class='fits-viewer'></div>
 
 <div class='tools'>
   <div class='info'>

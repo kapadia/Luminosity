@@ -42,6 +42,7 @@ class Image extends Controller
       $(".read-image").hide()
       dataunit.getExtent(arr)
       @trigger 'data-ready', arr
+      
     )
   
   setupSockets: ->
@@ -63,6 +64,7 @@ class Image extends Controller
     @wfits.setStretch(e.target.value)
   
   draw: (arr) ->
+    @unbind 'data-ready', @draw
     
     # Setup histogram
     @computeHistogram(arr)

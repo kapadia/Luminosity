@@ -47,7 +47,7 @@ class Drop extends Spine.Controller
     @blockEvent(e)
     $("#drop").addClass('over')
   
-  handleDragLeave: (e) ->
+  handleDragLeave: (e) =>
     @blockEvent(e)
     $("#drop").removeClass('over')
   

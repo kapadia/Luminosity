@@ -5,6 +5,7 @@ Histogram = require('controllers/Histogram')
 Scatter2D = require('controllers/Scatter2D')
 Scatter3D = require('controllers/Scatter3D')
 
+
 class Table extends Controller
   @binary = /(\d*)([BIJKED])/
   @ascii = /([IFED])(\d+)\.*(\d+)*/

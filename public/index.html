@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html>
 <head>
   <meta name="description" content="Luminosity is a web application for visualizing astronomical data in the FITS format. It renders images, tabular data, and data cubes." />
@@ -6,17 +5,30 @@
   <meta name="author" content="Amit Kapadia" />
   <meta charset="UTF-8" />
   <title>Luminosity &ndash; Astronomical Visualization</title>
-  <!-- <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Open+Sans:300,400,600,400italic,700|Open+Sans+Condensed:700,300" type="text/css" charset="utf-8"> -->
   <link rel="stylesheet" href="/application.css" type="text/css" charset="utf-8">
-  <!-- <script type="text/javascript" src="core/embed.js"></script> -->
   <script src="/application.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript" charset="utf-8">
     var exports = this;
     Zepto(function(){
       var Luminosity = require("index");
-      exports.app = new Luminosity({el: $("body")});
+      exports.app = new Luminosity({el: $("#luminosity")});
     });
   </script>
 </head>
-<body></body>
+<body>
+  <header>
+    Luminosity<span class='small'><a href='http://www.astrojs.org'>an astrojs project</a></span>
+  </header>
+  <div class='select-hdu'>
+    <span>select hdu</span>
+    <div class='options'>
+      <li>Option 1</li>
+      <li>Option 1</li>
+      <li>Option 1</li>
+      <li>Option 1</li>
+    </div>
+  </div>
+  
+  <div id='luminosity'></div>
+</body>
 </html>
