@@ -1,28 +1,27 @@
 <div class='fits-viewer'></div>
 
 <div class='tools'>
-  <div class='info'>
-  <table>
-    <tr>
-      <td>x</td>
-      <td class='x'></td>
-    </tr>
-    <tr>
-      <td>y</td>
-      <td class='y'></td>
-    </tr>
-    <tr>
-      <td>pixel</td>
-      <td class='pixel'></td>
-    </tr>
-  </table>
+  <div class='button'></div>
+  <div class='options'>
+    
+    <input type='radio' name='stretch-fn' id='linear-<%-@index %>' checked='checked' />
+    <label for='linear-<%-@index %>' data-fn='linear'></label>
+    
+    <input type='radio' name='stretch-fn' id='logarithm-<%-@index %>' value='logarithm' />
+    <label for='logarithm-<%-@index %>' data-fn='logarithm'></label>
+    
+    <input type='radio' name='stretch-fn' id='sqrt-<%-@index %>' value='sqrt' />
+    <label for='sqrt-<%-@index %>' data-fn='sqrt'></label>
+    
+    <input type='radio' name='stretch-fn' id='arcsinh-<%-@index %>' value='arcsinh' />
+    <label for='arcsinh-<%-@index %>' data-fn='arcsinh'></label>
+    
+    <input type='radio' name='stretch-fn' id='power-<%-@index %>' value='power' />
+    <label for='power-<%-@index %>' data-fn='power'></label>
+    
   </div>
-  <div class='histogram'></div>
-  <select class='stretch'>
-    <option value="linear">Linear</option>
-    <option value="logarithm">Logarithm</option>
-    <option value="sqrt">Square Root</option>
-    <option value="arcsinh">Arcsinh</option>
-    <option value="power">Power</option>
-  </select>
+  
+  <div class='button'></div>
+  
 </div>
+<div class='histogram'></div>

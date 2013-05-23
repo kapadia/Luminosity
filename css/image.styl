@@ -38,8 +38,45 @@ progress
     width 200px
     height 20px
 
-.spinner
-  display none
+.tools
   position absolute
-  top 316px
-  left 500px
+  top 0
+  right 0
+  background-color $gray2
+  width 40px
+  height 40px
+  overflow hidden
+  transition all 200
+  
+  &:hover
+    width 80px
+    height 160px
+  
+  .button
+    position absolute
+    top 0
+    right 0
+    width 40px
+    height 40px
+    
+    background-color $blue
+  
+  input[name='stretch-fn']
+    display none
+    
+    &:checked + label
+      background #333
+      border-color #333 !important
+      
+  label
+    display block
+    width 20px
+    height 20px
+    margin 10px
+    background-color $blue
+    cursor pointer
+    transition all 100 ease-out
+    
+    &:hover
+      background-color $blue2
+

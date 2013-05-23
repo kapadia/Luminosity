@@ -14,7 +14,9 @@ class Image extends Controller
     '.info'         : 'info'
   
   events:
-    'change .stretch' : 'onStretch'
+    'click .options label'      : 'onStretch'
+    'mouseover .options label'  : 'onStretch'
+    'mouseleave .options'       : 'resetStretch'
   
   
   constructor: ->
@@ -24,10 +26,13 @@ class Image extends Controller
     @width = @hdu.header.get('NAXIS1')
     @height = @hdu.header.get('NAXIS2')
     
-    @html require('views/image')()
+    @html require('views/image')({index: @index})
     
-    # Get DOM elements
-    @stretch  = @el[0].querySelector('.stretch')
+    # Set current stretch
+    # APPSTATE: Storing on controller for now.  Find better way
+    #           preserve application state.
+    @currentStretch = 'linear'
+    
     
     @bind 'data-ready', @draw
     
@@ -61,7 +66,13 @@ class Image extends Controller
     )
   
   onStretch: (e) =>
-    @wfits.setStretch(e.target.value)
+    stretch = e.target.dataset.fn
+    if e.type is 'click'
+      @currentStretch = stretch
+    @wfits.setStretch(stretch)
+  
+  resetStretch: (e) =>
+    @wfits.setStretch(@currentStretch)
   
   draw: (arr) ->
     @unbind 'data-ready', @draw
