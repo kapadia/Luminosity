@@ -6,6 +6,7 @@ Cube            = require('controllers/Cube')
 Table           = require('controllers/Table')
 CompressedImage = require('controllers/CompressedImage')
 
+
 class Handler extends Controller
   el: '#luminosity'
   
@@ -39,11 +40,16 @@ class Handler extends Controller
     # Render DOM
     @html require('views/hdus')(hdus)
     
+    # Set up HDU selection
+    $(".select-hdu").removeClass('hide')
+    optionsHDU = $(".select-hdu ul")
+    
     # Initialize the appropriate data handler
     for hdu, index in hdus
       
       # Get type from header
       type = hdu.header.getDataType()
+      optionsHDU.append("<li data-index='#{index}'>#{type}</li>")
       
       if type?
         
@@ -69,14 +75,18 @@ class Handler extends Controller
     
     # Setup keyboard shortcuts
     window.addEventListener('keydown', @shortcuts, false)
+    
+    $(".select-hdu li").on('click', (e) => @setHDU(e) )
   
   setHDU: (e) =>
-    @currentHDU = parseInt(e.target.dataset.order)
+    @currentHDU = parseInt(e.target.dataset.index)
     
-    # Read into memory now that user has requested these data
-    @hdus[@currentHDU].getData()
+    # Update DOM
     $('#dataunits article.current').removeClass('current')
     $("#dataunits article:nth-child(#{@currentHDU + 1})").addClass('current')
+    
+    # Read into memory now that user has requested data
+    @hdus[@currentHDU].getData()
   
   showHeader: (index) =>
     header = @fits.getHDU(index).header

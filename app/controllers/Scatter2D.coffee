@@ -10,6 +10,7 @@ class Scatter2D extends Graph
     "change select[data-axis='2']"  : 'draw'
     "click  button[name='save']"    : 'savePlot'
   
+  
   draw: =>
     index1 = @axis1.val()
     index2 = @axis2.val()
@@ -38,16 +39,27 @@ class Scatter2D extends Graph
     @data = []
     
     dataunit = @hdu.data
-    
-    # TODO: This is an expensive operation.  Ship off to worker, or find way
-    #       to do it asynchronously.
     rows = dataunit.rows
-    for i in [1..rows]
-      row = dataunit.getRow(i - 1)
-      datum = {}
-      datum[@key1] = row[@key1]
-      datum[@key2] = row[@key2]
-      @data.push datum
+    
+    dfd1 = new jQuery.Deferred()
+    dfd2 = new jQuery.Deferred()
+    $.when(dfd1, dfd2).then(@_draw, @no)
+    
+    dataunit.getColumn(@key1, 0, rows - 1, (column) =>
+      # c = {@key1: column}
+      # dfd1.resolve(x)
+    )
+    
+    dataunit.getColumn(@key2, 0, rows - 1, (column) =>
+      # c = {@key2: column}
+      # console.log c
+      # dfd2.resolve(x)
+    )
+  
+  _draw: (column1, column2) =>
+    # console.log 'go', arguments, arguments[0], arguments[1]
+    
+    
     
     margin =
       top: 20
@@ -117,6 +129,10 @@ class Scatter2D extends Graph
         .attr('cy', (d) => return @y(d[@key2]))
         .on('mouseover', @showInfo)
         .on('mouseout', @hideInfo)
+    
+  
+  no: =>
+    console.log 'no'
   
   showInfo: (d, i) =>
     item = d3.select(@svg.selectAll(".dot")[0][i])

@@ -1,18 +1,8 @@
-<div id='header' class='modal'></div>
-<div id='info'></div>
-
-<div id="controls">
-  <% for hdu, index in @: %>
-  <input type='radio' name='hdu' id='hdu<%-index %>' />
-  <label for='hdu<%-index %>' data-order='<%-index %>'></label>
-  <% end %>
-</div>
-
 <div id='overflow'>
   <div id='dataunits'>
     <% for hdu, index in @: %>
     <% type = if hdu.header.extensionType? then hdu.header.extensionType.toLowerCase() else 'primary' %>
-    <article class='<%- type %>'>
+    <article class='<%- hdu.header.getDataType()?.toLowerCase() %>'>
       <div class='container'></div>
     </article>
     <% end %>

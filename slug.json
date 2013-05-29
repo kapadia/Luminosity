@@ -10,7 +10,7 @@
   "libs": [
     "./vendor/fits.js",
     "./vendor/webfits.js",
-    "./vendor/zepto.js",
+    "./vendor/jquery.js",
     "./vendor/d3.js",
     "./vendor/vega.js",
     "./vendor/three.js",

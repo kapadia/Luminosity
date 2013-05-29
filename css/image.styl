@@ -1,82 +1,56 @@
-#info
-  position fixed
-  display none
-  width 120px
-  height 30px
-  z-index 2000
-  font-size 11px
-
-canvas
-  padding 0
-  margin 0
-
-.dataunit
-  float left
-  width 1000px
-  
-.histogram
-  float left
-  
 .brush .extent
   fill $blue
   stroke #fff
   fill-opacity 0.125
   shape-rendering crispEdges
 
-.fits-viewer
-  float left
-  border 1px solid $red
+.viewport
   width 600px
   height 600px
   cursor crosshair
-  
-  canvas
-    position relative
-
-progress
-  .read-image
-    width 200px
-    height 20px
+  float left
 
 .tools
-  position absolute
-  top 0
-  right 0
-  background-color $gray2
-  width 40px
-  height 40px
-  overflow hidden
-  transition all 200
+  float right
+  border 1px solid $blue
   
-  &:hover
-    width 80px
-    height 160px
-  
-  .button
-    position absolute
-    top 0
-    right 0
-    width 40px
-    height 40px
-    
-    background-color $blue
-  
-  input[name='stretch-fn']
-    display none
-    
-    &:checked + label
-      background #333
-      border-color #333 !important
+  .stretch
+    float right
+    .options
       
-  label
-    display block
-    width 20px
-    height 20px
-    margin 10px
-    background-color $blue
-    cursor pointer
-    transition all 100 ease-out
-    
-    &:hover
-      background-color $blue2
+      input[name='stretch-fn']
+        display none
 
+        &:checked + label
+          background #333
+          border-color #333 !important
+
+      label
+        display inline-block
+        width 20px
+        height 20px
+        margin 6px
+        background-color $blue
+        cursor pointer
+        transition all 100 ease-out
+
+        &:hover
+          background-color $blue2
+  
+  .row
+    display block
+    
+    .info
+      float left
+      
+      .row
+        display table-row
+        
+        .key, .value
+          display table-cell
+          text-align left
+        
+        .key
+          text-align right
+          font-weight 700
+          padding-right 10px

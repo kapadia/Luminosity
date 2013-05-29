@@ -11,11 +11,10 @@ class Table extends Controller
   @ascii = /([IFED])(\d+)\.*(\d+)*/
   inMemory: false
   
+  
   elements:
     'input[name=number]'  : 'rowNumber'
   
-  # events:
-  #   'click .fits-table th' : 'sortByColumn'
   
   constructor: ->
     super
@@ -36,25 +35,14 @@ class Table extends Controller
     fragment = document.createDocumentFragment()
     for column, index in @hdu.data.columns
       th = document.createElement('th')
-      
       id = "th-#{@index}-#{index}"
-      
-      input = document.createElement('input')
-      input.setAttribute('id', id)
-      input.setAttribute('type', 'checkbox')
-      
-      label = document.createElement('label')
-      label.setAttribute('for', id)
-      
       th.appendChild(document.createTextNode(column))
-      th.appendChild(input)
-      th.appendChild(label)
-      
       fragment.appendChild(th)
+    
     thead.appendChild(fragment)
     
     # Populate table with first ten rows
-    rows = if @rows < 10 then @rows else 10
+    rows = if @rows < 14 then @rows else 14
     
     # Place initial data in table
     dataunit = @hdu.data

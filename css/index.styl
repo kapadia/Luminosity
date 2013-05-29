@@ -10,7 +10,6 @@ $gray1  = #F3F3F3
 $gray2  = #E5E5E5
 $gray3  = #CFCFCF
 $gray4  = #505050
-$gray5  = #FAFAFA
 
 @import './mixin'
 @import './brand'
@@ -21,10 +20,14 @@ $gray5  = #FAFAFA
 @import './table'
 @import './plots'
 
+
+.hide
+  display none
+
+
 html, body
   margin 0 auto
-  background $gray4
-  color $black
+  background $white
   font-size 12px
   font-family 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif
   
@@ -32,58 +35,34 @@ html, body
   margin 0 2%
   padding-top 40px
   
-  #controls
-    height 4%
-    padding-top 1%
-    text-align center
-    
-    input[name='hdu']
-      display none
-      
-      &:checked + label
-        background #333
-        border-color #333 !important
-    
-    label
-      border-radius 6px
-      display inline-block
-      width 12px
-      height 12px
-      background #BBB
-      cursor pointer
-      transition all 0.8s ease-out
+#overflow
+  width 100%
+  overflow-x hidden
   
-  #overflow
-    width 100%
-    height 94%
-    overflow hidden
+#dataunits
+  width 400%
+  height 94%
+  position relative
+  
+  article
+    position absolute
+    padding 20px 0
+    left -110%
+    margin 0
+    width 25%
+    opacity 0
+    transition all 800ms cubic-bezier(0.770, 0.000, 0.175, 1.000)
     
-    #dataunits
-      width 400%
-      height 100%
-      position relative
-      background $gray5
-      box-shadow 1px 1px 2px #666
-      
-      article
-        position absolute
-        left -110%
-        margin 0
-        width 25%
-        height 100%
-        opacity 0
-        transition all 800ms cubic-bezier(0.770, 0.000, 0.175, 1.000)
-
-        -webkit-transition-timing-function cubic-bezier(0.770, 0.000, 0.175, 1.000)
-        -moz-transition-timing-function cubic-bezier(0.770, 0.000, 0.175, 1.000)
-        transition-timing-function cubic-bezier(0.770, 0.000, 0.175, 1.000)
-        
-        div.container
-          margin 0 auto
-      
-      article.current
-        left 0
-        opacity 1
-
-      article.current ~ article
-        left 110%
+    -webkit-transition-timing-function cubic-bezier(0.770, 0.000, 0.175, 1.000)
+    -moz-transition-timing-function cubic-bezier(0.770, 0.000, 0.175, 1.000)
+    transition-timing-function cubic-bezier(0.770, 0.000, 0.175, 1.000)
+    
+    div.container
+      margin 0 auto
+    
+  article.current
+    left 0
+    opacity 1
+  
+  article.current ~ article
+    left 110%

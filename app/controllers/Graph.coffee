@@ -61,14 +61,6 @@ class Graph extends Spine.Controller
     
     @el.width(width + dx)
     @el.height(height + dy)
-    
-    
-    
-    
-    
-    
-    
-  
   
   zoom: =>
     @svg.select(".x.axis").call(@xAxis)

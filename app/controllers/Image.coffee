@@ -7,11 +7,11 @@ class Image extends Controller
   inMemory: false
   
   elements:
-    '.fits-viewer'  : 'viewport'
-    '.x'            : 'xEl'
-    '.y'            : 'yEl'
-    '.pixel'        : 'pixelEl'
-    '.info'         : 'info'
+    '.viewport' : 'viewport'
+    '.x'        : 'xEl'
+    '.y'        : 'yEl'
+    '.pixel'    : 'pixelEl'
+    '.info'     : 'info'
   
   events:
     'click .options label'      : 'onStretch'
@@ -78,8 +78,8 @@ class Image extends Controller
     @unbind 'data-ready', @draw
     
     # Setup histogram
-    @computeHistogram(arr)
-    @drawHistogram()
+    # @computeHistogram(arr)
+    # @drawHistogramII(arr, @hdu.data.min, @hdu.data.max)
     
     # Create a WebFITS object
     @wfits = new astro.WebFITS(@viewport[0], 600)
@@ -87,6 +87,60 @@ class Image extends Controller
     @wfits.loadImage("visualization-#{@index}", arr, @width, @height)
     @wfits.setExtent(@hdu.data.min, @hdu.data.max)
     @wfits.setStretch('linear')
+  
+  drawHistogramII: (arr, min, max) ->
+    nBins = 100
+    
+    
+    # Cast to normal array
+    values = []
+    for value, index in arr
+      values[index] = value
+    
+    selector = "article:nth-child(#{@index + 1}) .histogram"
+    
+    formatCount = d3.format(",.0f")
+    margin = {top: 10, right: 30, bottom: 30, left: 30}
+    width = 400 - margin.left - margin.right
+    height = 300 - margin.top - margin.bottom
+    
+    x = d3.scale.linear()
+      .domain(d3.extent(values))
+      .range([0, width])
+    
+    data = d3.layout.histogram()
+      .bins(x.ticks(nBins))(values)
+    
+    y = d3.scale.linear()
+      .domain([0, d3.max(data, (d) -> return d.y)])
+      .range([height, 0])
+    
+    xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom")
+      .ticks(6)
+    
+    svg = d3.select(selector).append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+      .attr("transform", "translate(#{margin.left}, #{margin.top})")
+    
+    bar = svg.selectAll(".bar")
+      .data(data)
+    .enter().append("g")
+      .attr("class", "bar")
+      .attr("transform", (d) -> return "translate(#{x(d.x)}, #{y(d.y)})")
+    
+    bar.append("rect")
+      .attr("x", 1)
+      .attr("width", 1)
+      .attr("height", (d) -> return height - y(d.y))
+    
+    svg.append("g")
+      .attr("class", "x axis")
+      .attr("transform", "translate(0, #{height})")
+      .call(xAxis)
   
   # TODO: Possible optimization using a radix sort
   computeHistogram: (arr) ->

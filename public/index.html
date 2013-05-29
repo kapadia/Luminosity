@@ -9,7 +9,7 @@
   <script src="/application.js" type="text/javascript" charset="utf-8"></script>
   <script type="text/javascript" charset="utf-8">
     var exports = this;
-    Zepto(function(){
+    jQuery(function(){
       var Luminosity = require("index");
       exports.app = new Luminosity({el: $("#luminosity")});
     });
@@ -19,14 +19,9 @@
   <header>
     Luminosity<span class='small'><a href='http://www.astrojs.org'>an astrojs project</a></span>
   </header>
-  <div class='select-hdu'>
-    <span>select hdu</span>
-    <div class='options'>
-      <li>Option 1</li>
-      <li>Option 1</li>
-      <li>Option 1</li>
-      <li>Option 1</li>
-    </div>
+  <div class='select-hdu hide'>
+    <span>HDUs</span>
+    <ul></ul>
   </div>
   
   <div id='luminosity'></div>
