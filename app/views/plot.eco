@@ -1,7 +1,3 @@
-<div class='resize' data-corner='tl'></div>
-<div class='resize' data-corner='tr'></div>
-<div class='resize' data-corner='bl'></div>
-<div class='resize' data-corner='br'></div>
 <div class='heading'>
   <h3><%- @name %></h3>
   <% unless @name is 'Scatter 3D': %>
