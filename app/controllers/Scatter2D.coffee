@@ -46,20 +46,24 @@ class Scatter2D extends Graph
     $.when(dfd1, dfd2).then(@_draw, @no)
     
     dataunit.getColumn(@key1, 0, rows - 1, (column) =>
-      # c = {@key1: column}
-      # dfd1.resolve(x)
+      obj = new Object()
+      obj[@key1] = column
+      dfd1.resolve(obj)
     )
     
     dataunit.getColumn(@key2, 0, rows - 1, (column) =>
-      # c = {@key2: column}
-      # console.log c
-      # dfd2.resolve(x)
+      obj = new Object()
+      obj[@key2] = column
+      dfd2.resolve(obj)
     )
   
   _draw: (column1, column2) =>
-    # console.log 'go', arguments, arguments[0], arguments[1]
     
-    
+    # Merge the two objects
+    if column1.hasOwnProperty(@key1)
+      column1[@key2] = column2[@key2]
+    else
+      column1[@key1] = column1[@key1]
     
     margin =
       top: 20
@@ -70,66 +74,65 @@ class Scatter2D extends Graph
     width = @el.width() - margin.left - margin.right - parseInt(@el.css('padding-left')) - parseInt(@el.css('padding-right'))
     height = @el.height() - margin.top - margin.bottom - parseInt(@el.css('padding-top')) - parseInt(@el.css('padding-bottom'))
     
-    @x = d3.scale.linear()
-      .range([0, width])
-      .domain(d3.extent(@data, (d) => return d[@key1]))
-    @y = d3.scale.linear()
-      .range([height, 0])
-      .domain(d3.extent(@data, (d) => return d[@key2]))
-    
-    @xAxis = d3.svg.axis()
-      .scale(@x)
-      .ticks(6)
-      .orient("bottom")
-    @yAxis = d3.svg.axis()
-      .scale(@y)
-      .ticks(6)
-      .orient("left")
-    
-    @svg = d3.select("article:nth-child(#{@index + 1}) .two .graph").append('svg')
-            .attr('width', width + margin.left + margin.right)
-            .attr('height', height + margin.top + margin.bottom)
-            .call(d3.behavior.zoom().x(@x).y(@y).scaleExtent([1, 8]).on("zoom", @zoom))
-          .append('g')
-            .attr('transform', "translate(#{margin.left}, #{margin.top})")
-    @svg.append("g")
-        .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
-        .call(@xAxis)
-      .append("text")
-        .attr("class", "label")
-        .attr("x", width)
-        .attr("y", -6)
-        .style("text-anchor", "end")
-        .text(xlabel)
-    @svg.append("g")
-        .attr("class", "y axis")
-        .call(@yAxis)
-      .append("text")
-        .attr("class", "label")
-        .attr("transform", "rotate(-90)")
-        .attr("y", 6)
-        .attr("dy", ".71em")
-        .style("text-anchor", "end")
-        .text(ylabel)
-    
-    @svg.append('g')
-      .attr('class', 'brush')
-      .call(d3.svg.brush().x(@x).y(@y)
-      .on('brushstart', @brushstart)
-      .on('brush', @brushmove)
-      .on('brushend', @brushend))
-    
-    @circles = @svg.append('g').selectAll('circle')
-        .data(@data)
-      .enter().append('circle')
-        .attr('class', 'dot')
-        .attr('r', 1.5)
-        .attr('cx', (d) => return @x(d[@key1]))
-        .attr('cy', (d) => return @y(d[@key2]))
-        .on('mouseover', @showInfo)
-        .on('mouseout', @hideInfo)
-    
+    # @x = d3.scale.linear()
+    #   .range([0, width])
+    #   .domain(d3.extent(column1[@key1])
+    # @y = d3.scale.linear()
+    #   .range([height, 0])
+    #   .domain(d3.extent(column1[@key2]))
+    # 
+    # @xAxis = d3.svg.axis()
+    #   .scale(@x)
+    #   .ticks(6)
+    #   .orient("bottom")
+    # @yAxis = d3.svg.axis()
+    #   .scale(@y)
+    #   .ticks(6)
+    #   .orient("left")
+    # 
+    # @svg = d3.select("article:nth-child(#{@index + 1}) .two .graph").append('svg')
+    #         .attr('width', width + margin.left + margin.right)
+    #         .attr('height', height + margin.top + margin.bottom)
+    #         .call(d3.behavior.zoom().x(@x).y(@y).scaleExtent([1, 8]).on("zoom", @zoom))
+    #       .append('g')
+    #         .attr('transform', "translate(#{margin.left}, #{margin.top})")
+    # @svg.append("g")
+    #     .attr("class", "x axis")
+    #     .attr("transform", "translate(0," + height + ")")
+    #     .call(@xAxis)
+    #   .append("text")
+    #     .attr("class", "label")
+    #     .attr("x", width)
+    #     .attr("y", -6)
+    #     .style("text-anchor", "end")
+    #     .text(xlabel)
+    # @svg.append("g")
+    #     .attr("class", "y axis")
+    #     .call(@yAxis)
+    #   .append("text")
+    #     .attr("class", "label")
+    #     .attr("transform", "rotate(-90)")
+    #     .attr("y", 6)
+    #     .attr("dy", ".71em")
+    #     .style("text-anchor", "end")
+    #     .text(ylabel)
+    # 
+    # @svg.append('g')
+    #   .attr('class', 'brush')
+    #   .call(d3.svg.brush().x(@x).y(@y)
+    #   .on('brushstart', @brushstart)
+    #   .on('brush', @brushmove)
+    #   .on('brushend', @brushend))
+    # 
+    # @circles = @svg.append('g').selectAll('circle')
+    #     .data(@data)
+    #   .enter().append('circle')
+    #     .attr('class', 'dot')
+    #     .attr('r', 1.5)
+    #     .attr('cx', (d) => return @x(d[@key1]))
+    #     .attr('cy', (d) => return @y(d[@key2]))
+    #     .on('mouseover', @showInfo)
+    #     .on('mouseout', @hideInfo)
   
   no: =>
     console.log 'no'

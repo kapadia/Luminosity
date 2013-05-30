@@ -7,11 +7,12 @@ class Image extends Controller
   inMemory: false
   
   elements:
-    '.viewport' : 'viewport'
-    '.x'        : 'xEl'
-    '.y'        : 'yEl'
-    '.pixel'    : 'pixelEl'
-    '.info'     : 'info'
+    '.viewport'           : 'viewport'
+    '[data-type="x"]'     : 'xEl'
+    '[data-type="y"]'     : 'yEl'
+    '[data-type="ra"]'    : 'raEl'
+    '[data-type="dec"]'   : 'decEl'
+    '[data-type="flux"]'  : 'fluxEl'
   
   events:
     'click .options label'      : 'onStretch'
@@ -40,8 +41,27 @@ class Image extends Controller
     @setupSockets() if @socket?
   
   getData: ->
+    header = @hdu.header
     dataunit = @hdu.data
     
+    wcsKeywords =
+      WCSAXES: header.get('WCSAXES')
+      NAXIS: header.get("NAXIS")
+      RADESYS: header.get("RADESYS")
+      CTYPE1: header.get("CTYPE1")
+      CTYPE2: header.get("CTYPE2")
+      CRPIX1: header.get("CRPIX1")
+      CRPIX2: header.get("CRPIX2")
+      CUNIT1: header.get("CUNIT1")
+      CUNIT2: header.get("CUNIT2")
+      CRVAL1: header.get("CRVAL1")
+      CRVAL2: header.get("CRVAL2")
+      CD1_1: header.get("CD1_1")
+      CD1_2: header.get("CD1_2")
+      CD2_1: header.get("CD2_1")
+      CD2_2: header.get("CD2_2")
+    
+    @wcs = new WCS.Mapper(wcsKeywords)
     dataunit.getFrame(0, (arr) =>
       
       $(".read-image").hide()
@@ -79,17 +99,44 @@ class Image extends Controller
     
     # Setup histogram
     # @computeHistogram(arr)
-    # @drawHistogramII(arr, @hdu.data.min, @hdu.data.max)
+    @drawHistogramII(arr, @hdu.data.min, @hdu.data.max)
+    
+    # Define mouse callbacks for WebFITS
+    opts =
+      arr: arr
+      width: @width
+    
+    onmousemove = (x, y, opts) =>
+      arr = opts.arr
+      width = opts.width
+      sky = @wcs.pixelToCoordinate([x, y])
+      @xEl.text(x)
+      @yEl.text(y)
+      @raEl.text(sky.ra)
+      @decEl.text(sky.dec)
+      @fluxEl.text(arr[x + width * y])
     
     # Create a WebFITS object
     @wfits = new astro.WebFITS(@viewport[0], 600)
-    @wfits.setupControls()
+    @wfits.setupControls({onmousemove: onmousemove}, opts)
     @wfits.loadImage("visualization-#{@index}", arr, @width, @height)
     @wfits.setExtent(@hdu.data.min, @hdu.data.max)
     @wfits.setStretch('linear')
   
   drawHistogramII: (arr, min, max) ->
     nBins = 100
+    
+    # Define brush events
+    brushstart = ->
+      svg.classed "selecting", true
+    brushmove = =>
+      s = d3.event.target.extent()
+      bar.classed "selected", (d) ->
+        s[0] <= d and d <= s[1]
+      
+      @wfits.setExtent(s[0], s[1])
+    brushend = ->
+      svg.classed "selecting", not d3.event.target.empty()
     
     
     # Cast to normal array
@@ -141,6 +188,18 @@ class Image extends Controller
       .attr("class", "x axis")
       .attr("transform", "translate(0, #{height})")
       .call(xAxis)
+    
+    # Append the brush
+    svg.append('g')
+      .attr('class', 'brush')
+      .attr('width', width)
+      .attr('height', height)
+      .call(d3.svg.brush().x(x)
+      .on('brushstart', brushstart)
+      .on('brush', brushmove)
+      .on('brushend', brushend))
+      .selectAll('rect')
+      .attr('height', height)
   
   # TODO: Possible optimization using a radix sort
   computeHistogram: (arr) ->

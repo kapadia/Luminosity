@@ -5,27 +5,27 @@
     <div class='info'>
       <div class='row'>
         <span class='key'>ra:</span>
-        <span class='value'>-</span>
+        <span class='value' data-type='ra'>-</span>
       </div>
       
       <div class='row'>
         <span class='key'>dec:</span>
-        <span class='value'>-</span>
+        <span class='value' data-type='dec'>-</span>
       </div>
       
       <div class='row'>
         <span class='key'>x:</span>
-        <span class='value'>-</span>
+        <span class='value' data-type='x'>-</span>
       </div>
       
       <div class='row'>
         <span class='key'>y:</span>
-        <span class='value'>-</span>
+        <span class='value' data-type='y'>-</span>
       </div>
       
       <div class='row'>
         <span class='key'>flux:</span>
-        <span class='value'>-</span>
+        <span class='value' data-type='flux'>-</span>
       </div>
       
     </div>

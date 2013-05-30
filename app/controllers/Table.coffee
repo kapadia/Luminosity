@@ -42,7 +42,7 @@ class Table extends Controller
     thead.appendChild(fragment)
     
     # Populate table with first ten rows
-    rows = if @rows < 14 then @rows else 14
+    rows = if @rows < 25 then @rows else 25
     
     # Place initial data in table
     dataunit = @hdu.data

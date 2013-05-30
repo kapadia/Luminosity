@@ -5,14 +5,16 @@
   shape-rendering crispEdges
 
 .viewport
+  float left
   width 600px
   height 600px
   cursor crosshair
-  float left
+  margin-right 40px
 
 .tools
-  float right
+  overflow hidden
   border 1px solid $blue
+  height 600px
   
   .stretch
     float right
@@ -39,6 +41,7 @@
   
   .row
     display block
+    height 50%
     
     .info
       float left
