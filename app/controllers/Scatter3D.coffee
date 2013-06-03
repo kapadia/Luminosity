@@ -10,35 +10,77 @@ class Scatter3D extends Graph
     "change select[data-axis='2']" : 'draw'
     "change select[data-axis='3']" : 'draw'
   
+  
   constructor: ->
     super
     
     @axis1 = @el.find("select[data-axis='1']")
     @axis2 = @el.find("select[data-axis='2']")
     @axis3 = @el.find("select[data-axis='3']")
-    
-    @setup()
-    @setupMouseInteractions()
 
   draw: =>
-    dataunit = @hdu.data
-    numRows = dataunit.rows
     index1 = @axis1.val()
     index2 = @axis2.val()
     index3 = @axis3.val()
+    
+    return unless index1 + index2 + index3 > -1
+    
+    @setup()
+    @setupMouseInteractions()
+    
+    dataunit = @hdu.data
+    rows = dataunit.rows
+    
+    # Set up deferreds
+    dfd1 = new jQuery.Deferred()
+    dfd2 = new jQuery.Deferred()
+    dfd3 = new jQuery.Deferred()
+    $.when(dfd1, dfd2, dfd3).then(@_draw, @no)
+    
+    # Get labels for the axes
+    @key1 = xlabel = @axis1.find("option:selected").text()
+    @key2 = ylabel = @axis2.find("option:selected").text()
+    @key3 = zlabel = @axis3.find("option:selected").text()
+    
+    # Get data from file
+    dataunit.getColumn(@key1, 0, rows - 1, (column) =>
+      obj = new Object()
+      obj[@key1] = column
+      dfd1.resolve(obj)
+    )
+    
+    dataunit.getColumn(@key2, 0, rows - 1, (column) =>
+      obj = new Object()
+      obj[@key2] = column
+      dfd2.resolve(obj)
+    )
+    
+    dataunit.getColumn(@key3, 0, rows - 1, (column) =>
+      obj = new Object()
+      obj[@key3] = column
+      dfd3.resolve(obj)
+    )
+  
+  _draw: (column1, column2, column3) =>
+    
+    # Merge objects
+    for k, v of column2
+      column1[k] = v
+    for k, v of column3
+      column1[k] = v
     
     # Construct the scatter plot
     mat = new THREE.ParticleBasicMaterial({vertexColors: true, size: 1.0, color: 0xff0000})
     pointGeo = new THREE.Geometry()
     
-    for i in [0..numRows-1]
-      row = dataunit.getRow(i)
-      x = row[index1]
-      y = row[index2]
-      z = row[index3]
-      pointGeo.vertices.push(new THREE.Vector3(x, y, z))
-      pointGeo.colors.push(new THREE.Color().setHSV(10, 84, 80))
-        
+    rows = @hdu.data.rows
+    while rows--
+      x = column1[@key1][rows]
+      y = column1[@key2][rows]
+      z = column1[@key3][rows]
+      pointGeo.vertices.push( new THREE.Vector3(x, y, z) )
+      pointGeo.colors.push( new THREE.Color().setRGB(0, 113, 229) )
+    
     points = new THREE.ParticleSystem(pointGeo, mat)
     @scatter.add(points)
     @scene.add(@scatter)
@@ -46,8 +88,7 @@ class Scatter3D extends Graph
     @renderer.render(@scene, @camera)
     @controls.update()
   
-  setup: =>
-    console.log 'setup'
+  setup: ->
     
     width = @el.width() - parseInt(@el.css('padding-left')) - parseInt(@el.css('padding-right'))
     height = @el.height() - parseInt(@el.css('padding-top')) - parseInt(@el.css('padding-bottom'))
@@ -73,14 +114,14 @@ class Scatter3D extends Graph
     
     # Construct the axes
     v = (x, y, z) => return new THREE.Vector3(x, y, z)
-    distance = 20
+    distance = 1
     labels = ['-X', 'X', '-Y', 'Y', '-Z', 'Z']
     
     Scatter3D.createAxes3D(@scatter, distance)
     
     @container.appendChild(@renderer.domElement)
     
-  setupMouseInteractions: =>
+  setupMouseInteractions: ->
     @down = false
     [@sx, @sy] = [0, 0]
     @container.onmousedown = (e) =>

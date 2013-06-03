@@ -50,11 +50,8 @@ class Scatter2D extends Graph
   
   _draw: (column1, column2) =>
     
-    # Merge the two objects
-    if column1.hasOwnProperty(@key1)
-      column1[@key2] = column2[@key2]
-    else
-      column1[@key1] = column1[@key1]
+    for k, v of column2
+      column1[k] = v
     
     # Get units if they are available
     index1 = @axis1.val()

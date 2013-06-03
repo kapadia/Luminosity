@@ -44,28 +44,23 @@ class Image extends Controller
     header = @hdu.header
     dataunit = @hdu.data
     
-    wcsKeywords =
-      WCSAXES: header.get('WCSAXES')
-      NAXIS: header.get("NAXIS")
-      RADESYS: header.get("RADESYS")
-      CTYPE1: header.get("CTYPE1")
-      CTYPE2: header.get("CTYPE2")
-      CRPIX1: header.get("CRPIX1")
-      CRPIX2: header.get("CRPIX2")
-      CUNIT1: header.get("CUNIT1")
-      CUNIT2: header.get("CUNIT2")
-      CRVAL1: header.get("CRVAL1")
-      CRVAL2: header.get("CRVAL2")
-      CD1_1: header.get("CD1_1")
-      CD1_2: header.get("CD1_2")
-      CD2_1: header.get("CD2_1")
-      CD2_2: header.get("CD2_2")
     
-    @wcs = new WCS.Mapper(wcsKeywords)
+    # Massage fitsjs header
+    # TODO: Ideally this step should not be needed
+    wcsObj = {}
+    for card, datum of header.cards
+      wcsObj[card] = datum.value
+    
+    @wcs = new WCS.Mapper(wcsObj)
     dataunit.getFrame(0, (arr) =>
       
+      # Hide DOM element
       $(".read-image").hide()
+      
+      # Compute extent
       dataunit.getExtent(arr)
+      
+      # Broadcast that data is ready
       @trigger 'data-ready', arr
       
     )
@@ -98,8 +93,7 @@ class Image extends Controller
     @unbind 'data-ready', @draw
     
     # Setup histogram
-    # @computeHistogram(arr)
-    @drawHistogramII(arr, @hdu.data.min, @hdu.data.max)
+    @drawHistogram(arr, @hdu.data.min, @hdu.data.max)
     
     # Define mouse callbacks for WebFITS
     opts =
@@ -123,8 +117,20 @@ class Image extends Controller
     @wfits.setExtent(@hdu.data.min, @hdu.data.max)
     @wfits.setStretch('linear')
   
-  drawHistogramII: (arr, min, max) ->
-    nBins = 100
+  getHistogram: (arr, min, max, bins) ->
+    range = max - min
+    
+    h = new Uint32Array(bins)
+    i = arr.length
+    while i--
+      value = arr[i]
+      index = ~~(((value - min) / range) * bins)
+      h[index] += 1
+    h.dx = range / bins
+    
+    return h
+  
+  drawHistogram: (arr, min, max) ->
     
     # Define brush events
     brushstart = ->
@@ -138,28 +144,25 @@ class Image extends Controller
     brushend = ->
       svg.classed "selecting", not d3.event.target.empty()
     
-    
-    # Cast to normal array
-    values = []
-    for value, index in arr
-      values[index] = value
-    
     selector = "article:nth-child(#{@index + 1}) .histogram"
-    
+    histogram = @getHistogram(arr, min, max, 1000)
     formatCount = d3.format(",.0f")
-    margin = {top: 10, right: 30, bottom: 30, left: 30}
-    width = 400 - margin.left - margin.right
+    
+    margin =
+      top: 10
+      right: 30
+      bottom: 30
+      left: 30
+    
+    width = 600 - margin.left - margin.right
     height = 300 - margin.top - margin.bottom
     
     x = d3.scale.linear()
-      .domain(d3.extent(values))
+      .domain([min, max])
       .range([0, width])
     
-    data = d3.layout.histogram()
-      .bins(x.ticks(nBins))(values)
-    
     y = d3.scale.linear()
-      .domain([0, d3.max(data, (d) -> return d.y)])
+      .domain([0, d3.max(histogram)])
       .range([height, 0])
     
     xAxis = d3.svg.axis()
@@ -174,16 +177,16 @@ class Image extends Controller
       .attr("transform", "translate(#{margin.left}, #{margin.top})")
     
     bar = svg.selectAll(".bar")
-      .data(data)
-    .enter().append("g")
-      .attr("class", "bar")
-      .attr("transform", (d) -> return "translate(#{x(d.x)}, #{y(d.y)})")
+        .data(histogram)
+      .enter().append("g")
+        .attr("class", "bar")
+        .attr("transform", (d, i) -> return "translate(#{x(min + i * histogram.dx)}, #{y(d)})")
     
     bar.append("rect")
       .attr("x", 1)
       .attr("width", 1)
-      .attr("height", (d) -> return height - y(d.y))
-    
+      .attr("height", (d) -> return height - y(d))
+      
     svg.append("g")
       .attr("class", "x axis")
       .attr("transform", "translate(0, #{height})")
@@ -200,134 +203,6 @@ class Image extends Controller
       .on('brushend', brushend))
       .selectAll('rect')
       .attr('height', height)
-  
-  # TODO: Possible optimization using a radix sort
-  computeHistogram: (arr) ->
-    dataunit = @hdu.data
-    
-    min   = dataunit.min
-    max   = dataunit.max
-    range = max - min
-    
-    sum = 0
-    bins = @nBins
-    binSize = range / bins
-    length = arr.length
-    
-    @histogram = new Uint32Array(bins + 1)
-    for value in arr
-      sum += value
-      
-      index = Math.floor(((value - min) / range) * bins)
-      @histogram[index] += 1
-      
-    @mean = sum / length
-    
-    # Compute standard deviation
-    sum = 0
-    for count, index in @histogram
-      value = min + index * binSize
-      diff = value - @mean
-      sum += (diff * diff) * count
-    @std = Math.sqrt(sum / length)
-    
-    @histogramMax = Math.max.apply Math, @histogram
-    @histogramMin = Math.min.apply Math, @histogram
-    
-    @histogramLowerIndex = Math.floor(((value - @histogramMin) / range) * bins)
-    @histogramUpperIndex = Math.floor(((value - @histogramMax) / range) * bins)
-  
-  # TODO: Generalize histogram class further to utilize here
-  drawHistogram: ->
-    return null unless @histogram?
-    
-    # Define brush events
-    brushstart = ->
-      svg.classed "selecting", true
-    brushmove = =>
-      s = d3.event.target.extent()
-      bars.classed "selected", (d) ->
-        s[0] <= d and d <= s[1]
-      
-      @wfits.setExtent(s[0], s[1])
-    brushend = ->
-      svg.classed "selecting", not d3.event.target.empty()
-    
-    margin =
-      top: 0
-      right: 20
-      bottom: 60
-      left: 10
-    
-    w = 390 - margin.right - margin.left
-    h = 260 - margin.top - margin.bottom
-    
-    # Grab some info about the data
-    data = @hdu.data
-    [min, max] = [data.min, data.max]
-    
-    # Create scales for both axes
-    x = d3.scale.linear()
-      .domain([min, max])
-      .range([0, w])
-    
-    y = d3.scale.linear()
-      .domain([0, d3.max(@histogram)])
-      .range([0, h])
-    
-    # Create the SVG
-    # TODO: Find way to set a selection root with D3
-    svg = d3.select("article:nth-child(#{@index + 1}) .histogram").append('svg')
-      .attr('width', w + margin.right + margin.left)
-      .attr('height', h + margin.top + margin.bottom)
-      .append('g')
-      .attr('transform', "translate(#{margin.left}, #{margin.top})")
-    
-    # Create a parent element for the svg
-    main = svg.append('g')
-      .attr('transform', "translate(#{margin.left}, #{margin.top})")
-      .attr('width', w)
-      .attr('height', h)
-      .attr('class', 'main')
-    
-    # Add the data
-    bars = svg.selectAll('rect')
-      .data(@histogram)
-      .enter().append('rect' )
-      .attr('x', ((d, i) ->
-        return i * 1.25 + margin.left
-      ))
-      .attr('y', ((d) ->
-        return h - y(d) + margin.top - 1.5
-      ))
-      .attr('width', 1)
-      .attr('height', ((d) ->
-        return y(d)
-      ))
-    
-    # Create an x axis
-    xAxis = d3.svg.axis()
-      .scale(x)
-      .ticks(6)
-      .orient('bottom')
-
-    # Append the x axis to the parent object
-    main.append('g')
-      .attr('transform', "translate(#{-1 * margin.left}, #{h})")
-      .attr('class', 'main axis date')
-      .call(xAxis)
-    
-    # Append the brush
-    svg.append('g')
-      .attr('class', 'brush')
-      .attr('width', w)
-      .attr('height', h)
-      .call(d3.svg.brush().x(x)
-      .on('brushstart', brushstart)
-      .on('brush', brushmove)
-      .on('brushend', brushend))
-      .selectAll('rect')
-      .attr('height', h)
 
 
 module.exports = Image
