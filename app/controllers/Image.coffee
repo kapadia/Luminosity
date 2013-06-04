@@ -3,7 +3,7 @@
 
 
 class Image extends Controller
-  nBins: 5000
+  nBins: 10000
   inMemory: false
   
   elements:
@@ -149,21 +149,29 @@ class Image extends Controller
       svg.classed "selecting", not d3.event.target.empty()
     
     selector = "article:nth-child(#{@index + 1}) .histogram"
-    histogram = @getHistogram(arr, min, max, 10000)
+    
+    histogram = @getHistogram(arr, min, max, @nBins)
     formatCount = d3.format(",.0f")
     
     margin =
       top: 10
       right: 30
-      bottom: 30
+      bottom: 50
       left: 30
     
     width = 600 - margin.left - margin.right
     height = 300 - margin.top - margin.bottom
     
+    # Create linear and log scales
     x = d3.scale.linear()
       .domain([min, max])
       .range([0, width])
+    
+    xLog = d3.scale.log()
+      .domain([min, max])
+      .range([0, width])
+    
+    @xScale = x
     
     y = d3.scale.linear()
       .domain([0, d3.max(histogram)])
@@ -190,18 +198,40 @@ class Image extends Controller
       .attr("x", 1)
       .attr("width", 1)
       .attr("height", (d) -> return height - y(d))
-      
+    
     svg.append("g")
-      .attr("class", "x axis")
-      .attr("transform", "translate(0, #{height})")
-      .call(xAxis)
+        .attr("class", "x axis")
+        .attr("transform", "translate(0, #{height})")
+        .call(xAxis)
+      .append("text")
+        .attr("class", "label")
+        .attr("x", width)
+        .attr("y", 34)
+        .style("text-anchor", "end")
+        .text("intensity")
+        .on('click', =>
+          
+          # Toggle scale function
+          @xScale = if @xScale is x then xLog else x
+          
+          svg.selectAll(".bar").data(histogram)
+            .transition()
+            .delay(1000)
+            .duration(1000)
+            .attr("transform", (d, i) => return "translate(#{@xScale(min + i * histogram.dx)}, #{y(d)})")
+          svg.selectAll(".x")
+            .transition()
+            .delay(1000)
+            .duration(2000)
+            .call(xAxis.scale(@xScale))
+        )
     
     # Append the brush
     svg.append('g')
       .attr('class', 'brush')
       .attr('width', width)
       .attr('height', height)
-      .call(d3.svg.brush().x(x)
+      .call(d3.svg.brush().x(@xScale)
       .on('brushstart', brushstart)
       .on('brush', brushmove)
       .on('brushend', brushend))

@@ -98,7 +98,7 @@ class Scatter2D extends Graph
             .attr('transform', "translate(#{margin.left}, #{margin.top})")
     @svg.append("g")
         .attr("class", "x axis")
-        .attr("transform", "translate(0," + height + ")")
+        .attr("transform", "translate(0, #{height})")
         .call(@xAxis)
       .append("text")
         .attr("class", "label")
