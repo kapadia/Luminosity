@@ -6,7 +6,7 @@ class Cube extends Controller
   viewportWidth: 600
   viewportHeight: 800
   radius: 14
-  
+  inMemory: false
   
   constructor: ->
     super
@@ -16,6 +16,7 @@ class Cube extends Controller
     @container = @el[0].querySelector(".cube-viewer")
   
   getData: ->
+    return if @inMemory
     
     header    = @hdu.header
     dataunit  = @hdu.data
@@ -34,7 +35,7 @@ class Cube extends Controller
     @geometry = new THREE.CubeGeometry(@width / 4, @height / 4, 2)
     
     # Experiment with lighting
-    areaLight1 = new THREE.AreaLight(0xffffff, 1)
+    areaLight1 = new THREE.AreaLight(0xff0000, 1)
     areaLight1.position.set( 0.0001, 10.0001, -18.5001 )
     areaLight1.rotation.set( -0.74719, 0.0001, 0.0001 )
     areaLight1.width = 10
@@ -80,7 +81,7 @@ class Cube extends Controller
         @addControls()
         
         @animate()
-      
+        @inMemory = true
     )
   
   createTexture: (arr) ->

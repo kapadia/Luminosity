@@ -41,6 +41,8 @@ class Image extends Controller
     @setupSockets() if @socket?
   
   getData: ->
+    return if @inMemory
+    
     header = @hdu.header
     dataunit = @hdu.data
     
@@ -116,6 +118,8 @@ class Image extends Controller
     @wfits.loadImage("visualization-#{@index}", arr, @width, @height)
     @wfits.setExtent(@hdu.data.min, @hdu.data.max)
     @wfits.setStretch('linear')
+    
+    @inMemory = true
   
   getHistogram: (arr, min, max, bins) ->
     range = max - min
