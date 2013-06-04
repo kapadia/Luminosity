@@ -145,7 +145,7 @@ class Image extends Controller
       svg.classed "selecting", not d3.event.target.empty()
     
     selector = "article:nth-child(#{@index + 1}) .histogram"
-    histogram = @getHistogram(arr, min, max, 1000)
+    histogram = @getHistogram(arr, min, max, 10000)
     formatCount = d3.format(",.0f")
     
     margin =

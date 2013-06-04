@@ -12,6 +12,7 @@ class Handler extends Controller
   
   handlerConstructor:
     Image: Image
+    Cube: Cube
     Table: Table
     BinaryTable: Table
     CompressedImage: CompressedImage
@@ -50,6 +51,11 @@ class Handler extends Controller
       # Get type from header
       type = hdu.header.getDataType()
       optionsHDU.append("<li data-index='#{index}'>#{type}</li>")
+      
+      # TEMP: Check case for cube
+      if type is 'Image'
+        if hdu.data.isDataCube()
+          type = 'Cube'
       
       if type?
         
