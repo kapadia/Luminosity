@@ -4,6 +4,7 @@ ThreeHelpers = require('lib/ThreeHelpers')
 class Scatter3D extends Graph
   name: 'Scatter 3D'
   axes: 3
+  isSetup: false
   
   events:
     "change select[data-axis='1']" : 'draw'
@@ -17,16 +18,53 @@ class Scatter3D extends Graph
     @axis1 = @el.find("select[data-axis='1']")
     @axis2 = @el.find("select[data-axis='2']")
     @axis3 = @el.find("select[data-axis='3']")
-
+    
+  setup: ->
+    
+    width = @el.width() - parseInt(@el.css('padding-left')) - parseInt(@el.css('padding-right'))
+    height = @el.height() - parseInt(@el.css('padding-top')) - parseInt(@el.css('padding-bottom'))
+    
+    # Setup the parent div
+    @container = @el[0].querySelector('.graph')
+    @container.width = width
+    @container.height = height
+    
+    # Setup THREE 
+    @renderer = new THREE.WebGLRenderer({antialias: true})
+    @renderer.setSize(width, height)
+    @renderer.setClearColorHex(0xEEEEEE, 1.0)
+    @renderer.clear()
+    
+    @camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000)
+    
+    @controls = new THREE.TrackballControls(@camera, @renderer.domElement)
+    
+    @scene = new THREE.Scene()
+    @scene.fog = new THREE.FogExp2(0xFFFFFF, 0.0035)
+    
+    @scatter = new THREE.Object3D()
+    
+    # Construct the axes
+    v = (x, y, z) => return new THREE.Vector3(x, y, z)
+    distance = 1
+    labels = ['-X', 'X', '-Y', 'Y', '-Z', 'Z']
+    
+    @createAxes3D(@scatter, distance)
+    
+    @container.appendChild(@renderer.domElement)
+    @isSetup = true
+    
   draw: =>
+    
     index1 = @axis1.val()
     index2 = @axis2.val()
     index3 = @axis3.val()
     
     return unless index1 + index2 + index3 > -1
     
-    @setup()
-    @setupMouseInteractions()
+    # Setup is needed here because the height of the div is 0 until
+    # FIXME: Work better with DOM
+    @setup() unless @isSetup
     
     dataunit = @hdu.data
     rows = dataunit.rows
@@ -35,7 +73,7 @@ class Scatter3D extends Graph
     dfd1 = new jQuery.Deferred()
     dfd2 = new jQuery.Deferred()
     dfd3 = new jQuery.Deferred()
-    $.when(dfd1, dfd2, dfd3).then(@_draw, @no)
+    $.when(dfd1, dfd2, dfd3).then(@_draw, -> alert 'Sorry, something went wrong')
     
     # Get labels for the axes
     @key1 = xlabel = @axis1.find("option:selected").text()
@@ -69,58 +107,54 @@ class Scatter3D extends Graph
     for k, v of column3
       column1[k] = v
     
-    # Construct the scatter plot
-    mat = new THREE.ParticleBasicMaterial({vertexColors: true, size: 1.0, color: 0xff0000})
+    # Get extent for each column
+    extentX = @getExtent(column1[@key1])
+    extentY = @getExtent(column1[@key2])
+    extentZ = @getExtent(column1[@key3])
+    
+    console.log extentX, extentY, extentZ
+    
+    minX = extentX[0]
+    minY = extentY[0]
+    minZ = extentZ[0]
+    
+    rangeX = extentX[1] - minX
+    rangeY = extentY[1] - minY
+    rangeZ = extentZ[1] - minZ
+    
+    columnX = column1[@key1]
+    columnY = column1[@key2]
+    columnZ = column1[@key3]
+    
+    # Create geometry to store points
     pointGeo = new THREE.Geometry()
     
+    # Loop over values sending each to the GPU
     rows = @hdu.data.rows
     while rows--
-      x = column1[@key1][rows]
-      y = column1[@key2][rows]
-      z = column1[@key3][rows]
-      pointGeo.vertices.push( new THREE.Vector3(x, y, z) )
-      pointGeo.colors.push( new THREE.Color().setRGB(0, 113, 229) )
+      
+      # Get point
+      x = columnX[rows]
+      y = columnY[rows]
+      z = columnZ[rows]
+      
+      # Normalize
+      xn = (x - minX) / rangeX
+      yn = (y - minY) / rangeY
+      zn = (z - minZ) / rangeZ
+      
+      # Create vector representing point
+      point = new THREE.Vector3(xn, yn, zn)
+      pointGeo.vertices.push(point)
     
-    points = new THREE.ParticleSystem(pointGeo, mat)
+    
+    points = new THREE.ParticleSystem(pointGeo, new THREE.ParticleBasicMaterial({size: 1.5, color: 0x0071e5}))
     @scatter.add(points)
     @scene.add(@scatter)
     
     @renderer.render(@scene, @camera)
     @controls.update()
   
-  setup: ->
-    
-    width = @el.width() - parseInt(@el.css('padding-left')) - parseInt(@el.css('padding-right'))
-    height = @el.height() - parseInt(@el.css('padding-top')) - parseInt(@el.css('padding-bottom'))
-    
-    # Setup the parent div
-    @container = @el[0].querySelector('.graph')
-    @container.width = width
-    @container.height = height
-    
-    # Setup THREE 
-    @renderer = new THREE.WebGLRenderer({antialias: true})
-    @renderer.setSize(width, height)
-    @renderer.setClearColorHex(0xEEEEEE, 1.0)
-    @renderer.clear()
-    
-    @camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000)
-    @controls = new THREE.TrackballControls(@camera, @renderer.domElement)
-    
-    @scene = new THREE.Scene()
-    @scene.fog = new THREE.FogExp2(0xFFFFFF, 0.0035)
-    
-    @scatter = new THREE.Object3D()
-    
-    # Construct the axes
-    v = (x, y, z) => return new THREE.Vector3(x, y, z)
-    distance = 1
-    labels = ['-X', 'X', '-Y', 'Y', '-Z', 'Z']
-    
-    Scatter3D.createAxes3D(@scatter, distance)
-    
-    @container.appendChild(@renderer.domElement)
-    
   setupMouseInteractions: ->
     @down = false
     [@sx, @sy] = [0, 0]
@@ -142,7 +176,7 @@ class Scatter3D extends Graph
         @sy += dy
         @renderer.render(@scene, @camera)
 
-  @createAxes3D: (plot, size) ->
+  createAxes3D: (plot, size) ->
     v = (x, y, z) => return new THREE.Vector3(x, y, z)
 
     lineGeo = new THREE.Geometry()
@@ -187,7 +221,7 @@ class Scatter3D extends Graph
     line.type = THREE.Lines
     plot.add(line)
 
-  @createAxesLabel3D: (plot, labels, distance) ->
+  createAxesLabel3D: (plot, labels, distance) ->
     axes = ['x', 'x', 'y', 'y', 'z', 'z']
     for label, index in labels
       axis = axes[index]
@@ -195,5 +229,15 @@ class Scatter3D extends Graph
       title = ThreeHelpers.createText2D(label)
       title.position[axis] = Math.pow(-1, index + 1) * distance
       plot.add(title)
+
+  getExtent: (arr) ->
+    min = max = arr[0]
+    
+    for value, index in arr
+      if value < min
+        min = value
+      if value > max
+        max = value
+    return [min, max]
 
 module.exports = Scatter3D

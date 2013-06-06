@@ -17,7 +17,7 @@ class Drop extends Spine.Controller
       @hostname = '0.0.0.0'
       @port = 5000
     else
-      @hostname = 'weakforce.herokuapp.com'
+      @hostname = 'http://weakforce-env-y2xt7saftp.elasticbeanstalk.com/'
       @port = 80
     
     info = require('lib/info')
@@ -84,7 +84,8 @@ class Drop extends Spine.Controller
     
     unless @socket?
       @socket = io.connect(@hostname, {port: @port})
-    
+      console.log @socket
+      
     @socket.on('status', (data) =>
       window.removeEventListener('keydown', @shortcuts, false)
       handler = new Handler({socket: @socket}, @tutorialPath)
