@@ -8,6 +8,7 @@ class Histogram extends Graph
     "change select[data-axis='1']" : 'draw'
     "click  button[name='save']"   : 'savePlot'
   
+  
   draw: =>
     console.log 'draw'
     index1 = @axis1.val()
@@ -35,8 +36,7 @@ class Histogram extends Graph
     
     # Get every point in the selected column
     # TODO: Might need to make smart for large tables
-    dataunit.getColumn(@key1, 0, rows - 1, (column) =>
-      console.log 'COLUMN READ'
+    dataunit.getColumn(@key1, (column) =>
       
       numBins = parseInt(rows / 10)
       bins = d3.layout.histogram().bins(numBins)(column)

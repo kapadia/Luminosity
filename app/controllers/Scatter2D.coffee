@@ -36,13 +36,13 @@ class Scatter2D extends Graph
     dfd2 = new jQuery.Deferred()
     $.when(dfd1, dfd2).then(@_draw, @no)
     
-    dataunit.getColumn(@key1, 0, rows - 1, (column) =>
+    dataunit.getColumn(@key1, (column) =>
       obj = new Object()
       obj[@key1] = column
       dfd1.resolve(obj)
     )
     
-    dataunit.getColumn(@key2, 0, rows - 1, (column) =>
+    dataunit.getColumn(@key2, (column) =>
       obj = new Object()
       obj[@key2] = column
       dfd2.resolve(obj)
@@ -112,7 +112,7 @@ class Scatter2D extends Graph
       .append("text")
         .attr("class", "label")
         .attr("transform", "rotate(-90)")
-        .attr("y", -18)
+        .attr("y", -50)
         .attr("dy", ".71em")
         .style("text-anchor", "end")
         .text(ylabel)
