@@ -34,11 +34,10 @@ class Image extends Controller
     #           preserve application state.
     @currentStretch = 'linear'
     
-    
     @bind 'data-ready', @draw
     
     # Setup sockets if there is a socket instance
-    @setupSockets() if @socket?
+    @setupSocketEvents() if @socket?
   
   getData: ->
     return if @inMemory
@@ -67,19 +66,21 @@ class Image extends Controller
       
     )
   
-  setupSockets: ->
+  setupSocketEvents: ->
     
-    @socket.on('zoom', (data) =>
-      unless @socket.socket.sessionid is data.id
-        @scale = data.zoom
-        @drawScene()
+    @socket.on('zoom', (zoom) =>
+      @wfits.zoom = zoom
+      @wfits.draw()
     )
     
     @socket.on('translation', (data) =>
-      unless @socket.socket.sessionid is data.id
-        @xOffset = data.xOffset
-        @yOffset = data.yOffset
-        @drawScene()
+      @wfits.xOffset = data[0]
+      @wfits.yOffset = data[1]
+      @wfits.draw()
+    )
+    
+    @socket.on('scale', (min, max) =>
+      @wfits.setExtent(min, max)
     )
   
   onStretch: (e) =>
@@ -102,7 +103,7 @@ class Image extends Controller
       arr: arr
       width: @width
     
-    onmousemove = (x, y, opts) =>
+    _onmousemove = (x, y, opts) =>
       arr = opts.arr
       width = opts.width
       sky = @wcs.pixelToCoordinate([x, y])
@@ -112,9 +113,23 @@ class Image extends Controller
       @decEl.text(sky.dec)
       @fluxEl.text(arr[x + width * y])
     
+    # Define mouse callbacks for when sockets is enabled
+    mouseCallbacks = {}
+    if @socket
+      
+      mouseCallbacks.onmousemove = (x, y, opts) =>
+        _onmousemove(x, y, opts)
+        @socket.emit 'translation', [@wfits.xOffset, @wfits.yOffset]
+      
+      mouseCallbacks.onzoom = =>
+        @socket.emit 'zoom', @wfits.zoom
+    
+    else
+      mouseCallbacks.onmousemove = _onmousemove
+    
     # Create a WebFITS object
     @wfits = new astro.WebFITS(@viewport[0], 600)
-    @wfits.setupControls({onmousemove: onmousemove}, opts)
+    @wfits.setupControls(mouseCallbacks, opts)
     @wfits.loadImage("visualization-#{@index}", arr, @width, @height)
     @wfits.setExtent(@hdu.data.min, @hdu.data.max)
     @wfits.setStretch('linear')
@@ -145,6 +160,9 @@ class Image extends Controller
         s[0] <= d and d <= s[1]
       
       @wfits.setExtent(s[0], s[1])
+      if @socket
+        @socket.emit 'scale', s[0], s[1]
+      
     brushend = ->
       svg.classed "selecting", not d3.event.target.empty()
     

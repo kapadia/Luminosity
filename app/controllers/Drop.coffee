@@ -12,27 +12,21 @@ class Drop extends Spine.Controller
   constructor: ->
     super
     
-    # Determine hostname and port for sockets
-    if location.hostname is '0.0.0.0'
-      @hostname = '0.0.0.0'
-      @port = 5000
-    else
-      @hostname = 'http://weakforce-env-y2xt7saftp.elasticbeanstalk.com/'
-      @port = 80
-    
     info = require('lib/info')
     @html require('views/drop')(info)
     
     @drop = document.getElementById('drop')
-    @drop.addEventListener('dragover', @handleDragOver, false)
-    @drop.addEventListener('dragleave', @handleDragLeave, false)
-    @drop.addEventListener('drop', @handleDrop, false)
+    @share = document.getElementById('share')
+    
+    for el in [@drop, @share]
+      el.addEventListener('dragenter', @onDragEnter, false)
+      el.addEventListener('dragover', @onDragOver, false)
+      el.addEventListener('dragleave', @onDragLeave, false)
+      el.addEventListener('drop', @handleDrop, false)
+    
     @disabled = true
     
     window.addEventListener('keydown', @shortcuts, false)
-    
-    # Socket handler
-    @el.find('.sockets-experiment').on('click', @startSocket)
   
   enable: -> @disabled = false
   
@@ -43,13 +37,21 @@ class Drop extends Spine.Controller
   getExtension: (filename) ->
     filename.split('.').pop()
   
-  handleDragOver: (e) =>
+  # TODO: Drag events can be optimized
+  onDragOver: (e) =>
     @blockEvent(e)
+    
+  onDragEnter: (e) ->
     $("#drop").addClass('over')
+    
+    if e.target.id is "share"
+      $(".sharing").addClass('show')
   
-  handleDragLeave: (e) =>
-    @blockEvent(e)
+  onDragLeave: (e) ->
     $("#drop").removeClass('over')
+    
+    if e.target.id is "share"
+      $(".sharing").removeClass('show')
   
   handleDrop: (e) =>
     @blockEvent(e)
@@ -72,24 +74,31 @@ class Drop extends Spine.Controller
       alert 'This does not seem to be a FITS file'
       return null
     
+    # Turn off socket event
+    @socket.removeAllListeners('request-to-share')
+    
+    if e.target.id is "share"
+      @setupSocket(file)
+      socket = @socket
+    
     # Initialize FITS File object using native File instance
-    handler = new Handler(null, file)
+    handler = new Handler(null, file, socket)
     window.removeEventListener('keydown', @shortcuts, false)
   
   beginTutorial: =>
     handler = new Handler(null, @tutorialPath)
   
-  startSocket: (e) =>
-    @blockEvent(e)
+  setupSocket: (file) ->
     
-    unless @socket?
-      @socket = io.connect(@hostname, {port: @port})
-      console.log @socket
-      
-    @socket.on('status', (data) =>
-      window.removeEventListener('keydown', @shortcuts, false)
-      handler = new Handler({socket: @socket}, @tutorialPath)
+    # Broadcast shared file
+    @socket.emit('sharing-data',
+      filename: file.name
     )
+  
+  collaborateOn: (filename) =>
+    
+    # TODO: Put more data online
+    handler = new Handler(null, "http://astrojs.s3.amazonaws.com/sample/#{filename}", @socket)
   
   shortcuts: (e) =>
     keyCode = e.keyCode

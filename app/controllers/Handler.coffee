@@ -27,7 +27,7 @@ class Handler extends Controller
     '#header' : 'header'
   
   
-  constructor: (args, source)->
+  constructor: (args, source, @socket) ->
     super
     
     # Initialize FITS object with data source and render callback
@@ -61,7 +61,7 @@ class Handler extends Controller
         
         # Get DOM element and setup arguments
         elem = $("#dataunits article:nth-child(#{index + 1}) div.container")
-        args = {el: elem, hdu: hdu, index: index}
+        args = {el: elem, hdu: hdu, index: index, socket: @socket}
         
         handler = new @handlerConstructor[type](args)
         @hdus.push handler

@@ -2,6 +2,8 @@
   <p class='center'>DROP FITS HERE</p>
 </div>
 
+<div id="share" class='frame bottom-half'></div>
+
 <div id='loading' class='frame over'>
   <progress class='center' value='0' max='100'></progress>
 </div>
@@ -53,5 +55,5 @@
 <div class='links'>
   <a href='https://github.com/kapadia/Luminosity/commit/<%- @ref %>'><%- @ref %> <%- @date %></a>
   &nbsp;
-  <a class='sockets-experiment' href=''>sockets experiment</a>
+  <span class='sharing'>sharing</span>
 </div>

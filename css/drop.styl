@@ -51,6 +51,10 @@ label[for='tutorial']
     text-align center
     font-size 18px
     font-weight 200
+
+.bottom-half
+  top 50%
+  opacity: 0
   
 .over
   background-color $gray2
@@ -73,7 +77,7 @@ label[for='tutorial']
   bottom 0
   left 30px
   
-  a
+  a, .sharing
     position relative
     display inline-block
     font-size 10px
@@ -87,4 +91,12 @@ label[for='tutorial']
     &:hover
       color $red
       opacity 1
+  
+  .sharing
+    color $red
+    opacity 1
+    display none
     
+    &.show
+      display inline-block
+  
