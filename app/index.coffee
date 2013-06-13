@@ -19,7 +19,7 @@ class Luminosity extends Controller
       port = 3000
     else
       # hostname = 'http://weakforce-env-y2xt7saftp.elasticbeanstalk.com/'
-      @hostname = 'http://ec2-50-17-0-195.compute-1.amazonaws.com/'
+      @hostname = 'http://ec2-50-17-0-195.compute-1.amazonaws.com'
       port = 80
     socket = io.connect(hostname, {port: port})
     

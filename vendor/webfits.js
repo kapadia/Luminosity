@@ -44,7 +44,7 @@
       this.drag = false;
       this.zoom = 2 / this.width;
       this.minZoom = this.zoom;
-      this.maxZoom = 12 * this.zoom;
+      this.maxZoom = 48 * this.zoom;
       this.zoomX = this.zoom;
       this.zoomY = this.zoom;
     }
