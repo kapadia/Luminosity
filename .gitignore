@@ -4,3 +4,5 @@ public/core
 app/lib/info.js
 public/application*
 app/lib/keys.coffee
+*.map
+server.js

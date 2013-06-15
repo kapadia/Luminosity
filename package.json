@@ -1,10 +1,20 @@
 {
   "name": "Luminosity",
-  "version": "0.0.1",
-  "dependencies": { 
+  "version": "0.0.1-1",
+  "dependencies": {
+    "coffee-script": "~1.6.x",
     "serveup": "~0.0.4",
-    "hem": "git://github.com/spine/hem.git",
+    "hem": "0.2.7",
     "spine": "~1.0.8",
-    "radixsort": "git://github.com/jasondavies/radixsort.js.git"
+    "radixsort": "git://github.com/jasondavies/radixsort.js.git",
+    "socket.io": "0.9.x",
+    "express": "3.0.x"
+  },
+  "subdomain": "luminosity",
+  "scripts": {
+    "start": "node server"
+  },
+  "engines": {
+    "node": "0.8.x"
   }
 }

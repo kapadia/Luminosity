@@ -15,13 +15,9 @@ class Luminosity extends Controller
     
     # Start socket and determine hostname and port for sockets
     if location.hostname is '0.0.0.0'
-      hostname = '0.0.0.0'
-      port = 3000
+      socket = io.connect('http://localhost', {port: 8080})
     else
-      # hostname = 'http://weakforce-env-y2xt7saftp.elasticbeanstalk.com/'
-      @hostname = 'http://ec2-50-17-0-195.compute-1.amazonaws.com'
-      port = 80
-    socket = io.connect(hostname, {port: port})
+      socket = io.connect()
     
     # Initialize Drop controller with DOM element and socket
     drop = new Drop({el: @el, socket: socket})
@@ -53,13 +49,17 @@ class Luminosity extends Controller
     checkBlob = Blob?
     checkWebWorker = Worker?
     
-    # Check for WebGL
+    # Check for WebGL and texture extension
     canvas = document.createElement('canvas')
     context = canvas.getContext('webgl')
     context = canvas.getContext('experimental-webgl') unless context?
     checkWebGL = context?
+    checkExt = if context? then context.getExtension('OES_texture_float')? else null
     
-    return checkFile and checkFileReader and checkFileList and checkDataView and checkBlob and checkWebWorker and checkWebGL
+    context = null
+    canvas = null
+    
+    return checkFile and checkFileReader and checkFileList and checkDataView and checkBlob and checkWebWorker and checkWebGL and checkExt
 
 
 module.exports = Luminosity

@@ -77,6 +77,7 @@ class Handler extends Controller
         
         # Read only the current data unit
         @hdus[@currentHDU].getData()
+        
         break
     
     # Setup keyboard shortcuts

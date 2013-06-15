@@ -47,24 +47,24 @@ class Table extends Controller
     # Place initial data in table
     dataunit = @hdu.data
     dataunit.getRows(0, rows, (data) =>
+      @tbody = d3.select("article:nth-child(#{@index + 1}) .table-container tbody")
+      window.addEventListener('keydown', @shortcuts, false)
+
+      # Initialize a plot controllers
+      columns = @getNumericalColumns()
+
+      index = @index + 1
+      @histogramElem = $("article:nth-child(#{index}) .one")
+      @histogram = new Histogram({el: @histogramElem, hdu: @hdu, index: @index, columns: columns})
+
+      @scatter2dElem = $("article:nth-child(#{index}) .two")
+      @scatter2d = new Scatter2D({el: @scatter2dElem, hdu: @hdu, index: @index, columns: columns})
+
+      @scatter3dElem = $("article:nth-child(#{index}) .three")
+      @scatter3d = new Scatter3D({el: @scatter3dElem, hdu: @hdu, index: @index, columns: columns})
+      
       @renderRows(data)
     )
-    
-    @tbody = d3.select("article:nth-child(#{@index + 1}) .table-container tbody")
-    window.addEventListener('keydown', @shortcuts, false)
-    
-    # Initialize a plot controllers
-    columns = @getNumericalColumns()
-    
-    index = @index + 1
-    @histogramElem = $("article:nth-child(#{index}) .one")
-    @histogram = new Histogram({el: @histogramElem, hdu: @hdu, index: @index, columns: columns})
-    
-    @scatter2dElem = $("article:nth-child(#{index}) .two")
-    @scatter2d = new Scatter2D({el: @scatter2dElem, hdu: @hdu, index: @index, columns: columns})
-    
-    @scatter3dElem = $("article:nth-child(#{index}) .three")
-    @scatter3d = new Scatter3D({el: @scatter3dElem, hdu: @hdu, index: @index, columns: columns})
     
     return
     
@@ -92,6 +92,8 @@ class Table extends Controller
     @html require('views/table')(info)
   
   renderRows: (data) =>
+    console.log '@tbody', @tbody
+    
     @tbody.selectAll('tr').remove()
     @tbody.selectAll('tr')
         .data(data)
