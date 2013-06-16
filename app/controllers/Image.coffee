@@ -59,10 +59,10 @@ class Image extends Controller
       $(".read-image").hide()
       
       # Compute extent
-      dataunit.getExtent(arr)
+      [min, max] = dataunit.getExtent(arr)
       
       # Broadcast that data is ready
-      @trigger 'data-ready', arr
+      @trigger 'data-ready', arr, min, max
       
     )
   
@@ -92,11 +92,14 @@ class Image extends Controller
   resetStretch: (e) =>
     @wfits.setStretch(@currentStretch)
   
-  draw: (arr) ->
+  log10: (value) ->
+    return Math.log(value) / Math.log(10)
+  
+  draw: (arr, min, max) ->
     @unbind 'data-ready', @draw
     
     # Setup histogram
-    @drawHistogram(arr, @hdu.data.min, @hdu.data.max)
+    @drawHistogram(arr, min, max)
     
     # Define mouse callbacks for WebFITS
     opts =
@@ -131,19 +134,25 @@ class Image extends Controller
     @wfits = new astro.WebFITS(@viewport[0], 600)
     @wfits.setupControls(mouseCallbacks, opts)
     @wfits.loadImage("visualization-#{@index}", arr, @width, @height)
-    @wfits.setExtent(@hdu.data.min, @hdu.data.max)
+    @wfits.setExtent(min, max)
     @wfits.setStretch('linear')
     
     @inMemory = true
   
   getHistogram: (arr, min, max, bins) ->
+    log10 = @log10
+    
+    console.log min, max
+    min = log10(min)
+    max = log10(max)
+    console.log min, max
     range = max - min
     
     h = new Uint32Array(bins)
     i = arr.length
     while i--
-      value = arr[i]
-      index = ~~(((value - min) / range) * bins)
+      value = log10( arr[i] )
+      index = ~~( ( (value - min) / range) * bins )
       h[index] += 1
     h.dx = range / bins
     
@@ -181,7 +190,7 @@ class Image extends Controller
     height = 300 - margin.top - margin.bottom
     
     # Create linear and log scales
-    x = d3.scale.linear()
+    x = d3.scale.log()
       .domain([min, max])
       .range([0, width])
     
