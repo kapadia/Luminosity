@@ -140,22 +140,19 @@ class Image extends Controller
     @inMemory = true
   
   getHistogram: (arr, min, max, bins) ->
-    log10 = @log10
     
-    console.log min, max
-    min = log10(min)
-    max = log10(max)
-    console.log min, max
     range = max - min
     
     h = new Uint32Array(bins)
+    dx = range / bins
+    
     i = arr.length
     while i--
-      value = log10( arr[i] )
-      index = ~~( ( (value - min) / range) * bins )
+      value = arr[i]
+      index = ~~( (value - min) / dx )
       h[index] += 1
-    h.dx = range / bins
     
+    h.dx = dx
     return h
   
   drawHistogram: (arr, min, max) ->
@@ -190,19 +187,13 @@ class Image extends Controller
     height = 300 - margin.top - margin.bottom
     
     # Create linear and log scales
-    x = d3.scale.log()
-      .domain([min, max])
-      .range([0, width])
+    x = d3.scale.linear()
+      .domain( [min, max] )
+      .range( [0, width] )
     
-    xLog = d3.scale.log()
-      .domain([min, max])
-      .range([0, width])
-    
-    @xScale = x
-    
-    y = d3.scale.linear()
-      .domain([0, d3.max(histogram)])
-      .range([height, 0])
+    y = d3.scale.log()
+      .domain( [1, d3.max(histogram)] )
+      .range( [height, 0] )
     
     xAxis = d3.svg.axis()
       .scale(x)
@@ -219,12 +210,12 @@ class Image extends Controller
         .data(histogram)
       .enter().append("g")
         .attr("class", "bar")
-        .attr("transform", (d, i) -> return "translate(#{x(min + i * histogram.dx)}, #{y(d)})")
+        .attr("transform", (d, i) -> return "translate(#{x(min + i * histogram.dx)}, #{y(d + 1)})")
     
     bar.append("rect")
       .attr("x", 1)
       .attr("width", 1)
-      .attr("height", (d) -> return height - y(d))
+      .attr("height", (d) -> return height - y(d + 1) )
     
     svg.append("g")
         .attr("class", "x axis")
@@ -236,29 +227,13 @@ class Image extends Controller
         .attr("y", 34)
         .style("text-anchor", "end")
         .text("intensity")
-        .on('click', =>
-          
-          # Toggle scale function
-          @xScale = if @xScale is x then xLog else x
-          
-          svg.selectAll(".bar").data(histogram)
-            .transition()
-            .delay(1000)
-            .duration(1000)
-            .attr("transform", (d, i) => return "translate(#{@xScale(min + i * histogram.dx)}, #{y(d)})")
-          svg.selectAll(".x")
-            .transition()
-            .delay(1000)
-            .duration(2000)
-            .call(xAxis.scale(@xScale))
-        )
     
     # Append the brush
     svg.append('g')
       .attr('class', 'brush')
       .attr('width', width)
       .attr('height', height)
-      .call(d3.svg.brush().x(@xScale)
+      .call(d3.svg.brush().x(x)
       .on('brushstart', brushstart)
       .on('brush', brushmove)
       .on('brushend', brushend))
