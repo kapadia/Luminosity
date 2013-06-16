@@ -1,14 +1,17 @@
 require('lib/setup')
 
 {Controller} = require('spine')
-Drop  = require('controllers/Drop')
 
+Drop  = require('controllers/Drop')
+Info  = require('lib/info')
 
 class Luminosity extends Controller
   
   
   constructor: ->
     super
+    
+    @setBuild()
     
     # Initialize controllers
     @el = $('#luminosity')
@@ -60,6 +63,14 @@ class Luminosity extends Controller
     canvas = null
     
     return checkFile and checkFileReader and checkFileList and checkDataView and checkBlob and checkWebWorker and checkWebGL and checkExt
+  
+  setBuild: ->
+    a = $('footer a')
+    href = a.attr('href').replace('{{ref}}', Info.ref)
+    text = a.text().replace('{{ref}}', Info.ref).replace('{{date}}', Info.date)
+    a.attr('href', href)
+    a.text(text)
+    
 
 
 module.exports = Luminosity

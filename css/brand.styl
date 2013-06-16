@@ -6,12 +6,17 @@ header, .select-hdu
   
 header
   width 96%
-  background-color $black
+  background-color $blue
   z-index 1
-  height 20px
-  padding 10px 2%
+  height 50px
+  padding 10px 5.25%
   font-size 16px
   opacity 0.8
+  
+  p
+    font-size 16px
+    letter-spacing 3px
+    font-weight 700
   
   .small
     font-size 11px
@@ -26,6 +31,36 @@ header
     
     &:hover
       color $blue
+
+footer
+  position fixed
+  width 89.5%
+  background-color $black
+  z-index 1
+  height 25px
+  bottom 0
+  left 0
+  padding 10px 5.25%
+  
+  .resources
+    font-size 12px
+    color $white
+    display table-cell
+    vertical-align middle
+    padding-top 10px
+    
+    p
+      font-weight 700
+    a
+      color $white
+      font-weight 200
+      text-decoration none
+      
+      &:before
+        content: '\2003'
+      
+      &:hover
+        color $red
 
 .select-hdu
   z-index 2
