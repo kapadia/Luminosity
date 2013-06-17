@@ -1,4 +1,33 @@
-<div class='viewport'></div>
+
+<div class='viewport-container'>
+  <div class='cursors'>
+    <input type='radio' name='cursor' id='pointer-<%-@index %>' checked='checked' data-type='pointer' />
+    <label for='pointer-<%-@index %>'></label>
+    
+    <input type='radio' name='cursor' id='crosshair-<%-@index %>' data-type='crosshair' />
+    <label for='crosshair-<%-@index %>'></label>
+  </div>
+  
+  <div class='viewport'></div>
+  
+  <div class='stretch-fns'>
+    <input type='radio' name='fn' id='linear-<%-@index %>' checked='checked' />
+    <label for='linear-<%-@index %>' data-fn='linear'></label>
+    
+    <input type='radio' name='fn' id='logarithm-<%-@index %>' />
+    <label for='logarithm-<%-@index %>' data-fn='logarithm'></label>
+    
+    <input type='radio' name='fn' id='sqrt-<%-@index %>' />
+    <label for='sqrt-<%-@index %>' data-fn='sqrt'></label>
+    
+    <input type='radio' name='fn' id='arcsinh-<%-@index %>' />
+    <label for='arcsinh-<%-@index %>' data-fn='arcsinh'></label>
+    
+    <input type='radio' name='fn' id='power-<%-@index %>' />
+    <label for='power-<%-@index %>' data-fn='power'></label>
+  </div>
+  
+</div>
 
 <div class='tools'>
   <div class='row'>
@@ -28,24 +57,6 @@
         <span class='value' data-type='flux'>-</span>
       </div>
       
-    </div>
-    <div class='stretch'>
-      <div class='options'>
-        <input type='radio' name='stretch-fn' id='linear-<%-@index %>' checked='checked' />
-        <label for='linear-<%-@index %>' data-fn='linear'></label>
-
-        <input type='radio' name='stretch-fn' id='logarithm-<%-@index %>' value='logarithm' />
-        <label for='logarithm-<%-@index %>' data-fn='logarithm'></label>
-
-        <input type='radio' name='stretch-fn' id='sqrt-<%-@index %>' value='sqrt' />
-        <label for='sqrt-<%-@index %>' data-fn='sqrt'></label>
-
-        <input type='radio' name='stretch-fn' id='arcsinh-<%-@index %>' value='arcsinh' />
-        <label for='arcsinh-<%-@index %>' data-fn='arcsinh'></label>
-
-        <input type='radio' name='stretch-fn' id='power-<%-@index %>' value='power' />
-        <label for='power-<%-@index %>' data-fn='power'></label>
-      </div>
     </div>
   </div>
   

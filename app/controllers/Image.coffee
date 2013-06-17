@@ -15,9 +15,10 @@ class Image extends Controller
     '[data-type="flux"]'  : 'fluxEl'
   
   events:
-    'click .options label'      : 'onStretch'
-    'mouseover .options label'  : 'onStretch'
-    'mouseleave .options'       : 'resetStretch'
+    'mouseleave .options'           : 'resetStretch'
+    'change input[name="cursor"]'   : 'onPointer'
+    'mouseover .stretch-fns label'  : 'onStretch'
+    'click .stretch-fns label'      : 'onStretch'
   
   
   constructor: ->
@@ -88,6 +89,9 @@ class Image extends Controller
     if e.type is 'click'
       @currentStretch = stretch
     @wfits.setStretch(stretch)
+  
+  onPointer: (e) =>
+    @wfits.setCursor(e.target.dataset.type)
   
   resetStretch: (e) =>
     @wfits.setStretch(@currentStretch)

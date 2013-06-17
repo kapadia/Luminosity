@@ -70,7 +70,6 @@ class Luminosity extends Controller
     text = a.text().replace('{{ref}}', Info.ref).replace('{{date}}', Info.date)
     a.attr('href', href)
     a.text(text)
-    
 
 
 module.exports = Luminosity

@@ -4,12 +4,50 @@
   fill-opacity 0.125
   shape-rendering crispEdges
 
-.viewport
+.viewport-container
   float left
-  width 600px
-  height 600px
-  cursor crosshair
   margin-right 40px
+  
+  .cursors
+    float left
+    width 24px
+    
+    input[name="cursor"]
+      display none
+      
+      &:checked + label
+        background #333
+        border-color #333 !important
+    
+    label
+      display block
+      width 24px
+      height 24px
+      background-color $gray1
+      cursor pointer
+    
+  .viewport
+    float left
+    width 600px
+    height 600px
+    cursor crosshair
+  
+  .stretch-fns
+    float left
+    
+    input[name="fn"]
+      display none
+      
+      &:checked + label
+        background #333
+        border-color #333 !important
+    
+    label
+      display block
+      width 24px
+      height 24px
+      background-color $gray1
+      cursor pointer
 
 .tools
   overflow hidden
@@ -19,6 +57,7 @@
   .stretch
     float right
     .options
+      margin-top 10px
       
       input[name='stretch-fn']
         display none
@@ -28,11 +67,13 @@
           border-color #333 !important
 
       label
-        display inline-block
-        width 20px
-        height 20px
+        // display inline-block
+        // width 20px
+        // height 20px
         margin 6px
         background-color $blue
+        color $white
+        padding 10px 8px
         cursor pointer
         transition all 100 ease-out
 
