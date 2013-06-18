@@ -30,6 +30,8 @@ class Image extends Controller
     
     @html require('views/image')({index: @index})
     
+    @setupTooltips()
+    
     # Set current stretch
     # APPSTATE: Storing on controller for now.  Find better way
     #           preserve application state.
@@ -39,6 +41,32 @@ class Image extends Controller
     
     # Setup sockets if there is a socket instance
     @setupSocketEvents() if @socket?
+  
+  setupTooltips: ->
+    
+    @el.find(".tip").on('mouseenter', (e) =>
+      el      = $(e.target)
+      offset  = el.offset()
+      width   = el.width()
+      height  = el.height()
+      
+      # Compute offset for tip
+      offset.top -= (0.15 * height)
+      offset.left -= 0.75 * width
+      
+      template = require('views/tooltip')({tip: e.target.dataset.tip})
+      template = $(template).css(offset)
+      @el.append(template)
+      
+      tipEl = @el.find('.tooltip')
+      width = tipEl.width()
+      offset.left -= width
+      tipEl.css(offset)
+      
+    )
+    @el.find(".tip").on('mouseleave', (e) =>
+      @el.find('.tooltip').remove()
+    )
   
   getData: ->
     return if @inMemory
@@ -230,7 +258,7 @@ class Image extends Controller
         .attr("x", width)
         .attr("y", 34)
         .style("text-anchor", "end")
-        .text("intensity")
+        .text("flux")
     
     # Append the brush
     svg.append('g')

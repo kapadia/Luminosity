@@ -2,29 +2,29 @@
 <div class='viewport-container'>
   <div class='cursors'>
     <input type='radio' name='cursor' id='pointer-<%-@index %>' checked='checked' data-type='pointer' />
-    <label for='pointer-<%-@index %>'></label>
+    <label class='tip' data-tip='pointer' for='pointer-<%-@index %>'></label>
     
     <input type='radio' name='cursor' id='crosshair-<%-@index %>' data-type='crosshair' />
-    <label for='crosshair-<%-@index %>'></label>
+    <label class='tip' data-tip='crosshair' for='crosshair-<%-@index %>'></label>
   </div>
   
   <div class='viewport'></div>
   
   <div class='stretch-fns'>
     <input type='radio' name='fn' id='linear-<%-@index %>' checked='checked' />
-    <label for='linear-<%-@index %>' data-fn='linear'></label>
+    <label class='tip' data-tip='linear' for='linear-<%-@index %>' data-fn='linear'></label>
     
     <input type='radio' name='fn' id='logarithm-<%-@index %>' />
-    <label for='logarithm-<%-@index %>' data-fn='logarithm'></label>
+    <label class='tip' data-tip='logarithm' for='logarithm-<%-@index %>' data-fn='logarithm'></label>
     
     <input type='radio' name='fn' id='sqrt-<%-@index %>' />
-    <label for='sqrt-<%-@index %>' data-fn='sqrt'></label>
+    <label class='tip' data-tip='sqrt' for='sqrt-<%-@index %>' data-fn='sqrt'></label>
     
     <input type='radio' name='fn' id='arcsinh-<%-@index %>' />
-    <label for='arcsinh-<%-@index %>' data-fn='arcsinh'></label>
+    <label class='tip' data-tip='arcsinh' for='arcsinh-<%-@index %>' data-fn='arcsinh'></label>
     
     <input type='radio' name='fn' id='power-<%-@index %>' />
-    <label for='power-<%-@index %>' data-fn='power'></label>
+    <label class='tip' data-tip='power' for='power-<%-@index %>' data-fn='power'></label>
   </div>
   
 </div>
