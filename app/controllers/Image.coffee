@@ -6,6 +6,12 @@ class Image extends Controller
   nBins: 10000
   inMemory: false
   
+  colormaps:
+    gray:   [1, 1, 1]
+    red:    [1, 0, 0]
+    green:  [0, 1, 0]
+    blue:   [0, 0, 1]
+  
   elements:
     '.viewport'           : 'viewport'
     '[data-type="x"]'     : 'xEl'
@@ -18,6 +24,7 @@ class Image extends Controller
   events:
     'mouseleave .options'           : 'resetStretch'
     'change input[name="cursor"]'   : 'onPointer'
+    'change input[name="colormap"]' : 'onColorMap'
     'mouseover .stretch-fns label'  : 'onStretch'
     'click .stretch-fns label'      : 'onStretch'
   
@@ -120,6 +127,10 @@ class Image extends Controller
   
   onPointer: (e) =>
     @wfits.setCursor(e.target.dataset.type)
+  
+  onColorMap: (e) =>
+    cmap = @colormaps[e.target.dataset.type]
+    @wfits.setColorMap.apply(@wfits, cmap)
   
   resetStretch: (e) =>
     @wfits.setStretch(@currentStretch)

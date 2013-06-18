@@ -6,6 +6,19 @@
     
     <input type='radio' name='cursor' id='crosshair-<%-@index %>' data-type='crosshair' />
     <label class='tip' data-tip='crosshair' for='crosshair-<%-@index %>'></label>
+    
+    <!-- Color Maps -->
+    <input type='radio' name='colormap' id='gray-<%-@index %>' data-type='gray' />
+    <label class='tip' data-tip='gray' for='gray-<%-@index %>'></label>
+    
+    <input type='radio' name='colormap' id='red-<%-@index %>' data-type='red' />
+    <label class='tip' data-tip='red' for='red-<%-@index %>'></label>
+    
+    <input type='radio' name='colormap' id='green-<%-@index %>' data-type='green' />
+    <label class='tip' data-tip='green' for='green-<%-@index %>'></label>
+    
+    <input type='radio' name='colormap' id='blue-<%-@index %>' data-type='blue' />
+    <label class='tip' data-tip='blue' for='blue-<%-@index %>'></label>
   </div>
   
   <div class='viewport'></div>
