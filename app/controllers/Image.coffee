@@ -22,10 +22,10 @@ class Image extends Controller
     '.pixel-row'          : 'pixelRowsEl'
   
   events:
-    'mouseleave .options'           : 'resetStretch'
     'change input[name="cursor"]'   : 'onPointer'
     'change input[name="colormap"]' : 'onColorMap'
     'mouseover .stretch-fns label'  : 'onStretch'
+    'mouseleave .stretch-fns label' : 'resetStretch'
     'click .stretch-fns label'      : 'onStretch'
   
   
