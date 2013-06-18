@@ -13,6 +13,7 @@ class Image extends Controller
     '[data-type="ra"]'    : 'raEl'
     '[data-type="dec"]'   : 'decEl'
     '[data-type="flux"]'  : 'fluxEl'
+    '.pixel-row'          : 'pixelRowsEl'
   
   events:
     'mouseleave .options'           : 'resetStretch'
@@ -73,7 +74,6 @@ class Image extends Controller
     
     header = @hdu.header
     dataunit = @hdu.data
-    
     
     # Massage fitsjs header
     # TODO: Ideally this step should not be needed
@@ -147,6 +147,11 @@ class Image extends Controller
       @raEl.text(sky.ra)
       @decEl.text(sky.dec)
       @fluxEl.text(arr[x + width * y])
+      
+      # Pixel Table
+      rows = @getPixelTable(x, y, width, arr)
+      @pixelRowsEl.each (i, el) ->
+        $(el).html(rows[i])
     
     # Define mouse callbacks for when sockets is enabled
     mouseCallbacks = {}
@@ -170,6 +175,27 @@ class Image extends Controller
     @wfits.setStretch('linear')
     
     @inMemory = true
+  
+  
+  getPixelTable: (x, y, width, arr) ->
+    i1j1 = (x - 1) + width * (y + 1)
+    i2j1 = x + width * (y + 1)
+    i3j1 = (x + 1) + width * (y + 1)
+    
+    i1j2 = (x - 1) + width * y
+    i2j2 = x + width * y
+    i3j2 = (x + 1) + width * y
+    
+    i1j3 = (x - 1) + width * (y - 1)
+    i2j3 = x + width * (y - 1)
+    i3j3 = (x + 1) + width * (y - 1)
+    
+    rows = []
+    rows.push "#{arr[i1j1].toFixed(8)} | #{arr[i2j1].toFixed(8)} | #{arr[i3j1].toFixed(8)}"
+    rows.push "#{arr[i1j2].toFixed(8)} | #{arr[i2j2].toFixed(8)} | #{arr[i3j2].toFixed(8)}"
+    rows.push "#{arr[i1j3].toFixed(8)} | #{arr[i2j3].toFixed(8)} | #{arr[i3j3].toFixed(8)}"
+    
+    return rows
   
   getHistogram: (arr, min, max, bins) ->
     

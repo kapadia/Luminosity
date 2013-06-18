@@ -58,6 +58,13 @@
       </div>
       
     </div>
+    
+    <div class='pixel-table'>
+      <div class='pixel-row'></div>
+      <div class='pixel-row'></div>
+      <div class='pixel-row'></div>
+    </div>
+    
   </div>
   
   <div class='row'>
