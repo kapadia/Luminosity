@@ -16,16 +16,16 @@ task 'build', 'Build from server/', ->
 
 task 'server', 'Watch for changes', ->
   
-  # watch.createMonitor('.', (monitor) ->
-  #   
-  #   monitor.on("changed", (f, cur, prev) ->
-  #     ext = path.extname(f)
-  #     if ext in ['.coffee', '.styl']
-  #       exec('hem build', ->
-  #         console.log 'Build complete'
-  #       )
-  #   )
-  # )
+  watch.createMonitor('.', (monitor) ->
+    
+    monitor.on("changed", (f, cur, prev) ->
+      ext = path.extname(f)
+      if ext in ['.coffee', '.styl']
+        exec('hem build', ->
+          console.log 'Build complete'
+        )
+    )
+  )
   
   coffee = spawn 'node_modules/.bin/coffee', ['-w', '-c', '-m', '-o', '.', 'server']
   nodemon = spawn 'node_modules/.bin/nodemon', ['server.js']

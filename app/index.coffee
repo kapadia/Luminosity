@@ -17,11 +17,11 @@ class Luminosity extends Controller
     # Initialize controllers
     @el = $('#luminosity')
     
-    # Start socket and determine hostname and port for sockets
-    if location.hostname is '0.0.0.0'
-      socket = io.connect('http://localhost', {port: 8080})
-    else
-      socket = io.connect()
+    # # Start socket and determine hostname and port for sockets
+    # if location.hostname is '0.0.0.0'
+    #   socket = io.connect('http://localhost', {port: 8080})
+    # else
+    socket = io.connect()
     
     # Initialize Drop controller with DOM element and socket
     drop = new Drop({el: @el, socket: socket})

@@ -118,12 +118,24 @@ class Image extends Controller
     @socket.on('scale', (min, max) =>
       @wfits.setExtent(min, max)
     )
+    
+    @socket.on('stretch', (fn) =>
+      @wfits.setStretch(fn)
+    )
+    
+    # TODO: Finish this feature!
+    @socket.on('mousemove', (x, y) =>
+      console.log 'onmousemove', x, y
+    )
   
   onStretch: (e) =>
     stretch = e.target.dataset.fn
     if e.type is 'click'
       @currentStretch = stretch
     @wfits.setStretch(stretch)
+    
+    if @socket
+      @socket.emit 'stretch', stretch
   
   onPointer: (e) =>
     @wfits.setCursor(e.target.dataset.type)
@@ -170,6 +182,7 @@ class Image extends Controller
       
       mouseCallbacks.onmousemove = (x, y, opts) =>
         _onmousemove(x, y, opts)
+        @socket.emit 'mousemove', x, y
         @socket.emit 'translation', [@wfits.xOffset, @wfits.yOffset]
       
       mouseCallbacks.onzoom = =>
