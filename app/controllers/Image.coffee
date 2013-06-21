@@ -141,8 +141,7 @@ class Image extends Controller
     @wfits.setCursor(e.target.dataset.type)
   
   onColorMap: (e) =>
-    cmap = @colormaps[e.target.dataset.type]
-    @wfits.setColorMap.apply(@wfits, cmap)
+    @wfits.setupColorMap(e.target.dataset.cmap)
   
   resetStretch: (e) =>
     @wfits.setStretch(@currentStretch)

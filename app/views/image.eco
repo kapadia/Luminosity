@@ -8,17 +8,32 @@
     <label class='tip' data-tip='crosshair' for='crosshair-<%-@index %>'></label>
     
     <!-- Color Maps -->
-    <input type='radio' name='colormap' id='gray-<%-@index %>' data-type='gray' />
-    <label class='tip' data-tip='gray' for='gray-<%-@index %>'></label>
+    <input type='radio' name='colormap' id='binary-<%-@index %>' data-cmap='binary' checked='checked' />
+    <label class='tip' data-tip='gray' for='binary-<%-@index %>'></label>
     
-    <input type='radio' name='colormap' id='red-<%-@index %>' data-type='red' />
-    <label class='tip' data-tip='red' for='red-<%-@index %>'></label>
+    <input type='radio' name='colormap' id='coolwarm-<%-@index %>' data-cmap='coolwarm' />
+    <label class='tip' data-tip='coolwarm' for='coolwarm-<%-@index %>'></label>
     
+    <input type='radio' name='colormap' id='gist_heat-<%-@index %>' data-cmap='gist_heat' />
+    <label class='tip' data-tip='gist_heat' for='gist_heat-<%-@index %>'></label>
+    
+    <input type='radio' name='colormap' id='RdYlBu-<%-@index %>' data-cmap='RdYlBu' />
+    <label class='tip' data-tip='RdYlBu' for='RdYlBu-<%-@index %>'></label>
+    
+    <input type='radio' name='colormap' id='hsv-<%-@index %>' data-cmap='hsv' />
+    <label class='tip' data-tip='hsv' for='hsv-<%-@index %>'></label>
+    
+    <input type='radio' name='colormap' id='PRGn-<%-@index %>' data-cmap='PRGn' />
+    <label class='tip' data-tip='PRGn' for='PRGn-<%-@index %>'></label>
+    
+    <!--
     <input type='radio' name='colormap' id='green-<%-@index %>' data-type='green' />
     <label class='tip' data-tip='green' for='green-<%-@index %>'></label>
     
     <input type='radio' name='colormap' id='blue-<%-@index %>' data-type='blue' />
     <label class='tip' data-tip='blue' for='blue-<%-@index %>'></label>
+    -->
+    
   </div>
   
   <div class='viewport'></div>
