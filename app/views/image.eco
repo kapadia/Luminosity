@@ -88,6 +88,7 @@
     </div>
     
     <div class='pixel-table'>
+      <p>pixel table</p>
       <div class='pixel-row'></div>
       <div class='pixel-row'></div>
       <div class='pixel-row'></div>

@@ -59,7 +59,6 @@
 
 .tools
   overflow hidden
-  border 1px solid $blue
   height 600px
   
   .row
@@ -68,9 +67,11 @@
     
     .info
       float left
+      padding 10px
       
       .row
         display table-row
+        line-height 16px
         
         .key, .value
           display table-cell
@@ -83,4 +84,18 @@
   
   .pixel-table
     float right
-    border 1px solid $blue
+    padding 10px
+    display table
+    
+    p
+      font-weight 700
+    
+    .pixel-row
+      display table-row
+      
+      .pixel
+        display table-cell
+        padding 4px
+        width 66px
+    
+    

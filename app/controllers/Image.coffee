@@ -214,9 +214,9 @@ class Image extends Controller
     i3j3 = (x + 1) + width * (y - 1)
     
     rows = []
-    rows.push "#{arr[i1j1].toFixed(8)} | #{arr[i2j1].toFixed(8)} | #{arr[i3j1].toFixed(8)}"
-    rows.push "#{arr[i1j2].toFixed(8)} | #{arr[i2j2].toFixed(8)} | #{arr[i3j2].toFixed(8)}"
-    rows.push "#{arr[i1j3].toFixed(8)} | #{arr[i2j3].toFixed(8)} | #{arr[i3j3].toFixed(8)}"
+    rows.push "<div class='pixel'>#{arr[i1j1].toFixed(3)}</div><div class='pixel'>#{arr[i2j1].toFixed(3)}</div><div class='pixel'>#{arr[i3j1].toFixed(3)}</div>"
+    rows.push "<div class='pixel'>#{arr[i1j2].toFixed(3)}</div><div class='pixel'>#{arr[i2j2].toFixed(3)}</div><div class='pixel'>#{arr[i3j2].toFixed(3)}</div>"
+    rows.push "<div class='pixel'>#{arr[i1j3].toFixed(3)}</div><div class='pixel'>#{arr[i2j3].toFixed(3)}</div><div class='pixel'>#{arr[i3j3].toFixed(3)}</div>"
     
     return rows
   
