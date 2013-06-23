@@ -23,7 +23,6 @@ io.sockets.on('connection', (socket) ->
     status: true
 
   socket.on 'sharing-data', (msg) ->
-    console.log "SHARING DATA"
     socket.broadcast.emit 'request-to-share', msg.filename
 
   socket.on 'translation', (xOffset, yOffset) ->
@@ -36,11 +35,13 @@ io.sockets.on('connection', (socket) ->
     socket.broadcast.emit 'scale', min, max
     
   socket.on 'mousemove', (x, y) ->
-    console.log 'onmousemove'
     socket.broadcast.emit 'mousemove', x, y
   
   socket.on 'stretch', (fn) ->
     socket.broadcast.emit 'stretch', fn
+  
+  socket.on 'colormap', (cmap) ->
+    socket.broadcast.emit 'colormap', cmap
 )
 
 

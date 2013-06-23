@@ -6,11 +6,6 @@ class Image extends Controller
   nBins: 10000
   inMemory: false
   
-  colormaps:
-    gray:   [1, 1, 1]
-    red:    [1, 0, 0]
-    green:  [0, 1, 0]
-    blue:   [0, 0, 1]
   
   elements:
     '.viewport'           : 'viewport'
@@ -123,9 +118,14 @@ class Image extends Controller
       @wfits.setStretch(fn)
     )
     
-    # TODO: Finish this feature!
     @socket.on('mousemove', (x, y) =>
-      console.log 'onmousemove', x, y
+      @wfits.xCurrent = x
+      @wfits.yCurrent = y
+      @wfits.drawCrosshair()
+    )
+    
+    @socket.on('colormap', (cmap) =>
+      @wfits.setColorMap(cmap)
     )
   
   onStretch: (e) =>
@@ -141,7 +141,11 @@ class Image extends Controller
     @wfits.setCursor(e.target.dataset.type)
   
   onColorMap: (e) =>
-    @wfits.setupColorMap(e.target.dataset.cmap)
+    cmap = e.target.dataset.cmap
+    @wfits.setColorMap(cmap)
+    
+    if @socket
+      @socket.emit 'colormap', cmap
   
   resetStretch: (e) =>
     @wfits.setStretch(@currentStretch)
@@ -151,9 +155,6 @@ class Image extends Controller
   
   draw: (arr, min, max) ->
     @unbind 'data-ready', @draw
-    
-    # Setup histogram
-    @drawHistogram(arr, min, max)
     
     # Define mouse callbacks for WebFITS
     opts =
@@ -181,7 +182,7 @@ class Image extends Controller
       
       mouseCallbacks.onmousemove = (x, y, opts) =>
         _onmousemove(x, y, opts)
-        @socket.emit 'mousemove', x, y
+        @socket.emit 'mousemove', @wfits.xCurrent, @wfits.yCurrent
         @socket.emit 'translation', [@wfits.xOffset, @wfits.yOffset]
       
       mouseCallbacks.onzoom = =>
@@ -198,6 +199,9 @@ class Image extends Controller
     @wfits.setStretch('linear')
     
     @inMemory = true
+    
+    # # Setup histogram
+    # @drawHistogram(arr, min, max)
   
   
   getPixelTable: (x, y, width, arr) ->

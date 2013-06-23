@@ -81,19 +81,19 @@ class Scatter3D extends Graph
     @key3 = zlabel = @axis3.find("option:selected").text()
     
     # Get data from file
-    dataunit.getColumn(@key1, 0, rows - 1, (column) =>
+    dataunit.getColumn(@key1, (column) =>
       obj = new Object()
       obj[@key1] = column
       dfd1.resolve(obj)
     )
     
-    dataunit.getColumn(@key2, 0, rows - 1, (column) =>
+    dataunit.getColumn(@key2, (column) =>
       obj = new Object()
       obj[@key2] = column
       dfd2.resolve(obj)
     )
     
-    dataunit.getColumn(@key3, 0, rows - 1, (column) =>
+    dataunit.getColumn(@key3, (column) =>
       obj = new Object()
       obj[@key3] = column
       dfd3.resolve(obj)
@@ -112,7 +112,8 @@ class Scatter3D extends Graph
     extentY = @getExtent(column1[@key2])
     extentZ = @getExtent(column1[@key3])
     
-    console.log extentX, extentY, extentZ
+    @createAxes3D(@scatter, 50)
+    return
     
     minX = extentX[0]
     minY = extentY[0]
