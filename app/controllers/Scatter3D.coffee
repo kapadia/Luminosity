@@ -36,20 +36,23 @@ class Scatter3D extends Graph
     
     # Setup camera
     @camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000)
-    @camera.position.z = 200
+    @camera.position.z = 160
     @camera.position.x = 0
     @camera.position.y = 10
     
     # Setup controls
     @setupMouseInteractions()
-    # @controls = new THREE.TrackballControls(@camera, @renderer.domElement)
+    # @controls = new THREE.TrackballControls(@camera)
+    # @controls.rotateSpeed = 1.0
+    # @controls.zoomSpeed = 1.2
+    # @controls.panSpeed = 0.8
+    # 
+    # @controls.noZoom = false
+    # @controls.noPan = false
     
     # Setup scene
     @scene = new THREE.Scene()
     # @scene.fog = new THREE.FogExp2(0xFFFFFF, 0.0035)
-    
-    # Look
-    @camera.lookAt(@scene.position)
     
     @scatter = new THREE.Object3D()
     
@@ -157,8 +160,11 @@ class Scatter3D extends Graph
     @scatter.add(points)
     @scene.add(@scatter)
     
+    # Look at the scatter plot
+    @camera.lookAt(@scatter.position)
+    
     @renderer.render(@scene, @camera)
-    @controls.update()
+    # @controls.update()
   
   setupMouseInteractions: ->
     @down = false
