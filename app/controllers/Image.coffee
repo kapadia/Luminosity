@@ -200,8 +200,8 @@ class Image extends Controller
     
     @inMemory = true
     
-    # # Setup histogram
-    # @drawHistogram(arr, min, max)
+    # Setup histogram
+    @drawHistogram(arr, min, max)
   
   
   getPixelTable: (x, y, width, arr) ->

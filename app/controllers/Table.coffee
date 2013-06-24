@@ -92,7 +92,6 @@ class Table extends Controller
     @html require('views/table')(info)
   
   renderRows: (data) =>
-    console.log '@tbody', @tbody
     
     @tbody.selectAll('tr').remove()
     @tbody.selectAll('tr')

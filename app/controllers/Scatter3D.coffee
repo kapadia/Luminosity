@@ -32,24 +32,31 @@ class Scatter3D extends Graph
     # Setup THREE 
     @renderer = new THREE.WebGLRenderer({antialias: true})
     @renderer.setSize(width, height)
-    @renderer.setClearColorHex(0xEEEEEE, 1.0)
-    @renderer.clear()
+    @renderer.setClearColor(0xEEEEEE, 1.0)
     
+    # Setup camera
     @camera = new THREE.PerspectiveCamera(45, width / height, 1, 10000)
+    @camera.position.z = 200
+    @camera.position.x = 0
+    @camera.position.y = 10
     
-    @controls = new THREE.TrackballControls(@camera, @renderer.domElement)
+    # Setup controls
+    @setupMouseInteractions()
+    # @controls = new THREE.TrackballControls(@camera, @renderer.domElement)
     
+    # Setup scene
     @scene = new THREE.Scene()
-    @scene.fog = new THREE.FogExp2(0xFFFFFF, 0.0035)
+    # @scene.fog = new THREE.FogExp2(0xFFFFFF, 0.0035)
+    
+    # Look
+    @camera.lookAt(@scene.position)
     
     @scatter = new THREE.Object3D()
     
-    # Construct the axes
-    v = (x, y, z) => return new THREE.Vector3(x, y, z)
-    distance = 1
+    distance = 50
     labels = ['-X', 'X', '-Y', 'Y', '-Z', 'Z']
     
-    @createAxes3D(@scatter, distance)
+    @createAxes3D(distance)
     
     @container.appendChild(@renderer.domElement)
     @isSetup = true
@@ -112,9 +119,6 @@ class Scatter3D extends Graph
     extentY = @getExtent(column1[@key2])
     extentZ = @getExtent(column1[@key3])
     
-    @createAxes3D(@scatter, 50)
-    return
-    
     minX = extentX[0]
     minY = extentY[0]
     minZ = extentZ[0]
@@ -140,9 +144,9 @@ class Scatter3D extends Graph
       z = columnZ[rows]
       
       # Normalize
-      xn = (x - minX) / rangeX
-      yn = (y - minY) / rangeY
-      zn = (z - minZ) / rangeZ
+      xn = 50 * (x - minX) / rangeX
+      yn = 50 * (y - minY) / rangeY
+      zn = 50 * (z - minZ) / rangeZ
       
       # Create vector representing point
       point = new THREE.Vector3(xn, yn, zn)
@@ -177,8 +181,9 @@ class Scatter3D extends Graph
         @sy += dy
         @renderer.render(@scene, @camera)
 
-  createAxes3D: (plot, size) ->
-    v = (x, y, z) => return new THREE.Vector3(x, y, z)
+  createAxes3D: (size) ->
+    v = (x, y, z) ->
+      return new THREE.Vector3(x, y, z)
 
     lineGeo = new THREE.Geometry()
     lineGeo.vertices.push(
@@ -220,7 +225,7 @@ class Scatter3D extends Graph
     lineMat = new THREE.LineBasicMaterial({color: 0x808080, lineWidth: 1})
     line = new THREE.Line(lineGeo, lineMat)
     line.type = THREE.Lines
-    plot.add(line)
+    @scatter.add(line)
 
   createAxesLabel3D: (plot, labels, distance) ->
     axes = ['x', 'x', 'y', 'y', 'z', 'z']
