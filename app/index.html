@@ -1,0 +1,60 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <title>Luminosity</title>
+    <meta name="description" content="">
+    <meta name="viewport" content="width=device-width">
+    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
+
+    <!-- build:css({.tmp,app}) styles/main.css -->
+    <link rel="stylesheet" href="styles/bootstrap.css">
+    <link rel="stylesheet" href="styles/bootstrap-theme.css">
+    <link rel="stylesheet" href="styles/main.css">
+    <link rel="stylesheet" href="styles/header-dataunit.css">
+    <!-- endbuild -->
+</head>
+  <body ng-app="LuminosityApp">
+    
+    <header ng-controller='HeaderCtrl'>
+      <p class="brand">Luminosity</p>
+      <p ng-hide="isAuthenticated()" ng-click="onSignIn()">sign in</p>
+      <p ng-show="isAuthenticated()" ng-click="onSignOut()">sign out</p>
+    </header>
+    
+    <!-- Add your site or application content here -->
+    <div class="container" ng-view=""></div>
+
+    <!-- Google Analytics: change UA-XXXXX-X to be your site's ID. -->
+    <script>
+      var _gaq=[['_setAccount','UA-XXXXX-X'],['_trackPageview']];
+      (function(d,t){var g=d.createElement(t),s=d.getElementsByTagName(t)[0];
+      g.src='//www.google-analytics.com/ga.js';
+      s.parentNode.insertBefore(g,s)}(document,'script'));
+    </script>
+    
+    <!-- build:js({.tmp,app}) scripts/scripts.js -->
+    <script src="https://login.persona.org/include.js"></script>
+    
+    <script src="bower_components/angular/angular.js"></script>
+    <script src="bower_components/angular-route/angular-route.js"></script>
+    <script src="bower_components/angular-cookies/angular-cookies.js"></script>
+    
+    <!-- TODO: Move fitsjs to bower -->
+    <script src="lib/fits.js"></script>
+    
+    <script src="app.js"></script>
+    <script src="constant/supportedFormats.js"></script>
+    
+    <script src="controller/Header.js"></script>
+    <script src="controller/Main.js"></script>
+    <script src="controller/Workspace.js"></script>
+    
+    <script src="service/AppState.js"></script>
+    <script src="service/WorkspaceService.js"></script>
+    
+    <script src="directive/workspace.js"></script>
+    <!-- endbuild -->
+</body>
+</html>

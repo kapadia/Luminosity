@@ -1,0 +1,41 @@
+body {
+  background: #fafafa;
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  color: #333;
+  heigth: 100%;
+}
+
+header {
+  position: absolute;
+  width: 100%;
+  height: 8%;
+}
+
+header p {
+  display: inline-block;
+}
+
+header p.brand {
+  font-size: 14px;
+  text-transform: uppercase;
+}
+
+.container {
+  position: absolute;
+  bottom: 0;
+  
+  width: 90%;
+  height: 90%;
+  font-size: 18px;
+  font-weight: 200;
+  line-height: 30px;
+  background-color: #eee;
+  border-radius: 6px;
+  padding: 10px 60px;
+}
+
+.hero-unit h1 {
+  font-size: 60px;
+  line-height: 1;
+  letter-spacing: -1px;
+}

@@ -1,0 +1,38 @@
+<workspace>
+  <div ng-repeat="dataunit in getHeaders() track by $index">
+    <div class='header-dataunit'>
+      <p ng-click="onHeader($index)">Header</p>
+      <p ng-click="onDataUnit($index)">{{dataunit}}</p>
+    </div>
+  </div>
+  
+  <div class="header" ng-show="isHeaderSelected">
+    <p>Header</p>
+    <p ng-click="onCloseHeader()">close</p>
+    <table class="table">
+      <tr ng-repeat="(key, value) in cards">
+        <td>{{key}}</td>
+        <td>{{value.value}}</td>
+      </tr>
+    </table>
+  </div>
+  
+  <div class="bintable" ng-show="isBintableSelected">
+    <p ng-click="onCloseBinTable()">close</p>
+    <select id="x-axis">
+      <option></option>
+      <option ng-repeat="column in columns">{{column}}</option>
+    </select>
+    <select id="y-axis">
+      <option></option>
+      <option ng-repeat="column in columns">{{column}}</option>
+    </select>
+    <select id="z-axis">
+      <option></option>
+      <option ng-repeat="column in columns">{{column}}</option>
+    </select>
+    
+    <div class="chart" width="800px" height="500px"></div>
+  </div>
+  
+</workspace>
