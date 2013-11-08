@@ -19,20 +19,12 @@
   
   <div class="bintable" ng-show="isBintableSelected">
     <p ng-click="onCloseBinTable()">close</p>
-    <select id="x-axis">
-      <option></option>
-      <option ng-repeat="column in columns">{{column}}</option>
-    </select>
-    <select id="y-axis">
-      <option></option>
-      <option ng-repeat="column in columns">{{column}}</option>
-    </select>
-    <select id="z-axis">
-      <option></option>
-      <option ng-repeat="column in columns">{{column}}</option>
-    </select>
     
-    <div class="chart" width="800px" height="500px"></div>
+    <select ng-options="column for column in columns" ng-model="xAxis" ng-change="onAxis()"></select>
+    <select ng-options="column for column in columns" ng-model="yAxis" ng-change="onAxis()"></select>
+    <select ng-options="column for column in columns" ng-model="zAxis" ng-change="onAxis()"></select>
+    
+    <div id="chart"></div>
   </div>
   
 </workspace>

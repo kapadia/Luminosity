@@ -43,7 +43,39 @@ angular.module('LuminosityApp')
     
     workspace.getColumnsFromDataUnit = function(index) {
       var dataunit = workspace.file.getDataUnit(index);
+      workspace.index = index;
       return dataunit.columns;
+    }
+    
+    workspace.getColumnData = function(xAxis, yAxis, zAxis) {
+      var dataunit = workspace.file.getDataUnit(workspace.index);
+      
+      // TODO: Reimplement getColumn function in fitsjs to permit selection of multiple columns in one query
+      // TODO: Use promises!
+      dataunit.getColumn(xAxis, function(xValues) {
+        dataunit.getColumn(yAxis, function(yValues) {
+          dataunit.getColumn(zAxis, function(zValues) {
+            
+            // TODO: Move to directive
+            var el = document.querySelector('#chart');
+            var chart = new ruse(el, 800, 500);
+            
+            // Format data
+            // TODO: Allow ruse to consume arrays as well as an array of objects
+            var data = [];
+            for (var i = 0; i < xValues.length; i++) {
+              var obj = {}
+              obj[xAxis] = xValues[i];
+              obj[yAxis] = yValues[i];
+              obj[zAxis] = zValues[i];
+              data[i] = obj;
+            }
+            chart.plot(data)
+            
+          });
+        });
+      });
+      
     }
     
     return workspace;

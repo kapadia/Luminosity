@@ -13,25 +13,6 @@ angular.module('LuminosityApp')
     $scope.isHeaderSelected = false;
     $scope.isBintableSelected = false;
     
-    // TODO: Figure out ng-change events
-    var xAxis = document.querySelector("#x-axis");
-    var yAxis = document.querySelector("#y-axis");
-    var zAxis = document.querySelector("#z-axis");
-    
-    function onAxis() {
-      // Get all axis values
-      var xValue = xAxis.value;
-      var yValue = yAxis.value;
-      var zValue = zAxis.value;
-      
-      if (xValue && yValue && zValue) {
-        console.log(xValue, yValue, zValue);
-      }
-    }
-    xAxis.onchange = onAxis;
-    yAxis.onchange = onAxis;
-    zAxis.onchange = onAxis;
-    
     $scope.getHeaders = function() {
       return WorkspaceService.getHeaders();
     }
@@ -56,8 +37,13 @@ angular.module('LuminosityApp')
       $scope.isBintableSelected = true;
     }
     
-    $scope.onAxis = function(value, index) {
-      console.log(value, index);
+    $scope.onAxis = function() {
+      
+      // Determine if all axes selected
+      if (!$scope.xAxis || !$scope.yAxis || !$scope.zAxis)
+        return;
+      
+      WorkspaceService.getColumnData($scope.xAxis, $scope.yAxis, $scope.zAxis);
     }
     
   });
