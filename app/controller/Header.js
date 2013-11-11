@@ -6,7 +6,6 @@
 
 angular.module('LuminosityApp')
   .controller('HeaderCtrl', function ($scope, $http, $location, AppState) {
-    console.log('HeaderCtrl');
     
     // Check if online
     if (window.navigator.onLine) {
@@ -20,7 +19,7 @@ angular.module('LuminosityApp')
               }
             })
             .error(function(data) {
-              isAuthenticated = false;
+              AppState.isAuthenticated = false;
             })
         },
         onlogout: function() {
