@@ -1,13 +1,17 @@
 <workspace>
-  <div ng-repeat="dataunit in getHeaders() track by $index">
-    <div class='header-dataunit'>
-      <p ng-click="onHeader($index)">Header</p>
-      <p ng-click="onDataUnit($index)">{{dataunit}}</p>
+  
+  <div class="row">
+    <div ng-repeat="dataunit in getHeaders() track by $index" class="col-md-6">
+      <div class="header-dataunit">
+        <h4 class="header" ng-click="onHeader($index)">Header</h4>
+        <h4 class="dataunit" ng-click="onDataUnit($index, dataunit)">{{dataunit}}</h4>
+      </div>
     </div>
   </div>
   
-  <div class="header" ng-show="isHeaderSelected">
-    <p>Header</p>
+  <div ng-show="isHeaderSelected" ng-controller="HeaderCtrl">
+    <h5>Header</h5>
+    
     <p ng-click="onCloseHeader()">close</p>
     <table class="table">
       <tr ng-repeat="(key, value) in cards">
@@ -15,6 +19,18 @@
         <td>{{value.value}}</td>
       </tr>
     </table>
+  </div>
+  
+  <div class="image" ng-show="selectedData == 'image'" controller="ImageCtrl">
+    <h4>Image</h4>
+  </div>
+  
+  <div class="bintable" ng-show="selectedData == 'table'" controller="TableCtrl">
+    <h4>Table</h4>
+  </div>
+  
+  <div class="volume" ng-show="selectedData == 'volume'" controller="VolumeCtrl">
+    <h4>Volume</h4>
   </div>
   
   <div class="bintable" ng-show="isBintableSelected">

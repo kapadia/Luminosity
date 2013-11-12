@@ -11,6 +11,7 @@ angular.module('LuminosityApp')
     
     // TODO: Move to application state?
     $scope.isHeaderSelected = false;
+    $scope.selectedData = null;
     $scope.isBintableSelected = false;
     
     $scope.getHeaders = function() {
@@ -32,7 +33,9 @@ angular.module('LuminosityApp')
       $scope.columns = null;
     }
     
-    $scope.onDataUnit = function(index) {
+    $scope.onDataUnit = function(index, dataunit) {
+      // TODO: Call appropriate function depending on the dataunit
+      console.log(dataunit);
       $scope.columns = WorkspaceService.getColumnsFromDataUnit(index);
       $scope.isBintableSelected = true;
     }

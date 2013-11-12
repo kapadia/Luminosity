@@ -23,7 +23,7 @@
         <div class="navbar-header">
           <a class="navbar-brand" href="#">Luminosity</a>
         </div>
-        <div class="navbar-collapse collapse" ng-controller='HeaderCtrl'>
+        <div class="navbar-collapse collapse" ng-controller='NavCtrl'>
           <div class="navbar-right">
             <p class="persona-button" ng-hide="isAuthenticated()" ng-click="onSignIn()"><span>Sign in</span></p>
             <p class="persona-button" ng-show="isAuthenticated()" ng-click="onSignOut()"><span>Sign out</span></p>
@@ -60,14 +60,18 @@
     <script src="app.js"></script>
     <script src="constant/supportedFormats.js"></script>
     
-    <script src="controller/Header.js"></script>
-    <script src="controller/Main.js"></script>
-    <script src="controller/Workspace.js"></script>
-    
     <script src="service/AppState.js"></script>
     <script src="service/WorkspaceService.js"></script>
     
     <script src="directive/workspace.js"></script>
+    
+    <script src="controller/Nav.js"></script>
+    <script src="controller/Main.js"></script>
+    <script src="controller/Workspace.js"></script>
+    <script src="controller/Header.js"></script>
+    <script src="controller/Image.js"></script>
+    <script src="controller/Table.js"></script>
+    <script src="controller/Volume.js"></script>
     <!-- endbuild -->
 </body>
 </html>
