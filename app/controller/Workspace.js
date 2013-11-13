@@ -9,28 +9,25 @@ angular.module('LuminosityApp')
     if (!AppState.isAuthenticated)
       $location.path('/');
     
-    // TODO: Move to application state?
-    $scope.isHeaderSelected = false;
-    $scope.selectedData = null;
-    $scope.isBintableSelected = false;
+    // Recover state
+    if (WorkspaceService.file) {
+      var index = WorkspaceService.selectedHeader;
+      $scope.cards = WorkspaceService.file.hdus[index].header.cards;
+    }
+    
+    // Listen for when file is ready and default header to primary HDU
+    $scope.$on('file-ready', function() {
+      WorkspaceService.selectedHeader = 0;
+      $scope.cards = WorkspaceService.file.hdus[0].header.cards;
+    })
     
     $scope.getHeaders = function() {
       return WorkspaceService.getHeaders();
     }
     
     $scope.onHeader = function(index) {
-      $scope.isHeaderSelected = true;
+      WorkspaceService.selectedHeader = index;
       $scope.cards = WorkspaceService.file.hdus[index].header.cards;
-    }
-    
-    $scope.onCloseHeader = function() {
-      $scope.isHeaderSelected = false;
-      $scope.cards = null;
-    }
-    
-    $scope.onCloseBinTable = function() {
-      $scope.isBintableSelected = false;
-      $scope.columns = null;
     }
     
     $scope.onDataUnit = function(index, dataunit) {
@@ -38,15 +35,6 @@ angular.module('LuminosityApp')
       console.log(dataunit);
       $scope.columns = WorkspaceService.getColumnsFromDataUnit(index);
       $scope.isBintableSelected = true;
-    }
-    
-    $scope.onAxis = function() {
-      
-      // Determine if all axes selected
-      if (!$scope.xAxis || !$scope.yAxis || !$scope.zAxis)
-        return;
-      
-      WorkspaceService.getColumnData($scope.xAxis, $scope.yAxis, $scope.zAxis);
     }
     
   });

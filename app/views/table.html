@@ -1,0 +1,14 @@
+
+<div class="charts">
+  <button type="button" class="btn btn-default" ng-click="onHistogram()">Histogram</button>
+  <button type="button" class="btn btn-default" ng-click="onScatter2D()">Scatter 2D</button>
+  <button type="button" class="btn btn-default" ng-click="onScatter3D()">Scatter 3D</button>
+</div>
+
+<div class="row">
+  <div ng-repeat="chart in getCharts() track by $index" class="col-md-6">
+    <div id="chart-{{$index}}" class="chart">
+      <h6>{{chart}}</h6>
+    </div>
+  </div>
+</div>

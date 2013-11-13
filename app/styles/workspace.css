@@ -1,0 +1,22 @@
+a.header {
+  padding: 10px;
+}
+
+div.header {
+  height: 400px;
+  overflow: scroll;
+}
+
+table.header {
+  font-family: Courier;
+  font-size: 13px;
+}
+
+.jumbotron {
+  padding-top: 80px;
+  padding-bottom: 10px;
+}
+
+td.header-key {
+  width: 200px;
+}

@@ -1,46 +1,24 @@
 <workspace>
   
   <div class="row">
-    <div ng-repeat="dataunit in getHeaders() track by $index" class="col-md-6">
-      <div class="header-dataunit">
-        <h4 class="header" ng-click="onHeader($index)">Header</h4>
-        <h4 class="dataunit" ng-click="onDataUnit($index, dataunit)">{{dataunit}}</h4>
+    <div class="col-md-4 hdus">
+      <div class="row">
+        <div ng-repeat="dataunit in getHeaders() track by $index" class="col-md-12">
+          <button type="button" class="btn btn-info" ng-click="onHeader($index)">Header</button>
+          <a href="{{dataunit.toLowerCase() || 'primary'}}/{{$index}}">{{dataunit || 'PrimaryHDU'}}</a>
+        </div>
       </div>
     </div>
-  </div>
-  
-  <div ng-show="isHeaderSelected" ng-controller="HeaderCtrl">
-    <h5>Header</h5>
     
-    <p ng-click="onCloseHeader()">close</p>
-    <table class="table">
-      <tr ng-repeat="(key, value) in cards">
-        <td>{{key}}</td>
-        <td>{{value.value}}</td>
-      </tr>
-    </table>
-  </div>
-  
-  <div class="image" ng-show="selectedData == 'image'" controller="ImageCtrl">
-    <h4>Image</h4>
-  </div>
-  
-  <div class="bintable" ng-show="selectedData == 'table'" controller="TableCtrl">
-    <h4>Table</h4>
-  </div>
-  
-  <div class="volume" ng-show="selectedData == 'volume'" controller="VolumeCtrl">
-    <h4>Volume</h4>
-  </div>
-  
-  <div class="bintable" ng-show="isBintableSelected">
-    <p ng-click="onCloseBinTable()">close</p>
+    <div class="col-md-8 header">
+      <table class="table table-hover table-condensed header">
+        <tr ng-repeat="(key, value) in cards">
+          <td class="header-key">{{key}}</td>
+          <td class="header-value">{{value.value}}</td>
+        </tr>
+      </table>
+    </div>
     
-    <select ng-options="column for column in columns" ng-model="xAxis" ng-change="onAxis()"></select>
-    <select ng-options="column for column in columns" ng-model="yAxis" ng-change="onAxis()"></select>
-    <select ng-options="column for column in columns" ng-model="zAxis" ng-change="onAxis()"></select>
-    
-    <div id="chart"></div>
   </div>
   
 </workspace>

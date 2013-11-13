@@ -14,6 +14,12 @@ angular.module('LuminosityApp')
     // This singleton is used for doing the heavy lifting in the workspace
     var workspace = {};
     
+    // Set default parameters
+    // TODO: This service encompasses entire file state. Might want to abstract this later.
+    workspace.selectedHeader = 0;
+    workspace.nCharts = 0;
+    workspace.charts = [];
+    
     workspace.onFile = function(f) {
       
       // Check file extension
@@ -32,6 +38,7 @@ angular.module('LuminosityApp')
     // TODO: Create handlers for other file formats
     workspace.onFITS = function(fits) {
       workspace.file = fits;
+      $rootScope.$broadcast("file-ready");
       $rootScope.$apply();  // Re-render scope
     }
     
@@ -39,6 +46,25 @@ angular.module('LuminosityApp')
       if (workspace.file === undefined)
         return null;
       return workspace.file.hdus.map(function(hdu) { return hdu.header.getDataType(); });
+    }
+    
+    // Table specific functions
+    workspace.getNumericalColumns = function(index) {
+      var table = workspace.file.getDataUnit(index);
+      var header = workspace.file.getHeader(index);
+      
+      var columns = table.columns;
+      var numericalColumns = [];
+      
+      for (var i = 1; i < columns.length + 1; i++) {
+        var form = "TFORM" + i;
+        var type = "TTYPE" + i;
+        var match = header.get(form).match(/(\d*)([BIJKED])/);
+        if (typeof match !== "undefined" && match !== null) {
+          numericalColumns.push( header.get(type) );
+        }
+      }
+      return numericalColumns;
     }
     
     workspace.getColumnsFromDataUnit = function(index) {

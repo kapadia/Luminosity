@@ -1,0 +1,11 @@
+<div ng-show="isHeaderSelected()" ng-controller="HeaderCtrl">
+  <h5>Header</h5>
+  
+  <button type="button" class="btn btn-danger" ng-click="onCloseHeader()">Close</button>
+  <table class="table">
+    <tr ng-repeat="(key, value) in cards">
+      <td>{{key}}</td>
+      <td>{{value.value}}</td>
+    </tr>
+  </table>
+</div>
