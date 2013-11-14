@@ -48,22 +48,26 @@ angular.module('LuminosityApp')
       return workspace.file.hdus.map(function(hdu) { return hdu.header.getDataType(); });
     }
     
+    //
     // Table specific functions
+    //
+    
     workspace.getNumericalColumns = function(index) {
       var table = workspace.file.getDataUnit(index);
       var header = workspace.file.getHeader(index);
       
       var columns = table.columns;
+      var regex = /(\d*)([BIJKED])/;
       var numericalColumns = [];
       
       for (var i = 1; i < columns.length + 1; i++) {
         var form = "TFORM" + i;
         var type = "TTYPE" + i;
-        var match = header.get(form).match(/(\d*)([BIJKED])/);
-        if (typeof match !== "undefined" && match !== null) {
+        var match = header.get(form).match(regex);
+        if (typeof match !== "undefined" && match !== null)
           numericalColumns.push( header.get(type) );
-        }
       }
+      
       return numericalColumns;
     }
     
@@ -71,6 +75,13 @@ angular.module('LuminosityApp')
       var dataunit = workspace.file.getDataUnit(index);
       workspace.index = index;
       return dataunit.columns;
+    }
+    
+    workspace.getColumn = function(axis, chart) {
+      var dataunit = workspace.file.getDataUnit(workspace.index);
+      dataunit.getColumn(axis, function(data) {
+        chart.plot(data);
+      });
     }
     
     workspace.getColumnData = function(xAxis, yAxis, zAxis) {

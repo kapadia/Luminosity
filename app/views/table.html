@@ -7,8 +7,8 @@
 
 <div class="row">
   <div ng-repeat="chart in getCharts() track by $index" class="col-md-6">
-    <div id="chart-{{$index}}" class="chart">
-      <h6>{{chart}}</h6>
-    </div>
+    <histogram ng-if="chart=='histogram'"></histogram>
+    <scatter2d ng-if="chart=='scatter2d'"></scatter2d>
+    <scatter3d ng-if="chart=='scatter3d'"></scatter3d>
   </div>
 </div>
