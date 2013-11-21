@@ -2,9 +2,12 @@
   
   <div class="row">
     <div class="col-md-4 hdus">
+      
       <div class="row">
         <div ng-repeat="dataunit in getHeaders() track by $index" class="col-md-12">
-          <button type="button" class="btn btn-info" ng-click="onHeader($index)">Header</button>
+          <button type="button" class="btn btn-default btn-sm" ng-click="onHeader($index)">
+            <span class="glyphicon glyphicon-list"></span>
+          </button>
           <a href="{{dataunit.toLowerCase() || 'primary'}}/{{$index}}">{{dataunit || 'PrimaryHDU'}}</a>
         </div>
       </div>

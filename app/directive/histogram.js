@@ -7,7 +7,6 @@ angular.module('LuminosityApp')
       restrict: 'E',
       replace: true,
       controller: function($scope, WorkspaceService) {
-        
         $scope.onAxis = function() {
           WorkspaceService.getColumn($scope.axis, $scope.chart);
         }

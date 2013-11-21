@@ -13,10 +13,18 @@ table.header {
 }
 
 .jumbotron {
-  padding-top: 80px;
+  padding-top: 60px;
   padding-bottom: 10px;
 }
 
 td.header-key {
   width: 200px;
+}
+
+.header-icon {
+  cursor: pointer;
+}
+
+.chart-selected {
+  border: 1px solid #0071e5;
 }
