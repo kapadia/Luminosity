@@ -13,7 +13,7 @@ angular.module('LuminosityApp')
         var height = width * (9 / 16);
         element[0].style.height = height + "px";
         
-        var margin = {top: 10, right: 30, bottom: 30, left: 30};
+        var margin = {top: 10, right: 30, bottom: 30, left: 60};
         width = width - margin.left - margin.right;
         height = height - margin.top - margin.bottom;
         
@@ -51,6 +51,8 @@ angular.module('LuminosityApp')
             .style("text-anchor", "end")
             .text("Count");
         
+        var hasData = false;
+        
         // Watch changes to axes values
         scope.$watch('axes.' + index, function() {
           var axis1 = scope.axes[index].axis1;
@@ -59,27 +61,44 @@ angular.module('LuminosityApp')
           
           // Get data from file
           WorkspaceService.getColumn(scope.axes[index].axis1, function(data) {
+            var extent, h, bar;
             
-            // Get the min and max values
-            var extent = WorkspaceService.getExtent(data);
+            // Get the min, max and histogram
+            // TODO: Bayesian Blocks?
+            extent = WorkspaceService.getExtent(data);
+            h = HistogramService.compute(data, extent[0], extent[1], 100);
             
-            // Get the histogram
-            var h = HistogramService.compute(data, extent[0], extent[1], 100);
-            
-            // Set axes domains
+            // Set axes domains and transition
             x.domain(extent);
             y.domain([0, d3.max(h)]);
+            svg.select(".x").transition().duration(500).call(xAxis);
+            svg.select(".y").transition().duration(500).call(yAxis);
             
-            var bar = svg.selectAll(".bar")
-                .data(h)
-              .enter().append("g")
-                .attr("class", "bar")
-                .attr("transform", function(d, i) { return "translate(" + x(extent[0] + i * h.dx) + "," + y(d) + ")"; });
-            
-            bar.append("rect")
+            if (hasData) {
+              bar = svg.selectAll(".bar")
+                    .data(h)
+                  .transition()
+                    .duration(500)
+                    .attr("transform", function(d, i) { return "translate(" + x(extent[0] + i * h.dx) + "," + y(d) + ")"; });
+              
+              bar.select("rect")
                 .attr("x", 1)
                 .attr("width", x(h.dx) - 1)
                 .attr("height", function(d) { return height - y(d); });
+            } else {
+              bar = svg.selectAll(".bar")
+                  .data(h)
+                .enter().append("g")
+                  .attr("class", "bar")
+                  .attr("transform", function(d, i) { return "translate(" + x(extent[0] + i * h.dx) + "," + y(d) + ")"; });
+                  
+              bar.append("rect")
+                  .attr("x", 1)
+                  .attr("width", x(h.dx) - 1)
+                  .attr("height", function(d) { return height - y(d); });
+            }
+            
+            hasData = true;
           })
         }, true)
       }
