@@ -6,17 +6,17 @@ angular.module('LuminosityApp')
     $scope.columns = WorkspaceService.getNumericalColumns($routeParams.index);
     
     // TODO: Angular constant?
-    var nChartsPerRow = 2;
     var maxCharts = 4;
     var naxes = {'histogram': 1, 'scatter2d': 2, 'scatter3d': 3};
     
     $scope.isDisabled = false;
     $scope.nCharts = 0;
+    $scope.nChartsPerRow = 2;
     $scope.selectedChart = null;
     
     // Store the values of the selected axes here
     // Initialize storage for chart axes
-    $scope.axes = [];
+    $scope.axes = {};
     for (var i = 0; i < maxCharts; i++) {
       $scope.axes[i] = {};
     }
@@ -25,13 +25,13 @@ angular.module('LuminosityApp')
       return WorkspaceService.charts.length;
     }
     $scope.getRows = function() {
-      var nRows = Math.ceil($scope.nCharts / nChartsPerRow);
+      var nRows = Math.ceil($scope.nCharts / $scope.nChartsPerRow);
       return new Array(nRows);
     }
     
     $scope.getChartsPerRow = function(index) {
-      var index = nChartsPerRow * index;
-      var charts = WorkspaceService.charts.slice(index, index + nChartsPerRow);
+      var index = $scope.nChartsPerRow * index;
+      var charts = WorkspaceService.charts.slice(index, index + $scope.nChartsPerRow);
       return charts;
     }
     
@@ -57,7 +57,13 @@ angular.module('LuminosityApp')
     }
     
     $scope.onChartSpace = function(index) {
+      // Change the selected chart
       $scope.selectedChart = index;
+      
+      // Update with selected axes
+      $scope.axis1 = $scope.axes[index].axis1;
+      $scope.axis2 = $scope.axes[index].axis2;
+      $scope.axis3 = $scope.axes[index].axis3;
     }
     
     

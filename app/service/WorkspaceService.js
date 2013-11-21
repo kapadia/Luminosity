@@ -77,11 +77,12 @@ angular.module('LuminosityApp')
       return dataunit.columns;
     }
     
-    workspace.getColumn = function(axis, chart) {
+    workspace.getColumn = function(axis, fn) {
       var dataunit = workspace.file.getDataUnit(workspace.index);
+      console.log(axis);
       
       dataunit.getColumn(axis, function(data) {
-        chart.plot(data);
+        fn.call(fn, data);
       });
     }
     
@@ -122,6 +123,36 @@ angular.module('LuminosityApp')
           });
         });
       });
+    }
+    
+    workspace.getExtent = function(arr) {
+      var index, max, min, value;
+      
+      index = arr.length;
+      while (index--) {
+        value = arr[index];
+        if (isNaN(value)) {
+          continue;
+        }
+        min = max = value;
+        break;
+      }
+      if (index === -1) {
+        return [NaN, NaN];
+      }
+      while (index--) {
+        value = arr[index];
+        if (isNaN(value)) {
+          continue;
+        }
+        if (value < min) {
+          min = value;
+        }
+        if (value > max) {
+          max = value;
+        }
+      }
+      return [min, max];
     }
     
     return workspace;

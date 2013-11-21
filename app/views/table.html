@@ -19,9 +19,9 @@
 </div>
 
 <div class="row" ng-repeat="row in getRows() track by $index">
-  <div ng-repeat="chart in getChartsPerRow($index) track by $index" ng-click="onChartSpace($parent.$index * getRows().length + $index)" class="well col-md-{{12 / getChartsPerRow($parent.$index).length}}" ng-class="{'chart-selected': selectedChart==($parent.$index * getRows().length + $index)}">
-    <histogram ng-if="chart=='histogram'"></histogram>
-    <scatter2d ng-if="chart=='scatter2d'"></scatter2d>
-    <scatter3d ng-if="chart=='scatter3d'"></scatter3d>
+  <div ng-repeat="chart in getChartsPerRow($index) track by $index" ng-click="onChartSpace($parent.$index * nChartsPerRow + $index)" class="well col-md-{{12 / getChartsPerRow($parent.$index).length}}" ng-class="{'chart-selected': selectedChart==($parent.$index * nChartsPerRow + $index)}">
+    <histogram ng-if="chart=='histogram'" data-index="{{$parent.$parent.$index * nChartsPerRow + $parent.$index}}"></histogram>
+    <scatter2d ng-if="chart=='scatter2d'" data-index="{{$parent.$parent.$index * nChartsPerRow + $parent.$index}}"></scatter2d>
+    <scatter3d ng-if="chart=='scatter3d'" data-index="{{$parent.$parent.$index * nChartsPerRow + $parent.$index}}"></scatter3d>
   </div>
 </div>
