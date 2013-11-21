@@ -7,15 +7,13 @@
 angular.module('LuminosityApp')
   .controller('NavCtrl', function ($scope, $http, $location, AppState) {
     
-    // NOTE: Bypass authentication during development
-    AppState.isAuthenticated = true;
-    $location.path('/workspace');
+    // // NOTE: Bypass authentication during development
+    // AppState.isAuthenticated = true;
+    // $location.path('/workspace');
     
     $scope.isAuthenticated = function() {
       return AppState.isAuthenticated;
     }
-    
-    return;
     
     // Check if online
     if (window.navigator.onLine) {

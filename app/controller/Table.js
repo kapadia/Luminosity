@@ -4,15 +4,22 @@ angular.module('LuminosityApp')
   .controller('TableCtrl', function ($scope, $compile, $routeParams, AppState, WorkspaceService) {
     
     $scope.columns = WorkspaceService.getNumericalColumns($routeParams.index);
-    $scope.naxes = {'histogram': [1], 'scatter2d': [1, 2], 'scatter3d': [1, 2, 3]};
     
     // TODO: Angular constant?
     var nChartsPerRow = 2;
     var maxCharts = 4;
+    var naxes = {'histogram': 1, 'scatter2d': 2, 'scatter3d': 3};
     
     $scope.isDisabled = false;
     $scope.nCharts = 0;
     $scope.selectedChart = null;
+    
+    // Store the values of the selected axes here
+    // Initialize storage for chart axes
+    $scope.axes = [];
+    for (var i = 0; i < maxCharts; i++) {
+      $scope.axes[i] = {};
+    }
     
     $scope.getNCharts = function() {
       return WorkspaceService.charts.length;
@@ -32,8 +39,15 @@ angular.module('LuminosityApp')
       return $scope.naxes[chartType];
     }
     
-    $scope.onAxis = function(index) {
-      console.log('onAxis', index);
+    $scope.onAxis = function() {
+      var chartIndex = $scope.selectedChart;
+      var chartType = WorkspaceService.charts[chartIndex];
+      
+      var axes = naxes[chartType];
+      for (var i = 1; i < axes + 1; i++) {
+        var key = 'axis' + i;
+        $scope.axes[chartIndex][key] = $scope[key];
+      }
     }
     
     $scope.onChart = function(type) {
