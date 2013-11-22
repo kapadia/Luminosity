@@ -1,9 +1,9 @@
 
 <div class="row">
   <div class="nav navbar-nav">
-    <select class="axis" ng-model="axis1" ng-change="onAxis()" ng-options="column as column for column in columns" ng-disabled="selectedChart==undefined"></select>
-    <select class="axis" ng-model="axis2" ng-change="onAxis()" ng-options="column as column for column in columns" ng-disabled="selectedChart==undefined"></select>
-    <select class="axis" ng-model="axis3" ng-change="onAxis()" ng-options="column as column for column in columns" ng-disabled="selectedChart==undefined"></select>
+    <select class="axis" ng-model="axis1" ng-change="onAxis()" ng-options="column as column for column in columns" ng-disabled="selectedChart==undefined || ndimensions < 1"></select>
+    <select class="axis" ng-model="axis2" ng-change="onAxis()" ng-options="column as column for column in columns" ng-disabled="selectedChart==undefined || ndimensions < 2"></select>
+    <select class="axis" ng-model="axis3" ng-change="onAxis()" ng-options="column as column for column in columns" ng-disabled="selectedChart==undefined || ndimensions < 3"></select>
   </div>
   <div class="nav navbar-nav navbar-right">
     <button type="button" class="btn btn-default btn-sm" ng-click="onChart('histogram')" ng-disabled="isDisabled">

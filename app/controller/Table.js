@@ -67,6 +67,7 @@ angular.module('LuminosityApp')
     $scope.onChartSpace = function(index) {
       // Change the selected chart
       $scope.selectedChart = index;
+      $scope.ndimensions = naxes[ WorkspaceService.charts[index] ];
       
       // Update with selected axes
       $scope.axis1 = $scope.axes[index].axis1;

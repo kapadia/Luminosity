@@ -10,6 +10,8 @@ angular.module('LuminosityApp')
         var aspectRatio, margin, x, y, xAxis, yAxis, svg, chartEl, xAxisEl, yAxisEl, width, height, index, hasData, extent, hist, bar, nbins;
         
         hasData = false;
+        
+        // TODO: Make dynamic (either BB, user set, or other means)
         nbins = 100;
         
         // Angular constant?
