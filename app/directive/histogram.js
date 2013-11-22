@@ -7,7 +7,7 @@ angular.module('LuminosityApp')
       restrict: 'E',
       replace: true,
       link: function postLink(scope, element, attrs) {
-        var aspectRatio, margin, x, y, xAxis, yAxis, svg, chartEl, xAxisEl, yAxisEl, width, height, index, hasData;
+        var aspectRatio, margin, x, y, xAxis, yAxis, svg, chartEl, xAxisEl, yAxisEl, width, height, index, hasData, extent, hist, bar;
         
         hasData = false;
         
@@ -56,6 +56,22 @@ angular.module('LuminosityApp')
             chartEl.attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
             xAxisEl.attr('transform', 'translate(0,' + height + ')').call(xAxis);
             
+            if (hasData) {
+              x.domain(extent);
+              y.domain([0, d3.max(hist)]);
+              xAxisEl.transition().duration(500).call(xAxis);
+              yAxisEl.transition().duration(500).call(yAxis);
+              
+              bar = chartEl.selectAll('.bar')
+                      .data(hist)
+                    .transition()
+                      .duration(500)
+                      .attr('transform', function(d, i) { return 'translate(' + x(extent[0] + i * hist.dx) + ',' + y(d) + ')'; });
+              bar.select('rect')
+                .attr('x', 1)
+                .attr('width', x(hist.dx) - 1)
+                .attr('height', function(d) { return height - y(d); });
+            }
           }, 0);
         });
         
@@ -68,7 +84,6 @@ angular.module('LuminosityApp')
           
           // Get data from file
           WorkspaceService.getColumn(axis1, function(data) {
-            var extent, hist, bar;
             
             // Get the min, max and histogram
             // TODO: Bayesian Blocks?
@@ -81,6 +96,7 @@ angular.module('LuminosityApp')
             xAxisEl.transition().duration(500).call(xAxis);
             yAxisEl.transition().duration(500).call(yAxis);
             
+            // TODO: Boolean is a little weird. Could provide spoof data until axis is chosen.
             if (hasData) {
               bar = chartEl.selectAll(".bar")
                     .data(hist)
