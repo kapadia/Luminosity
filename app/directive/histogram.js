@@ -7,9 +7,10 @@ angular.module('LuminosityApp')
       restrict: 'E',
       replace: true,
       link: function postLink(scope, element, attrs) {
-        var aspectRatio, margin, x, y, xAxis, yAxis, svg, chartEl, xAxisEl, yAxisEl, width, height, index, hasData, extent, hist, bar;
+        var aspectRatio, margin, x, y, xAxis, yAxis, svg, chartEl, xAxisEl, yAxisEl, width, height, index, hasData, extent, hist, bar, nbins;
         
         hasData = false;
+        nbins = 100;
         
         // Angular constant?
         aspectRatio = 9 / 16;
@@ -69,7 +70,7 @@ angular.module('LuminosityApp')
                       .attr('transform', function(d, i) { return 'translate(' + x(extent[0] + i * hist.dx) + ',' + y(d) + ')'; });
               bar.select('rect')
                 .attr('x', 1)
-                .attr('width', x(hist.dx) - 1)
+                .attr('width', width / nbins)
                 .attr('height', function(d) { return height - y(d); });
             }
           }, 0);
@@ -88,9 +89,10 @@ angular.module('LuminosityApp')
             // Get the min, max and histogram
             // TODO: Bayesian Blocks?
             extent = WorkspaceService.getExtent(data);
-            hist = HistogramService.compute(data, extent[0], extent[1], 100);
+            hist = HistogramService.compute(data, extent[0], extent[1], nbins);
             
             // Set axes domains and transition
+            console.log('extent', extent);
             x.domain(extent);
             y.domain([0, d3.max(hist)]);
             xAxisEl.transition().duration(500).call(xAxis);
@@ -106,9 +108,11 @@ angular.module('LuminosityApp')
                     
               bar.select("rect")
                 .attr("x", 1)
-                .attr("width", x(hist.dx) - 1)
+                .attr("width", width / nbins)
                 .attr("height", function(d) { return height - y(d); });
             } else {
+              console.log('rect width', x(hist.dx) - 1);
+              
               bar = chartEl.selectAll(".bar")
                   .data(hist)
                 .enter().append("g")
@@ -117,7 +121,7 @@ angular.module('LuminosityApp')
                 
               bar.append("rect")
                   .attr("x", 1)
-                  .attr("width", x(hist.dx) - 1)
+                  .attr("width", width / nbins)
                   .attr("height", function(d) { return height - y(d); });
             }
             hasData = true;

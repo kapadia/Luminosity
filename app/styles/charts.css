@@ -1,5 +1,6 @@
 .bar {
   fill: #0071e5;
+  stroke: #FFF;
 }
 
 .bar:hover {
