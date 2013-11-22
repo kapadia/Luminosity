@@ -50,11 +50,19 @@ angular.module('LuminosityApp')
       }
     }
     
+    // Add chart
     $scope.onChart = function(type) {
       WorkspaceService.charts.push(type);
       $scope.nCharts = WorkspaceService.charts.length;
       $scope.isDisabled = WorkspaceService.charts.length === maxCharts ? true : false;
+      
+      // // Broadcast added chart to existing charts
+      // $scope.$broadcast('chart-added');
     }
+    
+    $scope.$on('chart-ready', function() {
+      $scope.$broadcast('chart-added');
+    });
     
     $scope.onChartSpace = function(index) {
       // Change the selected chart
