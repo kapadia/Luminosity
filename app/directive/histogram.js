@@ -15,7 +15,7 @@ angular.module('LuminosityApp')
         aspectRatio = 9 / 16;
         
         // Set margin for D3 chart
-        margin = {top: 10, right: 30, bottom: 30, left: 60};
+        margin = {top: 10, right: 30, bottom: 20, left: 40};
         
         // Create axes
         x = d3.scale.linear();
@@ -26,8 +26,8 @@ angular.module('LuminosityApp')
         // Create SVG elements
         svg = d3.select(element[0]).append('svg');
         chartEl = svg.append('g').attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
-        xAxisEl = svg.append('g').attr('class', 'x axis');
-        yAxisEl = svg.append('g').attr('class', 'y axis');
+        xAxisEl = chartEl.append('g').attr('class', 'x axis');
+        yAxisEl = chartEl.append('g').attr('class', 'y axis');
         
         // Listen for when chart element is ready
         scope.$on('chart-added', function() {
@@ -82,7 +82,7 @@ angular.module('LuminosityApp')
             yAxisEl.transition().duration(500).call(yAxis);
             
             if (hasData) {
-              bar = svg.selectAll(".bar")
+              bar = chartEl.selectAll(".bar")
                     .data(hist)
                   .transition()
                     .duration(500)
@@ -93,7 +93,7 @@ angular.module('LuminosityApp')
                 .attr("width", x(hist.dx) - 1)
                 .attr("height", function(d) { return height - y(d); });
             } else {
-              bar = svg.selectAll(".bar")
+              bar = chartEl.selectAll(".bar")
                   .data(hist)
                 .enter().append("g")
                   .attr("class", "bar")
