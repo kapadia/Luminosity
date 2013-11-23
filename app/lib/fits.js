@@ -231,7 +231,7 @@
 
   })(Base);
 
-  FITS.version = '0.6.0';
+  FITS.version = '0.6.4';
 
   this.astro.FITS = FITS;
 
@@ -986,9 +986,14 @@
         descriptor = this.descriptors[index];
         accessor = this.accessors[index];
         elementByteLength = this.elementByteLengths[index];
-        elementByteOffset = this.elementByteLengths.slice(0, +(index - 1) + 1 || 9e9).reduce(function(a, b) {
-          return a + b;
-        });
+        elementByteOffset = this.elementByteLengths.slice(0, index);
+        if (elementByteOffset.length === 0) {
+          elementByteOffset = 0;
+        } else {
+          elementByteOffset = elementByteOffset.reduce(function(a, b) {
+            return a + b;
+          });
+        }
         column = this.typedArray[descriptor] != null ? new this.typedArray[descriptor](this.rows) : [];
         rowsPerIteration = ~~(this.maxMemory / this.rowByteSize);
         rowsPerIteration = Math.min(rowsPerIteration, this.rows);

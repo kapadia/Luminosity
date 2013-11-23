@@ -94,7 +94,6 @@ angular.module('LuminosityApp')
             hist = HistogramService.compute(data, extent[0], extent[1], nbins);
             
             // Set axes domains and transition
-            console.log('extent', extent);
             x.domain(extent);
             y.domain([0, d3.max(hist)]);
             xAxisEl.transition().duration(500).call(xAxis);
@@ -113,7 +112,6 @@ angular.module('LuminosityApp')
                 .attr("width", width / nbins)
                 .attr("height", function(d) { return height - y(d); });
             } else {
-              console.log('rect width', x(hist.dx) - 1);
               
               bar = chartEl.selectAll(".bar")
                   .data(hist)

@@ -3,8 +3,12 @@
   stroke: #FFF;
 }
 
-.bar:hover {
+.bar:hover, .dot:hover {
   fill: brown;
+}
+
+.dot {
+  fill: #0071e5;
 }
 
 .axis {

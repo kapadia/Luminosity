@@ -86,7 +86,8 @@ angular.module('LuminosityApp')
       });
     }
     
-    workspace.getTwoColumns = function(axis1, axis2, chart) {
+    // TODO: Implement efficient getColumns methods in fitsjs
+    workspace.getTwoColumns = function(axis1, axis2, fn) {
       var dataunit = workspace.file.getDataUnit(workspace.index);
       
       dataunit.getColumn(axis1, function(xData) {
@@ -99,7 +100,7 @@ angular.module('LuminosityApp')
             
             data.push(obj);
           }
-          chart.plot(data);
+          fn.call(fn, data);
         });
       });
     }
