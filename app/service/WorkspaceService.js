@@ -17,7 +17,6 @@ angular.module('LuminosityApp')
     // Set default parameters
     // TODO: This service encompasses entire file state. Might want to abstract this later.
     workspace.selectedHeader = 0;
-    workspace.nCharts = 0;
     workspace.charts = [];
     
     workspace.onFile = function(f) {

@@ -10,6 +10,7 @@ angular.module('LuminosityApp')
     var naxes = {'histogram': 1, 'scatter2d': 2, 'scatter3d': 3};
     
     $scope.isDisabled = false;
+    $scope.isRemoveDisabled = true;
     $scope.nCharts = 0;
     $scope.nChartsPerRow = 2;
     $scope.selectedChart = null;
@@ -55,9 +56,26 @@ angular.module('LuminosityApp')
       WorkspaceService.charts.push(type);
       $scope.nCharts = WorkspaceService.charts.length;
       $scope.isDisabled = WorkspaceService.charts.length === maxCharts ? true : false;
+    }
+    
+    // Remove chart
+    $scope.onChartRemove = function() {
+      var index = $scope.selectedChart;
       
-      // // Broadcast added chart to existing charts
-      // $scope.$broadcast('chart-added');
+      // Get selected chart and remove from service
+      WorkspaceService.charts.splice(index, 1);
+      $scope.nCharts -= 1;
+      
+      // Reset axes to null
+      $scope.axis1 = null;
+      $scope.axis2 = null;
+      $scope.axis3 = null;
+      $scope.axes[index] = {};
+      
+      $scope.selectedChart = undefined;
+      $scope.isRemoveDisabled = true;
+      
+      // TODO: Detach events in directive
     }
     
     $scope.$on('chart-ready', function() {
@@ -73,6 +91,9 @@ angular.module('LuminosityApp')
       $scope.axis1 = $scope.axes[index].axis1;
       $scope.axis2 = $scope.axes[index].axis2;
       $scope.axis3 = $scope.axes[index].axis3;
+      
+      // Update state of remove button
+      $scope.isRemoveDisabled = false;
     }
     
     

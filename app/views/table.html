@@ -6,6 +6,9 @@
     <select class="axis" ng-model="axis3" ng-change="onAxis()" ng-options="column as column for column in columns" ng-disabled="selectedChart==undefined || ndimensions < 3"></select>
   </div>
   <div class="nav navbar-nav navbar-right">
+    <button type="button" class="btn btn-danger btn-xs" ng-click="onChartRemove()" ng-disabled="isRemoveDisabled">
+      <span class="glyphicon glyphicon-remove-circle"></span> Remove
+    </button>
     <button type="button" class="btn btn-default btn-sm" ng-click="onChart('histogram')" ng-disabled="isDisabled">
       <span class="glyphicon glyphicon-stats"></span> Histogram
     </button>
