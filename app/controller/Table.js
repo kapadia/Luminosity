@@ -7,7 +7,7 @@ angular.module('LuminosityApp')
     
     // TODO: Angular constant?
     var maxCharts = 4;
-    var naxes = {'histogram': 1, 'scatter2d': 2, 'scatter3d': 3};
+    var naxes = {'histogram': 1, 'scatter2d': 2, 'hexagonal': 2, 'scatter3d': 3};
     
     $scope.isDisabled = false;
     $scope.isRemoveDisabled = true;
@@ -75,7 +75,7 @@ angular.module('LuminosityApp')
       $scope.selectedChart = undefined;
       $scope.isRemoveDisabled = true;
       
-      // TODO: Detach events in directive
+      // TODO: Detach events in directive?
     }
     
     $scope.$on('chart-ready', function() {

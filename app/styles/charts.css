@@ -25,3 +25,9 @@
 .x.axis path {
   display: none;
 }
+
+.hexagon {
+  fill: none;
+  stroke: #000;
+  stroke-width: .5px;
+}
