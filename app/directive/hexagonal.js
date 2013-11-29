@@ -7,12 +7,12 @@ angular.module('LuminosityApp')
       restrict: 'E',
       replace: true,
       link: function postLink(scope, element, attrs) {
-        var aspectRatio, margin, x, y, xAxis, yAxis, 
-            svg, color, hexbin, chartGroup, axesGroup, xAxisEl, yAxisEl,
-            width, height, index, hasData, xExtent, yExtent,
-            clipPathEl, groupEl, chartData, zoom, scale, initialRadius, radius,
-            axis1, axis2;
         
+        var hasData, aspectRatio, initialRadius, margin, x, y, xAxis, yAxis, color,
+            svg, chartGroup, axesGroup, plotGroup, xAxisGroup, yAxisGroup, width,
+            height, xExtent, yExtent, index, axis1, axis2, chartData, zoom;
+        
+        index = parseInt(attrs.index);
         hasData = false;
         
         // Angular constant?
@@ -37,53 +37,52 @@ angular.module('LuminosityApp')
         // Create SVG element and groups
         svg = d3.select(element[0]).append('svg');
         
-        // One group for all plotted points and clip path
+        // One group for clip path and chart
         chartGroup = svg.append('g')
           .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
         
         // Another group for axes
-        // Using two group helps when performing transforms during zoom and pan.
         axesGroup = svg.append('g')
           .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')');
         
-        // TODO: Create unique id
         chartGroup.append('clipPath')
-            .attr('id', 'clip')
+            .attr('id', 'clip' + index)
           .append('rect')
             .attr('class', 'mesh');
-        var plotGroup = chartGroup.append('g')
-              .attr("clip-path", "url(#clip)")
+        plotGroup = chartGroup.append('g')
+              .attr('clip-path', 'url(#clip' + index + ')')
               .attr("transform", "translate(0, 0)")
             .append('g')
               .attr("class", "chart");
         
-        xAxisEl = axesGroup.append('g').attr('class', 'x axis');
-        yAxisEl = axesGroup.append('g').attr('class', 'y axis');
+        xAxisGroup = axesGroup.append('g').attr('class', 'x axis');
+        yAxisGroup = axesGroup.append('g').attr('class', 'y axis');
         
         function onzoom() {
-          xAxisEl.call(xAxis);
-          yAxisEl.call(yAxis);
+          xAxisGroup.call(xAxis);
+          yAxisGroup.call(yAxis);
           plotGroup.attr("transform", "translate(" + d3.event.translate + ")scale(" + d3.event.scale + ")");
         }
         
         function onzoomend() {
-          var xt, yt;
+          var scale, radius, xt, yt, xmin, xmax, ymin, ymax, filteredData, hexbin;
           
           scale = zoom.scale();
           radius = initialRadius / scale;
           xt = zoom.translate()[0];
           yt = zoom.translate()[1];
           
-          var xmin = x.domain()[0];
-          var xmax = x.domain()[1];
-          var ymin = y.domain()[0];
-          var ymax = y.domain()[1];
+          xmin = x.domain()[0];
+          xmax = x.domain()[1];
+          ymin = y.domain()[0];
+          ymax = y.domain()[1];
           function isInBounds(obj) {
             var x = obj[axis1];
             var y = obj[axis2];
             return (x > xmin && x < xmax && y > ymin && y < ymax);
           }
-          var filtered = chartData.filter(isInBounds);
+          
+          filteredData = chartData.filter(isInBounds);
           hexbin = d3.hexbin()
               .size([width, height])
               .radius(radius)
@@ -92,7 +91,7 @@ angular.module('LuminosityApp')
           
           plotGroup.selectAll(".hexagon").remove();
           plotGroup.selectAll(".hexagon")
-              .data(hexbin(filtered))
+              .data(hexbin(filteredData))
             .enter().append("path")
               .attr("class", "hexagon")
               .attr("d", hexbin.hexagon())
@@ -104,19 +103,18 @@ angular.module('LuminosityApp')
         scope.$on('chart-added', function() {
           $timeout(function() {
             
-            // Get width and compute height
+            // Get width and compute height based on the aspect ratio
             width = element[0].offsetWidth;
             height = width * aspectRatio;
             element[0].style.height = height + 'px';
             
-            // Get new width and height
+            // Get new width and height accounting for margins
             width = width - margin.left - margin.right;
             height = height - margin.top - margin.bottom;
             
-            // Update axes
+            // Update range of axes 
             x.range([0, width]);
             y.range([height, 0]);
-            
             xAxis.scale(x);
             yAxis.scale(y);
             
@@ -130,19 +128,19 @@ angular.module('LuminosityApp')
               .attr('width', width)
               .attr('height', height);
             
-            xAxisEl.attr('transform', 'translate(0,' + height + ')').call(xAxis);
-            yAxisEl.call(yAxis);
+            xAxisGroup.attr('transform', 'translate(0,' + height + ')').call(xAxis);
+            yAxisGroup.call(yAxis);
             
+            // Redraw chart when another chart is added to layout
             if (hasData) {
               x.domain(xExtent);
               y.domain(yExtent);
-              xAxisEl.transition().duration(500).call(xAxis);
-              yAxisEl.transition().duration(500).call(yAxis);
+              xAxisGroup.transition().duration(500).call(xAxis);
+              yAxisGroup.transition().duration(500).call(yAxis);
               
               // Remove previous hexagons
-              groupEl.selectAll('.hexagon').remove();
-              
-              groupEl.selectAll('.hexagon')
+              plotGroup.selectAll(".hexagon").remove();
+              plotGroup.selectAll('.hexagon')
                   .data(hexbin(chartData))
                 .enter().append("path")
                   .attr('class', 'hexagon')
@@ -154,9 +152,9 @@ angular.module('LuminosityApp')
           }, 0);
         });
         
-        // Watch for model change on scope
-        index = parseInt(attrs.index);
+        // Watch for axes selection represented by model change on scope
         scope.$watch('axes.' + index, function() {
+          var hexbin;
           
           axis1 = scope.axes[index].axis1;
           axis2 = scope.axes[index].axis2;
@@ -165,19 +163,19 @@ angular.module('LuminosityApp')
           
           WorkspaceService.getTwoColumns(axis1, axis2, function(data) {
             
-            // Get min and max
+            // Get minimum and maximum
             xExtent = d3.extent(data, function(d) { return d[axis1]; });
             yExtent = d3.extent(data, function(d) { return d[axis2]; });
             
-            // Set axes domains and transition
-            x.domain(xExtent).range([0, width]);
-            y.domain(yExtent).range([height, 0]);
+            // Update domains of axes
+            x.domain(xExtent);
+            y.domain(yExtent);
             
             xAxis.scale(x);
             yAxis.scale(y);
             
-            xAxisEl.transition().duration(500).call(xAxis);
-            yAxisEl.transition().duration(500).call(yAxis);
+            xAxisGroup.transition().duration(500).call(xAxis);
+            yAxisGroup.transition().duration(500).call(yAxis);
             
             // Create hexbin object with accessor functions
             hexbin = d3.hexbin()
@@ -189,10 +187,8 @@ angular.module('LuminosityApp')
             // Make data accessible to other functions
             chartData = data;
             
-            // Remove previous hexagons
+            // Remove previous hexagons and plot
             plotGroup.selectAll('.hexagon').remove();
-            
-            // Create plot points
             plotGroup.selectAll('.hexagon')
                 .data(hexbin(chartData))
               .enter().append("path")
@@ -201,13 +197,13 @@ angular.module('LuminosityApp')
                 .attr('transform', function(d) { return "translate(" + d.x + "," + d.y + ")"; })
                 .style("fill", function(d) { return color(d.length); });
             
+            // Create zoom behaviour and attach to SVG
             zoom = d3.behavior.zoom()
                 .x(x)
                 .y(y)
                 .scaleExtent([1, 8])
                 .on("zoom", onzoom)
                 .on("zoomend", onzoomend);
-            
             svg.call(zoom);
             
             hasData = true;
@@ -218,9 +214,8 @@ angular.module('LuminosityApp')
         scope.$emit('chart-ready');
         
         // Clean up event handlers
-        scope.$on('$destroy', function() {
-          
-        });
+        scope.$on('$destroy', function() {});
+        
       }
       
     };
