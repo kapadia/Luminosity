@@ -15,10 +15,6 @@ angular.module('LuminosityApp')
         index = parseInt(attrs.index);
         hasData = false;
         
-        // Set default values
-        xt = yt = 0;
-        scale = 1;
-        
         // Angular constant?
         aspectRatio = 9 / 16;
         initialRadius = 8;
@@ -115,6 +111,10 @@ angular.module('LuminosityApp')
         scope.$on('chart-added', function() {
           $timeout(function() {
             
+            // Reset default values
+            xt = yt = 0;
+            scale = 1;
+            
             // Get width and compute height based on the aspect ratio
             width = element[0].offsetWidth;
             height = width * aspectRatio;
@@ -150,6 +150,7 @@ angular.module('LuminosityApp')
               xAxisGroup.transition().duration(500).call(xAxis);
               yAxisGroup.transition().duration(500).call(yAxis);
               
+              plotGroup.attr("transform", "translate(0, 0)");
               zoom
                 .x(x)
                 .y(y);
