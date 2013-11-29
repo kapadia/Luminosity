@@ -10,10 +10,14 @@ angular.module('LuminosityApp')
         
         var hasData, aspectRatio, initialRadius, margin, x, y, xAxis, yAxis, color,
             svg, chartGroup, axesGroup, plotGroup, xAxisGroup, yAxisGroup, width,
-            height, xExtent, yExtent, index, axis1, axis2, chartData, zoom;
+            height, xExtent, yExtent, index, axis1, axis2, chartData, zoom, xt, yt, scale;
         
         index = parseInt(attrs.index);
         hasData = false;
+        
+        // Set default values
+        xt = yt = 0;
+        scale = 1;
         
         // Angular constant?
         aspectRatio = 9 / 16;
@@ -58,6 +62,25 @@ angular.module('LuminosityApp')
         xAxisGroup = axesGroup.append('g').attr('class', 'x axis');
         yAxisGroup = axesGroup.append('g').attr('class', 'y axis');
         
+        function createHexbin(radius) {
+          return d3.hexbin()
+              .size([width, height])
+              .radius(radius)
+              .x(function(d) { return (x(d[axis1]) - xt) / scale; })
+              .y(function(d) { return (y(d[axis2]) - yt) / scale; });
+        }
+        
+        function createPlot(data, hexbin) {
+          plotGroup.selectAll('.hexagon').remove();
+          plotGroup.selectAll('.hexagon')
+              .data(hexbin(data))
+            .enter().append('path')
+              .attr('class', 'hexagon')
+              .attr('d', hexbin.hexagon())
+              .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
+              .style('fill', function(d) { return color(d.length); });
+        }
+        
         function onzoom() {
           xAxisGroup.call(xAxis);
           yAxisGroup.call(yAxis);
@@ -65,7 +88,7 @@ angular.module('LuminosityApp')
         }
         
         function onzoomend() {
-          var scale, radius, xt, yt, xmin, xmax, ymin, ymax, filteredData, hexbin;
+          var radius, xmin, xmax, ymin, ymax, filteredData, hexbin;
           
           scale = zoom.scale();
           radius = initialRadius / scale;
@@ -83,20 +106,9 @@ angular.module('LuminosityApp')
           }
           
           filteredData = chartData.filter(isInBounds);
-          hexbin = d3.hexbin()
-              .size([width, height])
-              .radius(radius)
-              .x(function(d) { return (x(d[axis1]) - xt) / scale; })
-              .y(function(d) { return (y(d[axis2]) - yt) / scale; });
           
-          plotGroup.selectAll(".hexagon").remove();
-          plotGroup.selectAll(".hexagon")
-              .data(hexbin(filteredData))
-            .enter().append("path")
-              .attr("class", "hexagon")
-              .attr("d", hexbin.hexagon())
-              .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-              .style("fill", function(d) { return color(d.length); });
+          hexbin = createHexbin(radius);
+          createPlot(filteredData, hexbin);
         }
         
         // Listen for when chart element is ready
@@ -138,15 +150,13 @@ angular.module('LuminosityApp')
               xAxisGroup.transition().duration(500).call(xAxis);
               yAxisGroup.transition().duration(500).call(yAxis);
               
-              // Remove previous hexagons
-              plotGroup.selectAll(".hexagon").remove();
-              plotGroup.selectAll('.hexagon')
-                  .data(hexbin(chartData))
-                .enter().append("path")
-                  .attr('class', 'hexagon')
-                  .attr('d', hexbin.hexagon())
-                  .attr('transform', function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-                  .style("fill", function(d) { return color(d.length); });
+              zoom
+                .x(x)
+                .y(y);
+              
+              var radius = initialRadius / scale;
+              var hexbin = createHexbin(radius);
+              createPlot(chartData, hexbin);
             }
             
           }, 0);
@@ -177,25 +187,11 @@ angular.module('LuminosityApp')
             xAxisGroup.transition().duration(500).call(xAxis);
             yAxisGroup.transition().duration(500).call(yAxis);
             
-            // Create hexbin object with accessor functions
-            hexbin = d3.hexbin()
-                      .size([width, height])
-                      .radius(initialRadius)
-                      .x(function(d) { return x(d[axis1]); })
-                      .y(function(d) { return y(d[axis2]); });
-            
             // Make data accessible to other functions
             chartData = data;
             
-            // Remove previous hexagons and plot
-            plotGroup.selectAll('.hexagon').remove();
-            plotGroup.selectAll('.hexagon')
-                .data(hexbin(chartData))
-              .enter().append("path")
-                .attr('class', 'hexagon')
-                .attr('d', hexbin.hexagon())
-                .attr('transform', function(d) { return "translate(" + d.x + "," + d.y + ")"; })
-                .style("fill", function(d) { return color(d.length); });
+            hexbin = createHexbin(initialRadius);
+            createPlot(chartData, hexbin);
             
             // Create zoom behaviour and attach to SVG
             zoom = d3.behavior.zoom()
