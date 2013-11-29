@@ -51,10 +51,11 @@ angular.module('LuminosityApp')
             .attr('id', 'clip')
           .append('rect')
             .attr('class', 'mesh');
-        chartGroup.append('g')
-          .attr("clip-path", "url(#clip)")
-          .attr("transform", "translate(0, 0)");
-        var plotGroup = chartGroup.append('g').attr("class", "chart");
+        var plotGroup = chartGroup.append('g')
+              .attr("clip-path", "url(#clip)")
+              .attr("transform", "translate(0, 0)")
+            .append('g')
+              .attr("class", "chart");
         
         xAxisEl = axesGroup.append('g').attr('class', 'x axis');
         yAxisEl = axesGroup.append('g').attr('class', 'y axis');
@@ -215,6 +216,11 @@ angular.module('LuminosityApp')
         
         // Broadcast that chart element is ready
         scope.$emit('chart-ready');
+        
+        // Clean up event handlers
+        scope.$on('$destroy', function() {
+          
+        });
       }
       
     };

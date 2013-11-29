@@ -74,6 +74,7 @@ angular.module('LuminosityApp')
       
       $scope.selectedChart = undefined;
       $scope.isRemoveDisabled = true;
+      $scope.isDisabled = WorkspaceService.charts.length === maxCharts ? true : false;
       
       // TODO: Detach events in directive?
     }
