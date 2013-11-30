@@ -94,7 +94,7 @@ angular.module('LuminosityApp')
                 .transition()
                   .duration(500)
                   .attr('cx', function(d) { return x(d[axis1]) })
-                  .attr('cy', function(d) { return y(d[axis2]) })
+                  .attr('cy', function(d) { return y(d[axis2]) });
             } else {
               chartEl.selectAll('.dot')
                   .data(data)
@@ -102,7 +102,7 @@ angular.module('LuminosityApp')
                 .attr('class', 'dot')
                 .attr('r', 1.5)
                 .attr('cx', function(d) { return x(d[axis1]) })
-                .attr('cy', function(d) { return y(d[axis2]) })
+                .attr('cy', function(d) { return y(d[axis2]) });
             }
             hasData = true;
             

@@ -17,7 +17,7 @@ angular.module('LuminosityApp')
         
         // Angular constant?
         aspectRatio = 9 / 16;
-        initialRadius = 8;
+        initialRadius = 6;
         
         // Set margin for D3 chart
         margin = {top: 10, right: 30, bottom: 20, left: 40};
@@ -30,7 +30,7 @@ angular.module('LuminosityApp')
         
         // Create colormap
         color = d3.scale.linear()
-            .domain([0, 40])
+            .domain([0, 50])
             .range(["white", "steelblue"])
             .interpolate(d3.interpolateLab);
         
@@ -68,13 +68,27 @@ angular.module('LuminosityApp')
         
         function createPlot(data, hexbin) {
           plotGroup.selectAll('.hexagon').remove();
-          plotGroup.selectAll('.hexagon')
-              .data(hexbin(data))
-            .enter().append('path')
-              .attr('class', 'hexagon')
-              .attr('d', hexbin.hexagon())
-              .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
-              .style('fill', function(d) { return color(d.length); });
+          plotGroup.selectAll('.dot').remove();
+          
+          // Determine chart type from data length
+          // NOTE: Length threshold should be parameter (angular constant?)
+          if (data.length > 8000) {
+            plotGroup.selectAll('.hexagon')
+                .data(hexbin(data))
+              .enter().append('path')
+                .attr('class', 'hexagon')
+                .attr('d', hexbin.hexagon())
+                .attr('transform', function(d) { return 'translate(' + d.x + ',' + d.y + ')'; })
+                .style('fill', function(d) { return color(d.length); });
+          } else {
+            plotGroup.selectAll('.dot')
+                .data(data)
+              .enter().append('circle')
+              .attr('class', 'dot')
+              .attr('r', 0.1)
+              .attr('cx', function(d) { return (x(d[axis1]) - xt) / scale; })
+              .attr('cy', function(d) { return (y(d[axis2]) - yt) / scale; });
+          }
         }
         
         function onzoom() {
@@ -88,19 +102,15 @@ angular.module('LuminosityApp')
           
           scale = zoom.scale();
           radius = initialRadius / scale;
-          xt = zoom.translate()[0];
-          yt = zoom.translate()[1];
+          xt = zoom.translate()[0], yt = zoom.translate()[1];
           
-          xmin = x.domain()[0];
-          xmax = x.domain()[1];
-          ymin = y.domain()[0];
-          ymax = y.domain()[1];
+          xmin = x.domain()[0], xmax = x.domain()[1];
+          ymin = y.domain()[0], ymax = y.domain()[1];
           function isInBounds(obj) {
-            var x = obj[axis1];
-            var y = obj[axis2];
+            var x, y;
+            x = obj[axis1], y = obj[axis2];
             return (x > xmin && x < xmax && y > ymin && y < ymax);
           }
-          
           filteredData = chartData.filter(isInBounds);
           
           hexbin = createHexbin(radius);
@@ -144,6 +154,7 @@ angular.module('LuminosityApp')
             yAxisGroup.call(yAxis);
             
             // Redraw chart when another chart is added to layout
+            // TODO: This resets the chart. Need to preserve the state.
             if (hasData) {
               x.domain(xExtent);
               y.domain(yExtent);
@@ -167,6 +178,7 @@ angular.module('LuminosityApp')
         scope.$watch('axes.' + index, function() {
           var hexbin;
           
+          // Check if axes are selected
           axis1 = scope.axes[index].axis1;
           axis2 = scope.axes[index].axis2;
           if (!axis1 || !axis2)
