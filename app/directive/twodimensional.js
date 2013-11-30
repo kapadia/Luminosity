@@ -1,9 +1,9 @@
 'use strict';
 
 angular.module('LuminosityApp')
-  .directive('hexagonal', function (WorkspaceService, $timeout) {
+  .directive('twodimensional', function (WorkspaceService, $timeout) {
     return {
-      templateUrl: '/views/hexagonal.html',
+      templateUrl: '/views/twodimensional.html',
       restrict: 'E',
       replace: true,
       link: function postLink(scope, element, attrs) {

@@ -12,14 +12,11 @@
     <button type="button" class="btn btn-default btn-sm" ng-click="onChart('histogram')" ng-disabled="isDisabled">
       <span class="glyphicon glyphicon-stats"></span> Histogram
     </button>
-    <button type="button" class="btn btn-default btn-sm" ng-click="onChart('scatter2d')" ng-disabled="isDisabled">
-      <span class="glyphicon glyphicon-stats"></span> Scatter 2D
-    </button>
-    <button type="button" class="btn btn-default btn-sm" ng-click="onChart('hexagonal')" ng-disabled="isDisabled">
-      <span class="glyphicon glyphicon-stats"></span> Hexagonal Binning
+    <button type="button" class="btn btn-default btn-sm" ng-click="onChart('twodimensional')" ng-disabled="isDisabled">
+      <span class="glyphicon glyphicon-stats"></span> 2 Dimensional
     </button>
     <button type="button" class="btn btn-default btn-sm" ng-click="onChart('scatter3d')" ng-disabled="isDisabled">
-      <span class="glyphicon glyphicon-stats"></span> Scatter 3D
+      <span class="glyphicon glyphicon-stats"></span> 3 Dimensional
     </button>
   </div>
 </div>
@@ -27,8 +24,7 @@
 <div class="row" ng-repeat="row in getRows() track by $index">
   <div ng-repeat="chart in getChartsPerRow($index) track by $index" ng-click="onChartSpace($parent.$index * nChartsPerRow + $index)" class="well col-md-{{12 / getChartsPerRow($parent.$index).length}}" ng-class="{'chart-selected': selectedChart==($parent.$index * nChartsPerRow + $index)}">
     <histogram ng-if="chart=='histogram'" data-index="{{$parent.$parent.$index * nChartsPerRow + $parent.$index}}"></histogram>
-    <scatter2d ng-if="chart=='scatter2d'" data-index="{{$parent.$parent.$index * nChartsPerRow + $parent.$index}}"></scatter2d>
-    <hexagonal ng-if="chart=='hexagonal'" data-index="{{$parent.$parent.$index * nChartsPerRow + $parent.$index}}"></hexagonal>
+    <twodimensional ng-if="chart=='twodimensional'" data-index="{{$parent.$parent.$index * nChartsPerRow + $parent.$index}}"></twodimensional>
     <scatter3d ng-if="chart=='scatter3d'" data-index="{{$parent.$parent.$index * nChartsPerRow + $parent.$index}}"></scatter3d>
   </div>
 </div>
