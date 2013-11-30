@@ -31,3 +31,8 @@
   stroke: #000;
   stroke-width: .1px;
 }
+
+.label {
+  font-size: 12px;
+  font-family: sans-serif;
+}

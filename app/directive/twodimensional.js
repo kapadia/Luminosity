@@ -58,6 +58,17 @@ angular.module('LuminosityApp')
         xAxisGroup = axesGroup.append('g').attr('class', 'x axis');
         yAxisGroup = axesGroup.append('g').attr('class', 'y axis');
         
+        xAxisGroup.append('text')
+          .attr('class', 'label')
+          .attr('y', -6)
+          .style('text-anchor', 'end');
+        yAxisGroup.append("text")
+          .attr("class", "label")
+          .attr("transform", "rotate(-90)")
+          .attr("y", 6)
+          .attr("dy", ".71em")
+          .style("text-anchor", "end");
+        
         function createHexbin(radius) {
           return d3.hexbin()
               .size([width, height])
@@ -151,6 +162,7 @@ angular.module('LuminosityApp')
               .attr('height', height);
             
             xAxisGroup.attr('transform', 'translate(0,' + height + ')').call(xAxis);
+            xAxisGroup.select('.label').attr('x', width);
             yAxisGroup.call(yAxis);
             
             // Redraw chart when another chart is added to layout
@@ -183,6 +195,10 @@ angular.module('LuminosityApp')
           axis2 = scope.axes[index].axis2;
           if (!axis1 || !axis2)
             return;
+          
+          console.log(xAxisGroup.select('label'));
+          xAxisGroup.select('.label').text(axis1);
+          yAxisGroup.select('.label').text(axis2);
           
           WorkspaceService.getTwoColumns(axis1, axis2, function(data) {
             
