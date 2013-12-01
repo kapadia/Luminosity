@@ -96,7 +96,7 @@ angular.module('LuminosityApp')
                 .data(data)
               .enter().append('circle')
               .attr('class', 'dot')
-              .attr('r', 0.1)
+              .attr('r', 0.5)
               .attr('cx', function(d) { return (x(d[axis1]) - xt) / scale; })
               .attr('cy', function(d) { return (y(d[axis2]) - yt) / scale; });
           }

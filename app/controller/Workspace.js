@@ -2,7 +2,6 @@
 
 angular.module('LuminosityApp')
   .controller('WorkspaceCtrl', function ($scope, $location, AppState, WorkspaceService) {
-    console.log('WorkspaceCtrl');
     
     //  TODO: Not secure right now. Could implement another cycle to server
     //        and place template behind authenticated endpoint.
@@ -31,8 +30,9 @@ angular.module('LuminosityApp')
     }
     
     $scope.onDataUnit = function(index, dataunit) {
+      console.log('onDataUnit');
+      
       // TODO: Call appropriate function depending on the dataunit
-      console.log(dataunit);
       $scope.columns = WorkspaceService.getColumnsFromDataUnit(index);
       $scope.isBintableSelected = true;
     }

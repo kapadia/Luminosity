@@ -155,5 +155,17 @@ angular.module('LuminosityApp')
       return [min, max];
     }
     
+    //
+    //  IMAGE methods
+    //
+    workspace.getImage = function(index, fn) {
+      var image = workspace.file.getDataUnit(index);
+      
+      image.getFrame(0, function(arr) {
+        var extent = image.getExtent(arr);
+        fn.call(fn, arr, image.width, image.height, extent[0], extent[1]);
+      });
+    }
+    
     return workspace;
   });

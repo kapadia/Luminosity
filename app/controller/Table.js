@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('LuminosityApp')
-  .controller('TableCtrl', function ($scope, $compile, $routeParams, AppState, WorkspaceService) {
+  .controller('TableCtrl', function ($scope, $routeParams, AppState, WorkspaceService) {
     
     $scope.columns = WorkspaceService.getNumericalColumns($routeParams.index);
     

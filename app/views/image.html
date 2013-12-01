@@ -1,1 +1,14 @@
-<p>This is the image view.</p>
+<rawimage>
+  <div class="row">
+    <div class="col-md-6 viewer"></div>
+    <div class="col-md-6 control">
+      <div class="row">
+        <select class="col-md-2 col-md-offset-1" ng-model="stretch" ng-change="onStretch()" ng-options="fn as fn for fn in stretches"></select>
+        <div class="col-md-8 col-md-offset-1">
+          <input type="range" ng-model="minimum" name="minimum" min="0" max="1000">
+          <input type="range" ng-model="maximum" name="maximum" min="0" max="1000">
+        </div>
+      </div>
+    </div>
+  </div>
+</rawimage>

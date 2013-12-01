@@ -1,0 +1,8 @@
+/* Link body */
+.together-button{
+  display: inline-block;
+  overflow: hidden;
+  position: relative;
+  margin-top: 12px;
+  cursor: pointer;
+}

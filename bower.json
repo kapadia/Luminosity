@@ -2,13 +2,12 @@
   "name": "Luminosity",
   "version": "0.0.0",
   "dependencies": {
-    "angular": "~1.2.0",
-    "angular-route": "~1.2.0",
-    "angular-cookies": "~1.2.0",
-    "d3": "~3.3.0"
+    "angular": "1.2.x",
+    "angular-route": "1.2.x",
+    "d3": "3.3.x"
   },
   "devDependencies": {
-    "angular-mocks": "~1.2.0",
-    "angular-scenario": "~1.2.0"
+    "angular-mocks": "1.2.x",
+    "angular-scenario": "1.2.x"
   }
 }

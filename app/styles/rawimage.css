@@ -1,0 +1,8 @@
+
+.viewer {
+  padding: 0;
+}
+
+input[type='range'] {
+  width: 100%;
+}
