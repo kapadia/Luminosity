@@ -21,7 +21,14 @@ angular.module('LuminosityApp')
           gMinimum = min, gRange = max - min;
           minimum = min, maximum = max;
           
-          rawView.loadImage('img', arr, width, height);
+          // Downsample image when larger than the maximum texture size
+          if (width > rawView.gl.getParameter(rawView.gl.MAX_TEXTURE_SIZE)) {
+            var downsampled = rawView.downsample(arr, width, height, 4);
+            rawView.loadImage('img', downsampled.arr, downsampled.width, downsampled.height);
+            console.log(downsampled.width, downsampled.height);
+          } else {
+            rawView.loadImage('img', arr, width, height);  
+          }
           rawView.setExtent(min, max);
           rawView.setStretch('linear');
         });
@@ -31,6 +38,7 @@ angular.module('LuminosityApp')
           rawView.setStretch(scope.stretch);
         });
         scope.$watch('colormap', function() {
+          console.log(scope.colormap);
           rawView.setColorMap(scope.colormap);
         });
         

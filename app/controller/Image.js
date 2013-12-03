@@ -10,5 +10,10 @@ angular.module('LuminosityApp')
     $scope.stretches = ['linear', 'logarithm', 'sqrt', 'arcsinh', 'power'];
     
     $scope.colormap = 'binary';
-    $scope.colormaps = rawimage.colormaps;
+    
+    var colormaps = Object.keys(rawimage.colormaps);
+    var index = colormaps.indexOf('base64');
+    colormaps.splice(index, 1);
+    
+    $scope.colormaps = colormaps;
   });

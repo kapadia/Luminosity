@@ -4,7 +4,7 @@
     <div class="col-md-6 control">
       <div class="row">
         <select class="col-md-6" ng-model="stretch" ng-change="onStretch()" ng-options="fn as fn for fn in stretches"></select>
-        <select class="col-md-6" ng-model="colormap" ng-change="onColorMap()" ng-options="cmap for (cmap, value) in colormaps"></select>
+        <select class="col-md-6" ng-model="colormap" ng-change="onColorMap()" ng-options="cmap for cmap in colormaps"></select>
       </div>
       <div class="row">
         <input class="col-md-12" type="range" ng-model="minimum" name="minimum" min="0" max="1000">
