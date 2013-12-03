@@ -9,4 +9,6 @@ angular.module('LuminosityApp')
     $scope.maximum = 1000;
     $scope.stretches = ['linear', 'logarithm', 'sqrt', 'arcsinh', 'power'];
     
+    $scope.colormap = 'binary';
+    $scope.colormaps = rawimage.colormaps;
   });
